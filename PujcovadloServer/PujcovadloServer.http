@@ -1,0 +1,6 @@
+@PujcovadloServer_HostAddress = http://localhost:5046
+
+GET {{PujcovadloServer_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
