@@ -1,6 +1,39 @@
 @PujcovadloServer_HostAddress = http://localhost:5046
 
-GET {{PujcovadloServer_HostAddress}}/weatherforecast/
+GET {{PujcovadloServer_HostAddress}}/api/items/
 Accept: application/json
+
+###
+GET {{PujcovadloServer_HostAddress}}/api/items/10
+Accept: application/json
+
+###
+
+POST {{PujcovadloServer_HostAddress}}/api/items/
+Content-Type: application/json
+
+{
+  "name": "Test item",
+  "description": "Popis testovacího itemu.",
+  "status": 3,
+  "parameters": "velikost 10",
+  "pricePerDay": 100,
+  "updatedAt": "2018-01-01T00:00:00"
+}
+
+###
+PUT {{PujcovadloServer_HostAddress}}/api/items/1
+Content-Type: application/json
+
+{
+  "name": "Úprava testovací položky",
+  "description": "Popis testovacího itemu.",
+  "status": 2,
+  "parameters": "velikost 12",
+  "pricePerDay": 120
+}
+
+###
+DELETE {{PujcovadloServer_HostAddress}}/api/items/1
 
 ###
