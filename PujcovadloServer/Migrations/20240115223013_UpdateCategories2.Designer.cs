@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PujcovadloServer.data;
 
@@ -10,9 +11,11 @@ using PujcovadloServer.data;
 namespace PujcovadloServer.Migrations
 {
     [DbContext(typeof(PujcovadloServerContext))]
-    partial class PujcovadloServerContextModelSnapshot : ModelSnapshot
+    [Migration("20240115223013_UpdateCategories2")]
+    partial class UpdateCategories2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

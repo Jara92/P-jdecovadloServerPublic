@@ -22,10 +22,12 @@ public class ItemsRepository
 
     public async Task<Item?> Get(int id)
     {
-        return await _dbSet.FirstOrDefaultAsync(m => m.Id == id);
+        return await _dbSet.
+           // Include(i => i.ItemCategories).
+            FirstOrDefaultAsync(m => m.Id == id);
     }
 
-    public async void Create(Item item)
+    public async Task Create(Item item)
     {
         item.CreatedAt = DateTime.Now;
 
@@ -33,7 +35,7 @@ public class ItemsRepository
         await _context.SaveChangesAsync();
     }
 
-    public async void Update(Item item)
+    public async Task Update(Item item)
     {
         item.UpdatedAt = DateTime.Now;
 
@@ -41,7 +43,7 @@ public class ItemsRepository
         await _context.SaveChangesAsync();
     }
 
-    public async void Delete(Item item)
+    public async Task Delete(Item item)
     {
         _context.Remove(item);
         await _context.SaveChangesAsync();

@@ -1,6 +1,6 @@
-using System.Text.RegularExpressions;
 using PujcovadloServer.Models;
 using PujcovadloServer.Repositories;
+using PujcovadloServer.Services;
 
 namespace PujcovadloServer.Facades;
 
@@ -13,31 +13,27 @@ public class ItemsFacade
         this._itemsRepository = _itemsRepository;
     }
     
-    public void CreateItem(Item item)
+    public async Task CreateItem(Item item)
     {
-        item.Alias = CreateUrlStub(item.Name);
+        item.Alias = UrlHelper.CreateUrlStub(item.Name);
         
-        _itemsRepository.Create(item);
+         await _itemsRepository.Create(item);
     }
     
-    public void UpdateItem(Item item)
+    public async Task UpdateItem(Item item)
     {
-        item.Alias = CreateUrlStub(item.Name);
+        item.Alias = UrlHelper.CreateUrlStub(item.Name);
         
-        _itemsRepository.Update(item);
+        await _itemsRepository.Update(item);
     }
-    
-    private  string CreateUrlStub(string input)
+
+    public async Task AddCategory(Item item, ItemCategory dbCategory)
     {
-        // Replace spaces with dashes, remove special characters, and convert to lowercase
-        string urlStub = Regex.Replace(input, @"[^a-zA-Z0-9]", "-").ToLower();
-        
-        // Remove consecutive dashes
-        urlStub = Regex.Replace(urlStub, @"-+", "-");
-        
-        // Remove leading and trailing dashes
-        urlStub = urlStub.Trim('-');
-        
-        return urlStub;
+        // Check if item already has this category.
+        if (! item.Categories.Any(c => c.Id == dbCategory.Id))
+        {
+            item.Categories.Add(dbCategory);
+            await _itemsRepository.Update(item);
+        }
     }
 }

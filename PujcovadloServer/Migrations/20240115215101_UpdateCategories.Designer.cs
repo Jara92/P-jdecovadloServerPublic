@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PujcovadloServer.data;
 
@@ -10,26 +11,24 @@ using PujcovadloServer.data;
 namespace PujcovadloServer.Migrations
 {
     [DbContext(typeof(PujcovadloServerContext))]
-    partial class PujcovadloServerContextModelSnapshot : ModelSnapshot
+    [Migration("20240115215101_UpdateCategories")]
+    partial class UpdateCategories
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.1")
-                .HasAnnotation("Proxies:ChangeTracking", false)
-                .HasAnnotation("Proxies:CheckEquality", false)
-                .HasAnnotation("Proxies:LazyLoading", true);
+            modelBuilder.HasAnnotation("ProductVersion", "8.0.1");
 
             modelBuilder.Entity("ItemItemCategory", b =>
                 {
-                    b.Property<int>("CategoriesId")
+                    b.Property<int>("ItemCategoriesId")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("ItemsId")
                         .HasColumnType("INTEGER");
 
-                    b.HasKey("CategoriesId", "ItemsId");
+                    b.HasKey("ItemCategoriesId", "ItemsId");
 
                     b.HasIndex("ItemsId");
 
@@ -121,7 +120,7 @@ namespace PujcovadloServer.Migrations
                 {
                     b.HasOne("PujcovadloServer.Models.ItemCategory", null)
                         .WithMany()
-                        .HasForeignKey("CategoriesId")
+                        .HasForeignKey("ItemCategoriesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

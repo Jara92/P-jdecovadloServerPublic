@@ -11,6 +11,7 @@ public class Item
     
     [Required]
     [StringLength(64, MinimumLength = 6)]
+    [RegularExpression(@"^[A-Z]+[a-zA-Z]+[0-9]*$")]
     public string Name { get; set; }
     
     [StringLength(64, MinimumLength = 1)]
@@ -31,6 +32,8 @@ public class Item
     public float? PurchasePrice { get; set; }
     
     public float? SellingPrice { get; set; }
+
+    public virtual ICollection<ItemCategory> Categories { get; } = new List<ItemCategory>();
     
     [ReadOnly(true)]
     public DateTime CreatedAt { get; set; } = DateTime.Now;

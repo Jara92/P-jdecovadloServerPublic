@@ -30,7 +30,9 @@ else
 }
 
 builder.Services.AddScoped<ItemsFacade>();
+builder.Services.AddScoped<ItemCategoriesFacade>();
 builder.Services.AddScoped<ItemsRepository>();
+builder.Services.AddScoped<ItemCategoriesRepository>();
 
 var app = builder.Build();
 
