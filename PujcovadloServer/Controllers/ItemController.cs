@@ -1,25 +1,38 @@
 using System.ComponentModel;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using PujcovadloServer.Exceptions;
 using PujcovadloServer.Facades;
 using PujcovadloServer.Models;
+using PujcovadloServer.Requests;
+using PujcovadloServer.Responses;
 using PujcovadloServer.Repositories;
+using PujcovadloServer.Repositories.Interfaces;
+using PujcovadloServer.Services;
+using PujcovadloServer.Services.Interfaces;
 
 namespace PujcovadloServer.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
-public class ItemsController : ControllerBase
+[Route("api/items")]
+public class ItemController : ControllerBase
 {
-    private readonly ItemsRepository _itemsRepository;
-    private readonly ItemsFacade _itemsFacade;
+    private readonly IMapper _mapper;
+    private readonly IItemRepository _itemsRepository;
+    private readonly ItemService _itemService;
+    private readonly ItemFacade _itemFacade;
     private readonly ItemCategoriesFacade _itemCategoriesFacade;
 
-    public ItemsController(ItemsRepository itemsRepository, ItemsFacade itemsFacade,
-        ItemCategoriesFacade itemCategoriesFacade)
+    public ItemController(IItemRepository itemsRepository, ItemFacade itemFacade,
+        ItemCategoriesFacade itemCategoriesFacade, IMapper mapper,
+        ItemService itemService)
     {
         _itemsRepository = itemsRepository;
-        _itemsFacade = itemsFacade;
+        _itemFacade = itemFacade;
         _itemCategoriesFacade = itemCategoriesFacade;
+        _mapper = mapper;
+        _itemService = itemService;
     }
 
     /**
@@ -28,11 +41,12 @@ public class ItemsController : ControllerBase
      * Returns all items.
      */
     [HttpGet]
-    public async Task<ActionResult<List<Item>>> Index()
+    public async Task<ActionResult<List<ItemResponse>>> Index()
     {
-        var items = await _itemsRepository.GetAll();
-
-        return Ok(items);
+        var items = await _itemService.GetAll();
+        var responseItems = _mapper.Map<List<ItemResponse>>(items);
+        
+        return Ok(responseItems);
     }
 
     /**
@@ -41,7 +55,7 @@ public class ItemsController : ControllerBase
      * Returns item with given id.
      */
     [HttpGet("{id}")]
-    public async Task<ActionResult<Item>> Get(int id)
+    public async Task<ActionResult<ItemResponse>> Get(int id)
     {
         var item = await _itemsRepository.Get(id);
 
@@ -49,8 +63,10 @@ public class ItemsController : ControllerBase
         {
             return NotFound($"Item with {id} not found.");
         }
+        
+        var responseItem = _mapper.Map<ItemResponse>(item);
 
-        return Ok(item);
+        return Ok(responseItem);
     }
 
     /**
@@ -59,15 +75,14 @@ public class ItemsController : ControllerBase
      * Creates new item.
      */
     [HttpPost]
-    public async Task<ActionResult<Item>> Create([FromBody] Item item)
+    public async Task<ActionResult<ItemResponse>> Create([FromBody] ItemRequest itemDto)
     {
-        var newItem = new Item();
-        FillNewData(newItem, item);
-
-        await _itemsFacade.CreateItem(newItem);
+        var newItem = _mapper.Map<Item>(itemDto);
+        
+        await _itemFacade.CreateItem(newItem);
 
         // generate response with location header
-        var response = Created($"/api/items/{newItem.Id}", newItem);
+        var response = Created($"/api/items/{newItem.Id}", _mapper.Map<ItemResponse>(newItem));
 
         return response;
     }
@@ -78,23 +93,29 @@ public class ItemsController : ControllerBase
      * Updates item with given id.
      */
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, [FromBody] Item item)
+    public async Task<IActionResult> Update(int id, [FromBody] ItemRequest itemDto)
     {
-        var oldItem = await _itemsRepository.Get(id);
-
-        if (item.Id != id)
+        // Check if item with given id exists
+        if (itemDto.Id != id)
         {
             return BadRequest("Id in url and body must be the same.");
         }
-
+        
+        // Get old item
+        var oldItem = await _itemService.Get(id);
         if (oldItem == null)
         {
             return NotFound($"Item with {id} not found.");
         }
 
-        FillNewData(oldItem, item);
-
-        await _itemsFacade.UpdateItem(oldItem);
+        try
+        {
+            await _itemFacade.UpdateItem(oldItem, itemDto);
+        }
+        catch(DbUpdateConcurrencyException)
+        {
+            return Conflict($"Item with {id} was updated in the meantime. Try again.");
+        }
 
         return Ok();
     }
@@ -107,12 +128,12 @@ public class ItemsController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var dbItem = await _itemsRepository.Get(id);
+        var dbItem = await _itemService.Get(id);
 
         if (dbItem == null)
             return NotFound($"Item with {id} not found.");
 
-        await _itemsRepository.Delete(dbItem);
+        await _itemService.Delete(dbItem);
 
         return NoContent();
     }
@@ -128,6 +149,7 @@ public class ItemsController : ControllerBase
         return Ok(item.Categories);
     }
 
+    // TODO REMOVE THIS FUCKING PIECE OF SHIT
     [HttpPost("{id}/categories")]
     public async Task<ActionResult<ItemCategory>> AddCategory(int id, [FromBody] ItemCategory category)
     {
@@ -142,22 +164,8 @@ public class ItemsController : ControllerBase
             return NotFound($"ItemCategory with {category.Id} not found.");
 
         // Add category to item
-        await _itemsFacade.AddCategory(item, dbCategory);
+        await _itemFacade.AddCategory(item, dbCategory);
 
         return Created($"/api/items/{id}/categories/{dbCategory.Id}", null);
-    }
-
-    private void FillNewData(Item item, Item newData)
-    {
-        var editableProperties = typeof(Item)
-            .GetProperties()
-            .Where(property => !Attribute.IsDefined(property, typeof(ReadOnlyAttribute)))
-            .ToList();
-
-        foreach (var property in editableProperties)
-        {
-            var newValue = property.GetValue(newData);
-            property.SetValue(item, newValue);
-        }
     }
 }

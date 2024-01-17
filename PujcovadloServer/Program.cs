@@ -1,8 +1,13 @@
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using PujcovadloServer.data;
 using PujcovadloServer.Facades;
+using PujcovadloServer.Models;
 using PujcovadloServer.Repositories;
+using PujcovadloServer.Repositories.Interfaces;
+using PujcovadloServer.Services;
+using PujcovadloServer.Services.Interfaces;
 
 //using PujcovadloServer.Data;
 
@@ -29,10 +34,23 @@ else
         options.UseSqlServer(builder.Configuration.GetConnectionString("ProductionMvcMovieContext")));*/
 }
 
-builder.Services.AddScoped<ItemsFacade>();
+builder.Services.AddScoped<IItemRepository, ItemRepository>();
+builder.Services.AddScoped<IItemCategoryRepository, ItemCategoryRepository>();
+
+builder.Services.AddScoped<ItemService>();
+builder.Services.AddScoped<ItemCategoryService>();
+
+builder.Services.AddScoped<ItemFacade>();
 builder.Services.AddScoped<ItemCategoriesFacade>();
-builder.Services.AddScoped<ItemsRepository>();
-builder.Services.AddScoped<ItemCategoriesRepository>();
+
+// AutoMapper configuration
+var config = new MapperConfiguration(cfg =>
+{
+    cfg.AddProfile<MappingProfile>();
+    cfg.AllowNullCollections = true;
+});
+//config.AssertConfigurationIsValid();
+builder.Services.AddSingleton<IMapper>(config.CreateMapper());
 
 var app = builder.Build();
 

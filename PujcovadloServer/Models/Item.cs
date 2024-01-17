@@ -4,11 +4,8 @@ using PujcovadloServer.Enums;
 
 namespace PujcovadloServer.Models;
 
-public class Item
+public class Item : BaseEntity
 {
-    [ReadOnly(true)]
-    public int Id { get; set; }
-    
     [Required]
     [StringLength(64, MinimumLength = 6)]
     [RegularExpression(@"^[A-Z]+[a-zA-Z]+[0-9]*$")]

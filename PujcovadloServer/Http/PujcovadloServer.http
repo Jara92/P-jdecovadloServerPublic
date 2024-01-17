@@ -4,7 +4,7 @@ GET {{PujcovadloServer_HostAddress}}/api/items/
 Accept: application/json
 
 ###
-GET {{PujcovadloServer_HostAddress}}/api/items/10
+GET {{PujcovadloServer_HostAddress}}/api/items/1
 Accept: application/json
 
 ###
@@ -34,7 +34,8 @@ PUT {{PujcovadloServer_HostAddress}}/api/items/1
 Content-Type: application/json
 
 {
-  "name": "Úprava testovací položky",
+  "id": 1,
+  "name": "Úprava testovací položky 3",
   "description": "Popis testovacího itemu.",
   "status": 2,
   "parameters": "velikost 12",

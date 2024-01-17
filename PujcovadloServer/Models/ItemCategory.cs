@@ -4,18 +4,16 @@ using System.Text.Json.Serialization;
 
 namespace PujcovadloServer.Models;
 
-public class ItemCategory
+public class ItemCategory : BaseEntity
 {
-    public int Id { get; set; }
-    
     [Required]
     [StringLength(32, MinimumLength = 4)]
-    public string Name { get; set; } = "";
+    public string Name { get; set; } = default!;
     
     [ReadOnly(true)]
-    public string Alias { get; set; } = "";
+    public string? Alias { get; set; }
     
-    public string Description { get; set; } = "";
+    public string Description { get; set; } = default!;
     
     public virtual ItemCategory? Parent { get; set; }
 

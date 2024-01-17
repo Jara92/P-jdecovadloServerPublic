@@ -1,21 +1,22 @@
-using System.ComponentModel;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using PujcovadloServer.Exceptions;
 using PujcovadloServer.Facades;
 using PujcovadloServer.Models;
-using PujcovadloServer.Repositories;
-using PujcovadloServer.Services;
+using PujcovadloServer.Repositories.Interfaces;
 
 namespace PujcovadloServer.Controllers;
 
 [ApiController]
 [Route("api/item-categories")]
-public class ItemCategoriesController : ControllerBase
+public class ItemCategoryController : ControllerBase
 {
-    private readonly ItemCategoriesRepository _itemCategoriesRepository;
+    private readonly ItemCategoriesFacade _itemCategoryFacade;
+    private readonly IItemCategoryRepository _itemCategoriesRepository;
 
-    public ItemCategoriesController(ItemCategoriesRepository itemCategoriesRepository)
+    public ItemCategoryController(ItemCategoriesFacade itemCategoriesFacade, IItemCategoryRepository itemCategoriesRepository)
     {
+        _itemCategoryFacade = itemCategoriesFacade;
         _itemCategoriesRepository = itemCategoriesRepository;
     }
 
@@ -58,14 +59,10 @@ public class ItemCategoriesController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] ItemCategory category)
     {
-        var newCategory = new ItemCategory();
-        FillNewData(newCategory, category);
-
-        newCategory.Alias = UrlHelper.CreateUrlStub(newCategory.Name);
-        await _itemCategoriesRepository.Create(newCategory);
+        await _itemCategoryFacade.Create(category);
 
         // generate response with location header
-        var response = Created($"/api/item-categories/{newCategory.Id}", newCategory);
+        var response = Created($"/api/item-categories/{category.Id}", category);
 
         return response;
     }
@@ -78,22 +75,24 @@ public class ItemCategoriesController : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, [FromBody] ItemCategory category)
     {
-        var oldCategory = await _itemCategoriesRepository.Get(id);
-
+        // Check that id in url and body are the same
         if (category.Id != id)
         {
             return BadRequest("Id in url and body must be the same.");
         }
 
-        if (oldCategory == null)
+        try
+        {
+            await _itemCategoryFacade.Update(category);
+        }
+        catch (EntityNotFoundException)
         {
             return NotFound($"ItemCategory with {id} not found.");
         }
-
-        FillNewData(oldCategory, category);
-
-        oldCategory.Alias = UrlHelper.CreateUrlStub(oldCategory.Name);
-        await _itemCategoriesRepository.Update(oldCategory);
+        catch (DbUpdateConcurrencyException)
+        {
+            return Conflict($"Concurrency exception. The item with id {id} has been updated in the meantime.");
+        }
 
         return Ok();
     }
@@ -109,7 +108,9 @@ public class ItemCategoriesController : ControllerBase
         var category = await _itemCategoriesRepository.Get(id);
 
         if (category == null)
+        {
             return NotFound($"ItemCategory with {id} not found.");
+        }
 
         await _itemCategoriesRepository.Delete(category);
 
@@ -127,19 +128,5 @@ public class ItemCategoriesController : ControllerBase
         }
 
         return Ok(category.Items.ToList());
-    }
-
-    private void FillNewData(ItemCategory category, ItemCategory newData)
-    {
-        var editableProperties = typeof(ItemCategory)
-            .GetProperties()
-            .Where(property => !Attribute.IsDefined(property, typeof(ReadOnlyAttribute)))
-            .ToList();
-
-        foreach (var property in editableProperties)
-        {
-            var newValue = property.GetValue(newData);
-            property.SetValue(category, newValue);
-        }
     }
 }

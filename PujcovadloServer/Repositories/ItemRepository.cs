@@ -1,15 +1,17 @@
 using Microsoft.EntityFrameworkCore;
 using PujcovadloServer.data;
+using PujcovadloServer.Exceptions;
 using PujcovadloServer.Models;
+using PujcovadloServer.Repositories.Interfaces;
 
 namespace PujcovadloServer.Repositories;
 
-public class ItemsRepository
+public class ItemRepository : ACrudRepository<Item>, IItemRepository
 {
     private readonly PujcovadloServerContext _context;
     private readonly DbSet<Item> _dbSet;
 
-    public ItemsRepository(PujcovadloServerContext context)
+    public ItemRepository(PujcovadloServerContext context) : base(context)
     {
         _context = context;
         _dbSet = context.Item;
@@ -23,7 +25,7 @@ public class ItemsRepository
     public async Task<Item?> Get(int id)
     {
         return await _dbSet.
-           // Include(i => i.ItemCategories).
+            // Include(i => i.ItemCategories).
             FirstOrDefaultAsync(m => m.Id == id);
     }
 
@@ -37,6 +39,17 @@ public class ItemsRepository
 
     public async Task Update(Item item)
     {
+        var oldItem = await Get(item.Id);
+
+        if (oldItem == null)
+        {
+            throw new EntityNotFoundException();
+        }
+
+        // Update only changed values.
+        _context.Entry(oldItem).CurrentValues.SetValues(item);
+
+        // Update timestamps.
         item.UpdatedAt = DateTime.Now;
 
         _context.Update(item);
