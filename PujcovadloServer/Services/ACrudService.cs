@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using PujcovadloServer.Exceptions;
 using PujcovadloServer.Repositories;
 using PujcovadloServer.Repositories.Interfaces;
 using PujcovadloServer.Services.Interfaces;
@@ -24,9 +25,12 @@ public abstract class ACrudService<T> : ICrudService<T> where T : class
         return await _repository.GetAll();
     }
 
-    public virtual async Task<T?> Get(int id)
+    public virtual async Task<T?> Get(int id, bool track = true)
     {
-        return await _repository.Get(id);
+        if(track)
+            return await _repository.Get(id);
+        else
+            return await _repository.GetUntracked(id);
     }
 
     public virtual async Task Create(T entity)
@@ -37,6 +41,16 @@ public abstract class ACrudService<T> : ICrudService<T> where T : class
     public virtual async Task Update(T entity)
     {
         await _repository.Update(entity);
+    }
+    
+    public virtual async Task Delete(int id)
+    {
+        var entity = await _repository.Get(id);
+        
+        if(entity is null)
+            throw new EntityNotFoundException($"Entity with id {id} not found.");
+
+        await Delete(entity);
     }
 
     public virtual async Task Delete(T entity)

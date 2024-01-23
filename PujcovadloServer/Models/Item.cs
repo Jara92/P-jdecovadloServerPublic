@@ -40,4 +40,6 @@ public class Item : BaseEntity
     
     [ReadOnly(true)]
     public DateTime? ApprovedAt { get; set; }
+
+    [ReadOnly(true)] public DateTime? DeletedAt { get; set; }
 }

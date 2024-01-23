@@ -16,20 +16,9 @@ public class ItemResponse
     
     public ItemStatus Status { get; set; } = ItemStatus.Public;
     
-    public string Parameters { get; set; } = "";
-    
     public float PricePerDay { get; set; }
     
-    public float? RefundableDeposit { get; set; }
-    
-    public float? SellingPrice { get; set; }
-
-    // todo make DTOs
-    public virtual ICollection<ItemCategoryResponse> Categories { get; } = new List<ItemCategoryResponse>();
-    
-    public DateTime CreatedAt { get; set; } = DateTime.Now;
-    
-    public DateTime? UpdatedAt { get; set; }
-    
-    public DateTime? ApprovedAt { get; set; }
+    //public string? Href { get; set; }
+    public IList<LinkResponse> Links { get; private set; } = new List<LinkResponse>();
+ 
 }

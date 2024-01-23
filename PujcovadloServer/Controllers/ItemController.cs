@@ -11,6 +11,7 @@ using PujcovadloServer.Repositories;
 using PujcovadloServer.Repositories.Interfaces;
 using PujcovadloServer.Services;
 using PujcovadloServer.Services.Interfaces;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace PujcovadloServer.Controllers;
 
@@ -23,16 +24,18 @@ public class ItemController : ControllerBase
     private readonly ItemService _itemService;
     private readonly ItemFacade _itemFacade;
     private readonly ItemCategoriesFacade _itemCategoriesFacade;
+    private readonly LinkGenerator _urlHelper;
 
     public ItemController(IItemRepository itemsRepository, ItemFacade itemFacade,
         ItemCategoriesFacade itemCategoriesFacade, IMapper mapper,
-        ItemService itemService)
+        ItemService itemService, LinkGenerator urlHelper)
     {
         _itemsRepository = itemsRepository;
         _itemFacade = itemFacade;
         _itemCategoriesFacade = itemCategoriesFacade;
         _mapper = mapper;
         _itemService = itemService;
+        _urlHelper = urlHelper;
     }
 
     /**
@@ -44,8 +47,17 @@ public class ItemController : ControllerBase
     public async Task<ActionResult<List<ItemResponse>>> Index()
     {
         var items = await _itemService.GetAll();
+
         var responseItems = _mapper.Map<List<ItemResponse>>(items);
-        
+
+        // Hateos links
+        foreach (var item in responseItems)
+        {
+            item.Links.Add(new LinkResponse(
+                _urlHelper.GetUriByAction(HttpContext, nameof(this.Get), values: new { item.Id }), "SELF", "GET"));
+        }
+
+
         return Ok(responseItems);
     }
 
@@ -54,17 +66,19 @@ public class ItemController : ControllerBase
      *
      * Returns item with given id.
      */
-    [HttpGet("{id}")]
-    public async Task<ActionResult<ItemResponse>> Get(int id)
+    [HttpGet("{id}", Name = nameof(Get))]
+    public async Task<ActionResult<ItemDetailResponse>> Get(int id)
     {
-        var item = await _itemsRepository.Get(id);
+        var item = await _itemService.Get(id);
 
         if (item == null)
-        {
             return NotFound($"Item with {id} not found.");
-        }
-        
-        var responseItem = _mapper.Map<ItemResponse>(item);
+
+        var responseItem = _mapper.Map<ItemDetailResponse>(item);
+
+        // Hateos links
+        responseItem.Links.Add(new LinkResponse(
+            _urlHelper.GetUriByAction(HttpContext, nameof(this.Index)), "LIST", "GET"));
 
         return Ok(responseItem);
     }
@@ -75,16 +89,12 @@ public class ItemController : ControllerBase
      * Creates new item.
      */
     [HttpPost]
-    public async Task<ActionResult<ItemResponse>> Create([FromBody] ItemRequest itemDto)
+    public async Task<ActionResult<ItemResponse>> Create([FromBody] ItemRequest request)
     {
-        var newItem = _mapper.Map<Item>(itemDto);
-        
-        await _itemFacade.CreateItem(newItem);
+        var newItem = await _itemFacade.CreateItem(request);
 
         // generate response with location header
-        var response = Created($"/api/items/{newItem.Id}", _mapper.Map<ItemResponse>(newItem));
-
-        return response;
+        return Created($"/api/items/{newItem.Id}", _mapper.Map<ItemResponse>(newItem));
     }
 
     /**
@@ -93,26 +103,23 @@ public class ItemController : ControllerBase
      * Updates item with given id.
      */
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, [FromBody] ItemRequest itemDto)
+    public async Task<IActionResult> Update(int id, [FromBody] ItemRequest request)
     {
         // Check if item with given id exists
-        if (itemDto.Id != id)
+        if (request.Id != id)
         {
             return BadRequest("Id in url and body must be the same.");
-        }
-        
-        // Get old item
-        var oldItem = await _itemService.Get(id);
-        if (oldItem == null)
-        {
-            return NotFound($"Item with {id} not found.");
         }
 
         try
         {
-            await _itemFacade.UpdateItem(oldItem, itemDto);
+            await _itemFacade.UpdateItem(request);
         }
-        catch(DbUpdateConcurrencyException)
+        catch (EntityNotFoundException)
+        {
+            return NotFound($"Item with {id} was not found.");
+        }
+        catch (DbUpdateConcurrencyException)
         {
             return Conflict($"Item with {id} was updated in the meantime. Try again.");
         }
@@ -128,12 +135,14 @@ public class ItemController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var dbItem = await _itemService.Get(id);
-
-        if (dbItem == null)
-            return NotFound($"Item with {id} not found.");
-
-        await _itemService.Delete(dbItem);
+        try
+        {
+            await _itemFacade.DeleteItem(id);
+        }
+        catch (EntityNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
 
         return NoContent();
     }

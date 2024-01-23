@@ -35,7 +35,7 @@ Content-Type: application/json
 
 {
   "id": 1,
-  "name": "Úprava testovací položky 3",
+  "name": "Úprava testovací položky 16",
   "description": "Popis testovacího itemu.",
   "status": 2,
   "parameters": "velikost 12",

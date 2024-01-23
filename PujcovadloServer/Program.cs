@@ -1,15 +1,10 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using PujcovadloServer.data;
 using PujcovadloServer.Facades;
-using PujcovadloServer.Models;
 using PujcovadloServer.Repositories;
 using PujcovadloServer.Repositories.Interfaces;
 using PujcovadloServer.Services;
-using PujcovadloServer.Services.Interfaces;
-
-//using PujcovadloServer.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -19,7 +19,9 @@ public class ItemRequest
     public float? RefundableDeposit { get; set; }
     
     public float? SellingPrice { get; set; }
+    
+    public float? PurchasePrice { get; set; }
 
     // todo make DTOs
-    public virtual ICollection<ItemCategory> Categories { get; } = new List<ItemCategory>();
+    public virtual ICollection<ItemCategoryRequest> Categories { get; } = new List<ItemCategoryRequest>();
 }

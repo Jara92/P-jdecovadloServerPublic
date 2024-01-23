@@ -1,10 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using PujcovadloServer.data;
+using PujcovadloServer.Models;
 using PujcovadloServer.Repositories.Interfaces;
 
 namespace PujcovadloServer.Repositories
 {
-    public abstract class ACrudRepository<T> : ICrudRepository<T> where T : class
+    public abstract class ACrudRepository<T> : ICrudRepository<T> where T : BaseEntity
     {
         protected readonly PujcovadloServerContext _context;
         protected readonly DbSet<T> _dbSet;
@@ -23,6 +24,11 @@ namespace PujcovadloServer.Repositories
         public virtual async Task<T?> Get(int id)
         {
             return await _dbSet.FindAsync(id);
+        }
+        
+        public virtual async Task<T?> GetUntracked(int id)
+        {
+            return await _dbSet.AsNoTracking().FirstOrDefaultAsync(e => e.Id == id);
         }
 
         public virtual async Task Create(T entity)
