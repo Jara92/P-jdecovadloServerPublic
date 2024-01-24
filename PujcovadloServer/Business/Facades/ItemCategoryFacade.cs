@@ -1,34 +1,34 @@
 using PujcovadloServer.Business.Entities;
-using PujcovadloServer.Business.Interfaces;
+using PujcovadloServer.Business.Services;
 using PujcovadloServer.Helpers;
 
 namespace PujcovadloServer.Business.Facades;
 
 public class ItemCategoryFacade
 {
-    private readonly IItemCategoryRepository _itemCategoriesRepository;
+    private readonly ItemCategoryService _itemCategoryService;
 
-    public ItemCategoryFacade(IItemCategoryRepository itemCategoriesRepository)
+    public ItemCategoryFacade(ItemCategoryService itemCategoryService)
     {
-        _itemCategoriesRepository = itemCategoriesRepository;
+        _itemCategoryService = itemCategoryService;
     }
 
     public async Task<ItemCategory?> Get(int id)
     {
-        return await _itemCategoriesRepository.Get(id);
+        return await _itemCategoryService.Get(id);
     }
 
     public async Task Create(ItemCategory newCategory)
     {
         newCategory.Alias = UrlHelper.CreateUrlStub(newCategory.Name);
         
-        await _itemCategoriesRepository.Create(newCategory);
+        await _itemCategoryService.Create(newCategory);
     }
 
     public async Task Update(ItemCategory category)
     {
         category.Alias = UrlHelper.CreateUrlStub(category.Name);
         
-        await _itemCategoriesRepository.Update(category);
+        await _itemCategoryService.Update(category);
     }
 }
