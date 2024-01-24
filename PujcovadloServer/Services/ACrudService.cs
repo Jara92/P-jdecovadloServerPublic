@@ -2,6 +2,7 @@ using System.ComponentModel;
 using PujcovadloServer.Exceptions;
 using PujcovadloServer.Filters;
 using PujcovadloServer.Lib;
+using PujcovadloServer.Models;
 using PujcovadloServer.Repositories;
 using PujcovadloServer.Repositories.Interfaces;
 using PujcovadloServer.Services.Interfaces;
@@ -13,16 +14,16 @@ namespace PujcovadloServer.Services;
 /// Implements all CRUD base methods.
 /// </summary>
 /// <typeparam name="T">Managed entity</typeparam>
-public abstract class ACrudService<T> : ICrudService<T> where T : class
+public abstract class ACrudService<T, G> : ICrudService<T, G> where T : BaseEntity where G : BaseFilter
 {
-    protected readonly ICrudRepository<T> _repository;
+    protected readonly ICrudRepository<T, G> _repository;
 
-    protected ACrudService(ICrudRepository<T> repository)
+    protected ACrudService(ICrudRepository<T, G> repository)
     {
         _repository = repository;
     }
 
-    public virtual async Task<PaginatedList<T>> GetAll(BaseFilter filter)
+    public virtual async Task<PaginatedList<T>> GetAll(G filter)
     {
         return await _repository.GetAll(filter);
     }

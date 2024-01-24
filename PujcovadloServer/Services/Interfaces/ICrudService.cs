@@ -3,9 +3,9 @@ using PujcovadloServer.Lib;
 
 namespace PujcovadloServer.Services.Interfaces;
 
-public interface ICrudService<T>
+public interface ICrudService<T, G> where T : class where G : BaseFilter
 {
-    public Task<PaginatedList<T>> GetAll(BaseFilter filter);
+    public Task<PaginatedList<T>> GetAll(G filter);
 
     public Task<T?> Get(int id, bool track = true);
 

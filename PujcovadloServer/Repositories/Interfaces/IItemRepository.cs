@@ -4,7 +4,7 @@ using PujcovadloServer.Models;
 
 namespace PujcovadloServer.Repositories.Interfaces;
 
-public interface IItemRepository : ICrudRepository<Item>
+public interface IItemRepository : ICrudRepository<Item, ItemFilter>
 {
-    public Task<PaginatedList<Item>> GetAll(ItemFilter filter);
+   
 }

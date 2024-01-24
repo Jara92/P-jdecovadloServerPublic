@@ -7,7 +7,7 @@ using PujcovadloServer.Repositories.Interfaces;
 
 namespace PujcovadloServer.Repositories
 {
-    public abstract class ACrudRepository<T> : ICrudRepository<T> where T : BaseEntity
+    public abstract class ACrudRepository<T, G> : ICrudRepository<T, G> where T : BaseEntity where G: BaseFilter
     {
         protected readonly PujcovadloServerContext _context;
         protected readonly DbSet<T> _dbSet;
@@ -18,12 +18,12 @@ namespace PujcovadloServer.Repositories
             _dbSet = context.Set<T>();
         }
 
-        public virtual async Task<PaginatedList<T>> GetAll(BaseFilter filter)
+        public virtual async Task<PaginatedList<T>> GetAll(G filter)
         {
             return await GetAll(_dbSet.AsQueryable(), filter);
         }
 
-        protected virtual async Task<PaginatedList<T>> GetAll(IQueryable<T> baseQuery, BaseFilter filter)
+        protected virtual async Task<PaginatedList<T>> GetAll(IQueryable<T> baseQuery, G filter)
         {
             return await PaginatedList<T>.CreateAsync(baseQuery, filter.Page, filter.PageSize);
         }

@@ -8,7 +8,7 @@ using PujcovadloServer.Repositories.Interfaces;
 
 namespace PujcovadloServer.Repositories;
 
-public class ItemRepository : ACrudRepository<Item>, IItemRepository
+public class ItemRepository : ACrudRepository<Item, ItemFilter>, IItemRepository
 {
     private readonly PujcovadloServerContext _context;
     private readonly DbSet<Item> _dbSet;
