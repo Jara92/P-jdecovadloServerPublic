@@ -1,10 +1,10 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using PujcovadloServer.data;
-using PujcovadloServer.Facades;
-using PujcovadloServer.Repositories;
-using PujcovadloServer.Repositories.Interfaces;
-using PujcovadloServer.Services;
+using PujcovadloServer.Business.Facades;
+using PujcovadloServer.Business.Interfaces;
+using PujcovadloServer.Business.Services;
+using PujcovadloServer.Data;
+using PujcovadloServer.Data.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -62,3 +62,8 @@ app.UseHttpsRedirection();
 app.MapControllers();
 
 app.Run();
+
+namespace PujcovadloServer
+{
+    public partial class Program {}
+}

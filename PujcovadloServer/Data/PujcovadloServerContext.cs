@@ -1,11 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using PujcovadloServer.Models;
+using PujcovadloServer.Business.Entities;
 
-namespace PujcovadloServer.data
+namespace PujcovadloServer.Data
 {
     public class PujcovadloServerContext : DbContext
     {
@@ -14,8 +10,8 @@ namespace PujcovadloServer.data
         {
         }
 
-        public DbSet<PujcovadloServer.Models.Item> Item { get; set; } = default!;
-        public DbSet<PujcovadloServer.Models.ItemCategory> ItemCategory { get; set; } = default!;
+        public DbSet<Item> Item { get; set; } = default!;
+        public DbSet<ItemCategory> ItemCategory { get; set; } = default!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

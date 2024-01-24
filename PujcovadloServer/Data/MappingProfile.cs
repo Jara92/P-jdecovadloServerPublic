@@ -1,9 +1,9 @@
 using AutoMapper;
-using PujcovadloServer.Models;
+using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Requests;
 using PujcovadloServer.Responses;
 
-namespace PujcovadloServer.data;
+namespace PujcovadloServer.Data;
 
 public class MappingProfile : Profile
 {

@@ -1,6 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using PujcovadloServer.Enums;
-using PujcovadloServer.Models;
 
 namespace PujcovadloServer.Responses;
 
