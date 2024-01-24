@@ -25,12 +25,16 @@ public class ItemCategoryController : ACrudController
         _urlHelper = linkGenerator;
     }
 
-    /**
-     * GET /api/item-categories
-     *
-     * Returns all items.
-     */
+    /// <summary>
+    /// Returns paginated list of categories by given filter.
+    /// </summary>
+    /// <param name="filter">Filter</param>
+    /// <returns></returns>
+    /// <response code="200">Returns paginated list of categories.</response>
+    /// <response code="400">If filter input is invalid.</response>
     [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<List<ItemCategoryResponse>>> Index([FromQuery]ItemCategoryFilter filter)
     {
         // get categories by filter
@@ -61,12 +65,16 @@ public class ItemCategoryController : ACrudController
         return Ok(response);
     }
 
-    /**
-     * GET /api/item-categories/{id}
-     *
-     * Returns item with given id.
-     */
+    /// <summary>
+    /// Returns category by given id.
+    /// </summary>
+    /// <param name="id">Categorie's id.</param>
+    /// <returns></returns>
+    /// <response code="200">Returns category.</response>
+    /// <response code="404">If category with given id is not found.</response>
     [HttpGet("{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ItemCategoryResponse>> Get(int id)
     {
         // Get the category

@@ -29,8 +29,8 @@ public class ItemRepository : ACrudRepository<Item, ItemFilter>, IItemRepository
             query = query.Where(i => i.Status == filter.Status);
         
         // Filter by category
-        if(filter.Category != null)
-            query = query.Where(i => i.Categories.Contains(filter.Category));
+        if(filter.CategoryId != null)
+            query = query.Where(i => i.Categories.Any(c => c.Id == filter.CategoryId));
         
         // Search by name or description
         if(filter.Search != null)

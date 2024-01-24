@@ -19,11 +19,24 @@ public class BaseFilter
         return new BaseFilter(this);
     }
     
+    /// <summary>
+    /// Page number.
+    /// </summary>
     public int Page { get; set; } = 1;
     
+    /// <summary>
+    /// Page size.
+    /// </summary>
     public int PageSize { get; set; } = 2;
     
+    /// <summary>
+    /// Column to sort the result by.
+    /// </summary>
     public string? Sortby { get; set; } = "Id";
     
+    /// <summary>
+    /// Sort direction.
+    /// True = ascending, false = descending.
+    /// </summary>
     public bool? SortOrder { get; set; } = true;
 }

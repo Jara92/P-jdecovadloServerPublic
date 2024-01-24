@@ -5,6 +5,7 @@ using PujcovadloServer.Business.Interfaces;
 using PujcovadloServer.Business.Services;
 using PujcovadloServer.Data;
 using PujcovadloServer.Data.Repositories;
+using NSwag;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +13,29 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddOpenApiDocument(options => {
+    options.PostProcess = document =>
+    {
+        document.Info = new OpenApiInfo
+        {
+            Version = "v1",
+            Title = "Půjčovadlo.cz API",
+            Description = "API pro půjčovadlo.cz",
+            TermsOfService = "https://pujcovadlo.cz/terms",
+            Contact = new OpenApiContact
+            {
+                Name = "Example Contact",
+                Url = "https://example.com/contact"
+            },
+            License = new OpenApiLicense
+            {
+                Name = "Example License",
+                Url = "https://example.com/license"
+            }
+        };
+    };
+});
 
 // Use controllers
 builder.Services.AddControllers();
@@ -52,6 +76,10 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    // Add OpenAPI 3.0 document serving middleware
+    // Available at: http://localhost:<port>/swagger/v1/swagger.json
+    app.UseOpenApi();
+    
     app.UseSwagger();
     app.UseSwaggerUI();
 }

@@ -13,7 +13,7 @@ public class ItemFilter : BaseFilter
     {
         Search = filter.Search;
         Status = filter.Status;
-        Category = filter.Category;
+        CategoryId = filter.CategoryId;
     }
 
     public ItemFilter Clone()
@@ -21,9 +21,18 @@ public class ItemFilter : BaseFilter
         return new ItemFilter(this);
     }
     
+    /// <summary>
+    /// Search string to search in item name and description
+    /// </summary>
     public string? Search { get; set; }
     
+    /// <summary>
+    /// Item status.
+    /// </summary>
     public ItemStatus? Status { get; set; } 
     
-    public ItemCategory? Category { get; set; }
+    /// <summary>
+    /// Item category.
+    /// </summary>
+    public int? CategoryId { get; set; }
 }
