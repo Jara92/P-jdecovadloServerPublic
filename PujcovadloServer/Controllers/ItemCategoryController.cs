@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PujcovadloServer.Exceptions;
 using PujcovadloServer.Facades;
+using PujcovadloServer.Filters;
 using PujcovadloServer.Models;
 using PujcovadloServer.Repositories.Interfaces;
 
@@ -26,9 +27,9 @@ public class ItemCategoryController : ControllerBase
      * Returns all items.
      */
     [HttpGet]
-    public async Task<ActionResult<List<ItemCategory>>> Index()
+    public async Task<ActionResult<List<ItemCategory>>> Index(ItemCategoryFilter filter)
     {
-        var categories = await _itemCategoriesRepository.GetAll();
+        var categories = await _itemCategoriesRepository.GetAll(filter);
 
         return Ok(categories);
     }

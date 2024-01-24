@@ -1,4 +1,6 @@
 using PujcovadloServer.Enums;
+using PujcovadloServer.Filters;
+using PujcovadloServer.Lib;
 using PujcovadloServer.Models;
 using PujcovadloServer.Repositories.Interfaces;
 
@@ -6,6 +8,11 @@ namespace PujcovadloServer.Services;
 
 public class ItemService(IItemRepository repository) : ACrudService<Item>(repository)
 {
+    
+    public async Task<PaginatedList<Item>> GetAll(ItemFilter filter)
+    {
+        return await repository.GetAll(filter);
+    }
     
     public override async Task Update(Item item)
     {

@@ -10,8 +10,7 @@ using PujcovadloServer.Responses;
 using PujcovadloServer.Repositories;
 using PujcovadloServer.Repositories.Interfaces;
 using PujcovadloServer.Services;
-using PujcovadloServer.Services.Interfaces;
-using Microsoft.AspNetCore.JsonPatch;
+using PujcovadloServer.Filters;
 
 namespace PujcovadloServer.Controllers;
 
@@ -44,21 +43,57 @@ public class ItemController : ControllerBase
      * Returns all items.
      */
     [HttpGet]
-    public async Task<ActionResult<List<ItemResponse>>> Index()
+    public async Task<ActionResult<List<ItemResponse>>> Index([FromQuery] ItemFilter filter)
     {
-        var items = await _itemService.GetAll();
+        // Get items
+        var items = await _itemService.GetAll(filter);
 
+        // Map items to response
         var responseItems = _mapper.Map<List<ItemResponse>>(items);
-
-        // Hateos links
+        
+        // Hateos item links
         foreach (var item in responseItems)
         {
             item.Links.Add(new LinkResponse(
                 _urlHelper.GetUriByAction(HttpContext, nameof(this.Get), values: new { item.Id }), "SELF", "GET"));
         }
+        
+        // Hateos links
+        var links = new List<LinkResponse>();
 
+        // Next page link
+        if (items.HasNextPage)
+        {
+            var nextPageFilter = new ItemFilter(filter)
+            {
+                Page = items.PageIndex + 1
+            };
 
-        return Ok(responseItems);
+            links.Add(new LinkResponse(
+                _urlHelper.GetUriByAction(HttpContext, nameof(this.Index), values: nextPageFilter), "NEXT", "GET"));
+        }
+
+        // Previous page link
+        if (items.HasPreviousPage)
+        {
+            var previousPageFilter = new ItemFilter(filter)
+            {
+                Page = items.PageIndex - 1
+            };
+            
+            links.Add(new LinkResponse(
+                _urlHelper.GetUriByAction(HttpContext, nameof(this.Index), values: previousPageFilter), "PREVIOUS", "GET"));
+        }
+
+        // Build response
+        var response = new ResponseList()
+        {
+            Data = responseItems,
+            Links = links
+        };
+        
+
+        return Ok(response);
     }
 
     /**

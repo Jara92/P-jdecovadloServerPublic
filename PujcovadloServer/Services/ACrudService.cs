@@ -1,5 +1,7 @@
 using System.ComponentModel;
 using PujcovadloServer.Exceptions;
+using PujcovadloServer.Filters;
+using PujcovadloServer.Lib;
 using PujcovadloServer.Repositories;
 using PujcovadloServer.Repositories.Interfaces;
 using PujcovadloServer.Services.Interfaces;
@@ -20,9 +22,9 @@ public abstract class ACrudService<T> : ICrudService<T> where T : class
         _repository = repository;
     }
 
-    public virtual async Task<List<T>> GetAll()
+    public virtual async Task<PaginatedList<T>> GetAll(BaseFilter filter)
     {
-        return await _repository.GetAll();
+        return await _repository.GetAll(filter);
     }
 
     public virtual async Task<T?> Get(int id, bool track = true)

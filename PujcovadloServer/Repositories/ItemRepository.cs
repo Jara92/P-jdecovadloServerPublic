@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using PujcovadloServer.data;
 using PujcovadloServer.Exceptions;
+using PujcovadloServer.Filters;
+using PujcovadloServer.Lib;
 using PujcovadloServer.Models;
 using PujcovadloServer.Repositories.Interfaces;
 
@@ -17,9 +19,33 @@ public class ItemRepository : ACrudRepository<Item>, IItemRepository
         _dbSet = context.Item;
     }
 
-    public async Task<List<Item>> GetAll()
+    // TODO: get all is not actually overriding the base method because of the different parameter type.
+    
+    public async Task<PaginatedList<Item>> GetAll(ItemFilter filter)
     {
-        return await _dbSet.ToListAsync();
+        var query = _dbSet.AsQueryable();
+        
+        // Filter by status
+        if(filter.Status != null)
+            query = query.Where(i => i.Status == filter.Status);
+        
+        // Filter by category
+        if(filter.Category != null)
+            query = query.Where(i => i.Categories.Contains(filter.Category));
+        
+        // Search by name or description
+        if(filter.Search != null)
+            query = query.Where(i => i.Name.Contains(filter.Search) || i.Description.Contains(filter.Search));
+
+        switch (filter.Sortby)
+        {
+            case "Id":
+                query = filter.SortOrder == true ? query.OrderBy(i => i.Id) : query.OrderByDescending(i => i.Id);
+                break;
+        }
+
+        // Return paginated result
+        return await base.GetAll(query, filter);
     }
 
     public async Task<Item?> Get(int id)

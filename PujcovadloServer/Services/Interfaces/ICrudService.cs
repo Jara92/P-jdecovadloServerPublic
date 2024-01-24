@@ -1,8 +1,11 @@
+using PujcovadloServer.Filters;
+using PujcovadloServer.Lib;
+
 namespace PujcovadloServer.Services.Interfaces;
 
 public interface ICrudService<T>
 {
-    public Task<List<T>> GetAll();
+    public Task<PaginatedList<T>> GetAll(BaseFilter filter);
 
     public Task<T?> Get(int id, bool track = true);
 

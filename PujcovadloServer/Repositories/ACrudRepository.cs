@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using PujcovadloServer.data;
+using PujcovadloServer.Filters;
+using PujcovadloServer.Lib;
 using PujcovadloServer.Models;
 using PujcovadloServer.Repositories.Interfaces;
 
@@ -16,16 +18,21 @@ namespace PujcovadloServer.Repositories
             _dbSet = context.Set<T>();
         }
 
-        public virtual async Task<List<T>> GetAll()
+        public virtual async Task<PaginatedList<T>> GetAll(BaseFilter filter)
         {
-            return await _dbSet.ToListAsync();
+            return await GetAll(_dbSet.AsQueryable(), filter);
+        }
+
+        protected virtual async Task<PaginatedList<T>> GetAll(IQueryable<T> baseQuery, BaseFilter filter)
+        {
+            return await PaginatedList<T>.CreateAsync(baseQuery, filter.Page, filter.PageSize);
         }
 
         public virtual async Task<T?> Get(int id)
         {
             return await _dbSet.FindAsync(id);
         }
-        
+
         public virtual async Task<T?> GetUntracked(int id)
         {
             return await _dbSet.AsNoTracking().FirstOrDefaultAsync(e => e.Id == id);

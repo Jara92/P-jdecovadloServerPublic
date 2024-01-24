@@ -4,6 +4,10 @@ GET {{PujcovadloServer_HostAddress}}/api/items/
 Accept: application/json
 
 ###
+GET {{PujcovadloServer_HostAddress}}/api/items/?Page=1&PageSize=3&Sortby=Id&SortOrder=True&status=3
+Accept: application/json
+
+###
 GET {{PujcovadloServer_HostAddress}}/api/items/1
 Accept: application/json
 
