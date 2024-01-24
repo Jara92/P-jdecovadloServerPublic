@@ -4,11 +4,11 @@ using PujcovadloServer.Helpers;
 
 namespace PujcovadloServer.Business.Facades;
 
-public class ItemCategoriesFacade
+public class ItemCategoryFacade
 {
     private readonly IItemCategoryRepository _itemCategoriesRepository;
 
-    public ItemCategoriesFacade(IItemCategoryRepository itemCategoriesRepository)
+    public ItemCategoryFacade(IItemCategoryRepository itemCategoriesRepository)
     {
         _itemCategoriesRepository = itemCategoriesRepository;
     }

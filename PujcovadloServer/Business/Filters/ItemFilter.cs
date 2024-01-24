@@ -15,6 +15,11 @@ public class ItemFilter : BaseFilter
         Status = filter.Status;
         Category = filter.Category;
     }
+
+    public ItemFilter Clone()
+    {
+        return new ItemFilter(this);
+    }
     
     public string? Search { get; set; }
     

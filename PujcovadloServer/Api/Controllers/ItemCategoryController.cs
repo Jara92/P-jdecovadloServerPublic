@@ -1,3 +1,4 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PujcovadloServer.Business.Entities;
@@ -5,20 +6,26 @@ using PujcovadloServer.Business.Exceptions;
 using PujcovadloServer.Business.Facades;
 using PujcovadloServer.Business.Filters;
 using PujcovadloServer.Business.Interfaces;
+using PujcovadloServer.Responses;
 
 namespace PujcovadloServer.Api.Controllers;
 
 [ApiController]
 [Route("api/item-categories")]
-public class ItemCategoryController : ControllerBase
+public class ItemCategoryController : ACrudController
 {
-    private readonly ItemCategoriesFacade _itemCategoryFacade;
+    private readonly ItemCategoryFacade _itemCategoryFacade;
     private readonly IItemCategoryRepository _itemCategoriesRepository;
+    private readonly IMapper _mapper;
+    private readonly LinkGenerator _urlHelper;
 
-    public ItemCategoryController(ItemCategoriesFacade itemCategoriesFacade, IItemCategoryRepository itemCategoriesRepository)
+    public ItemCategoryController(ItemCategoryFacade itemCategoryFacade, IItemCategoryRepository itemCategoriesRepository,
+        IMapper mapper, LinkGenerator linkGenerator) : base(linkGenerator)
     {
-        _itemCategoryFacade = itemCategoriesFacade;
+        _itemCategoryFacade = itemCategoryFacade;
         _itemCategoriesRepository = itemCategoriesRepository;
+        _mapper = mapper;
+        _urlHelper = linkGenerator;
     }
 
     /**
@@ -27,11 +34,34 @@ public class ItemCategoryController : ControllerBase
      * Returns all items.
      */
     [HttpGet]
-    public async Task<ActionResult<List<ItemCategory>>> Index(ItemCategoryFilter filter)
+    public async Task<ActionResult<List<ItemCategoryResponse>>> Index([FromQuery]ItemCategoryFilter filter)
     {
+        // get categories by filter
         var categories = await _itemCategoriesRepository.GetAll(filter);
+        
+        // Convert to response items
+        var categoriesResponse = _mapper.Map<List<ItemCategoryResponse>>(categories);
+        
+        // Hateos item links
+        foreach (var category in categoriesResponse)
+        {
+            category.Links.Add(new LinkResponse(
+                _urlHelper.GetUriByAction(HttpContext, nameof(this.Get), values: new { category.Id }), "SELF", "GET"));
+            
+            category.Links.Add(new LinkResponse(
+                _urlHelper.GetUriByAction(HttpContext, nameof(ItemController.Index), "Item", values: new { CategoryId = category.Id }), "ITEMS", "GET"));
+        }
+        
+        var links = GeneratePaginationLinks(categories, filter, nameof(Index));
 
-        return Ok(categories);
+        // Create response list
+        var response = new ResponseList<ItemCategoryResponse>
+        {
+            Data = categoriesResponse,
+            Links = links
+        };
+
+        return Ok(response);
     }
 
     /**
@@ -40,16 +70,20 @@ public class ItemCategoryController : ControllerBase
      * Returns item with given id.
      */
     [HttpGet("{id}")]
-    public async Task<ActionResult<ItemCategory>> Get(int id)
+    public async Task<ActionResult<ItemCategoryResponse>> Get(int id)
     {
-        var categories = await _itemCategoriesRepository.Get(id);
-
-        if (categories == null)
-        {
-            return NotFound($"ItemCategory with {id} not found.");
-        }
-
-        return Ok(categories);
+        // Get the category
+        var category = await _itemCategoriesRepository.Get(id);
+        if (category == null) return NotFound($"ItemCategory with {id} not found.");
+        
+        // Map to response
+        var categoryResponse = _mapper.Map<ItemCategoryResponse>(category);
+        
+        // Link to items
+        categoryResponse.Links.Add(new LinkResponse(
+            _urlHelper.GetUriByAction(HttpContext, nameof(ItemController.Index), "Item", values: new { CategoryId = category.Id }), "ITEMS", "GET"));
+        
+        return Ok(categoryResponse);
     }
 
     /**

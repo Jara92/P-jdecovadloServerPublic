@@ -50,6 +50,10 @@ Content-Type: application/json
 DELETE {{PujcovadloServer_HostAddress}}/api/items/1
 
 ###
+GET {{PujcovadloServer_HostAddress}}/api/item-categories
+Accept: application/json
+
+###
 POST {{PujcovadloServer_HostAddress}}/api/item-categories
 Content-Type: application/json
 

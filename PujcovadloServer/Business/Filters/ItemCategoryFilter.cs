@@ -10,6 +10,11 @@ public class ItemCategoryFilter : BaseFilter
     {
        
     }
+
+    public ItemCategoryFilter Clone()
+    {
+        return new ItemCategoryFilter(this);
+    }
     
     
 }

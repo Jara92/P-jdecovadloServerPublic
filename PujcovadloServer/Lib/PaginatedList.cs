@@ -2,10 +2,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace PujcovadloServer.Lib;
 
-public class PaginatedList<T> : List<T>
+public class PaginatedList<T> : List<T>, IPaginatedList
 {
-    public int PageIndex { get; private set; }
-    public int TotalPages { get; private set; }
+    public int PageIndex { get; protected set; }
+    public int TotalPages { get; protected set; }
 
     public PaginatedList(List<T> items, int count, int pageIndex, int pageSize)
     {

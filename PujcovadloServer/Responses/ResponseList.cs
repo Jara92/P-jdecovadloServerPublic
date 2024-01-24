@@ -1,7 +1,7 @@
 namespace PujcovadloServer.Responses;
 
-public class ResponseList
+public class ResponseList<T> where T : class
 {
-    public IEnumerable<ItemResponse> Data { get; set; } = new List<ItemResponse>();
+    public IEnumerable<T> Data { get; set; } = new List<T>();
     public IEnumerable<LinkResponse> Links { get; set; } = new List<LinkResponse>();
 }

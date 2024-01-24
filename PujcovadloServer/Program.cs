@@ -36,7 +36,7 @@ builder.Services.AddScoped<ItemService>();
 builder.Services.AddScoped<ItemCategoryService>();
 
 builder.Services.AddScoped<ItemFacade>();
-builder.Services.AddScoped<ItemCategoriesFacade>();
+builder.Services.AddScoped<ItemCategoryFacade>();
 
 // AutoMapper configuration
 var config = new MapperConfiguration(cfg =>

@@ -88,14 +88,4 @@ public class ItemFacade
         // Delete the item
         await _itemService.Delete(item);
     }
-
-    public async Task AddCategory(Item item, ItemCategory dbCategory)
-    {
-        // Check if item already has this category.
-        if (!item.Categories.Any(c => c.Id == dbCategory.Id))
-        {
-            item.Categories.Add(dbCategory);
-            await _itemRepository.Update(item);
-        }
-    }
 }

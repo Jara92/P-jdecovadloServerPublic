@@ -14,22 +14,22 @@ namespace PujcovadloServer.Api.Controllers;
 
 [ApiController]
 [Route("api/items")]
-public class ItemController : ControllerBase
+public class ItemController : ACrudController
 {
     private readonly IMapper _mapper;
     private readonly IItemRepository _itemsRepository;
     private readonly ItemService _itemService;
     private readonly ItemFacade _itemFacade;
-    private readonly ItemCategoriesFacade _itemCategoriesFacade;
+    private readonly ItemCategoryFacade _itemCategoryFacade;
     private readonly LinkGenerator _urlHelper;
 
     public ItemController(IItemRepository itemsRepository, ItemFacade itemFacade,
-        ItemCategoriesFacade itemCategoriesFacade, IMapper mapper,
-        ItemService itemService, LinkGenerator urlHelper)
+        ItemCategoryFacade itemCategoryFacade, IMapper mapper,
+        ItemService itemService, LinkGenerator urlHelper): base(urlHelper)
     {
         _itemsRepository = itemsRepository;
         _itemFacade = itemFacade;
-        _itemCategoriesFacade = itemCategoriesFacade;
+        _itemCategoryFacade = itemCategoryFacade;
         _mapper = mapper;
         _itemService = itemService;
         _urlHelper = urlHelper;
@@ -57,34 +57,10 @@ public class ItemController : ControllerBase
         }
         
         // Hateos links
-        var links = new List<LinkResponse>();
-
-        // Next page link
-        if (items.HasNextPage)
-        {
-            var nextPageFilter = new ItemFilter(filter)
-            {
-                Page = items.PageIndex + 1
-            };
-
-            links.Add(new LinkResponse(
-                _urlHelper.GetUriByAction(HttpContext, nameof(this.Index), values: nextPageFilter), "NEXT", "GET"));
-        }
-
-        // Previous page link
-        if (items.HasPreviousPage)
-        {
-            var previousPageFilter = new ItemFilter(filter)
-            {
-                Page = items.PageIndex - 1
-            };
-            
-            links.Add(new LinkResponse(
-                _urlHelper.GetUriByAction(HttpContext, nameof(this.Index), values: previousPageFilter), "PREVIOUS", "GET"));
-        }
+        var links = GeneratePaginationLinks(items, filter, nameof(Index));
 
         // Build response
-        var response = new ResponseList()
+        var response = new ResponseList<ItemResponse>
         {
             Data = responseItems,
             Links = links
@@ -189,25 +165,5 @@ public class ItemController : ControllerBase
             return NotFound($"Item with {id} not found.");
 
         return Ok(item.Categories);
-    }
-
-    // TODO REMOVE THIS FUCKING PIECE OF SHIT
-    [HttpPost("{id}/categories")]
-    public async Task<ActionResult<ItemCategory>> AddCategory(int id, [FromBody] ItemCategory category)
-    {
-        var item = _itemsRepository.Get(id).Result;
-
-        if (item == null)
-            return NotFound($"Item with {id} not found.");
-
-        var dbCategory = await _itemCategoriesFacade.Get(category.Id);
-
-        if (dbCategory == null)
-            return NotFound($"ItemCategory with {category.Id} not found.");
-
-        // Add category to item
-        await _itemFacade.AddCategory(item, dbCategory);
-
-        return Created($"/api/items/{id}/categories/{dbCategory.Id}", null);
     }
 }

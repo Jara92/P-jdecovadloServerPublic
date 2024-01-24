@@ -13,6 +13,11 @@ public class BaseFilter
         Sortby = filter.Sortby;
         SortOrder = filter.SortOrder;
     }
+
+    public BaseFilter Clone()
+    {
+        return new BaseFilter(this);
+    }
     
     public int Page { get; set; } = 1;
     
