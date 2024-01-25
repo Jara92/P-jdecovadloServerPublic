@@ -1,10 +1,13 @@
 using AutoMapper;
+using PujcovadloServer.Authentication;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Enums;
 using PujcovadloServer.Business.Exceptions;
+using PujcovadloServer.Business.Filters;
 using PujcovadloServer.Business.Interfaces;
 using PujcovadloServer.Business.Services;
 using PujcovadloServer.Helpers;
+using PujcovadloServer.Lib;
 using PujcovadloServer.Requests;
 
 namespace PujcovadloServer.Business.Facades;
@@ -87,5 +90,16 @@ public class ItemFacade
         
         // Delete the item
         await _itemService.Delete(item);
+    }
+    
+    public async Task<PaginatedList<Item>> GetMyItems(ItemFilter filter, ApplicationUser user)
+    {
+        // Set owner id
+        filter.OnwerId = user.Id;
+        
+        // Get items
+        var items = await _itemService.GetAll(filter);
+        
+        return items;
     }
 }

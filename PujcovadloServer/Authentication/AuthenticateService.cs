@@ -4,6 +4,7 @@ using System.Text;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using PujcovadloServer.Authentication.Exceptions;
+using PujcovadloServer.Business.Enums;
 
 namespace PujcovadloServer.Authentication;
 
@@ -20,7 +21,31 @@ public class AuthenticateService
         _roleManager = roleManager;
         _configuration = configuration;
     }
-    
+
+    private async Task CreateRoles()
+    {
+        // Create roles if they don't exist
+        if (!await _roleManager.RoleExistsAsync(UserRoles.Admin))
+            await _roleManager.CreateAsync(new IdentityRole<int>(UserRoles.Admin));
+
+        if (!await _roleManager.RoleExistsAsync(UserRoles.User))
+            await _roleManager.CreateAsync(new IdentityRole<int>(UserRoles.User));
+
+        if (!await _roleManager.RoleExistsAsync(UserRoles.Tenant))
+            await _roleManager.CreateAsync(new IdentityRole<int>(UserRoles.Tenant));
+
+        if (!await _roleManager.RoleExistsAsync(UserRoles.Owner))
+            await _roleManager.CreateAsync(new IdentityRole<int>(UserRoles.Owner));
+    }
+
+    public async Task AddRole(ApplicationUser user, string role)
+    {
+        if (await _roleManager.RoleExistsAsync(role))
+        {
+            await _userManager.AddToRoleAsync(user, role);
+        }
+    }
+
     /// <summary>
     /// Registers a new user in the database.
     /// </summary>
@@ -32,10 +57,10 @@ public class AuthenticateService
         // Check if user exists
         var usernameExists = await _userManager.FindByNameAsync(request.Username);
         var emailExists = await _userManager.FindByEmailAsync(request.Email);
-        
+
         if (usernameExists != null)
             throw new UserAlreadyExistsException($"Username {request.Username} already exists!");
-        
+
         if (emailExists != null)
             throw new UserAlreadyExistsException($"Email {request.Email} already exists!");
 
@@ -62,8 +87,17 @@ public class AuthenticateService
         {
             throw new RegistrationFailedException(result.Errors.Select(e => e.Description).ToList());
         }
+
+        // Create roles if they don't exist
+        await CreateRoles();
+
+        // Add user to role
+        await AddRole(user, UserRoles.User);
+        //await AddRole(user, UserRoles.Admin);
+        await AddRole(user, UserRoles.Tenant);
+        await AddRole(user, UserRoles.Owner);
     }
-    
+
     /// <summary>
     /// Performs user login and returns JWT token
     /// </summary>
@@ -96,7 +130,7 @@ public class AuthenticateService
 
             // Create JWT token
             var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
-            
+
             var token = new JwtSecurityToken(
                 issuer: _configuration["JWT:ValidIssuer"],
                 audience: _configuration["JWT:ValidAudience"],
@@ -109,5 +143,20 @@ public class AuthenticateService
         }
 
         throw new AuthenticationFailedException("Invalid username or password.");
+    }
+    
+    public async Task<ApplicationUser> GetUser(ClaimsPrincipal principal)
+    {
+        // Get user id from claims
+        var userId = principal.Identity?.Name;
+        if (userId == null)
+            throw new AuthenticationFailedException("User not authenticated.");
+
+        // Get user by id
+        var user = await _userManager.FindByNameAsync(userId);
+        if (user == null)
+            throw new AuthenticationFailedException("User not authenticated.");
+        
+        return user;
     }
 }
