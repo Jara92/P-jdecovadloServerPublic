@@ -1,9 +1,12 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using PujcovadloServer.Authentication;
 using PujcovadloServer.Business.Entities;
 
 namespace PujcovadloServer.Data
 {
-    public class PujcovadloServerContext : DbContext
+    public class PujcovadloServerContext : IdentityDbContext<ApplicationUser, IdentityRole<int>, int>
     {
         public PujcovadloServerContext(DbContextOptions<PujcovadloServerContext> options)
             : base(options)
@@ -12,6 +15,7 @@ namespace PujcovadloServer.Data
 
         public DbSet<Item> Item { get; set; } = default!;
         public DbSet<ItemCategory> ItemCategory { get; set; } = default!;
+       // public DbSet<User> User { get; set; } = default!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -19,6 +23,8 @@ namespace PujcovadloServer.Data
             /*modelBuilder.Entity<Item>()
                 .HasMany<ItemCategory>(i => i.Categories)
                 .WithMany(c => c.Items);*/
+            
+            base.OnModelCreating(modelBuilder);
         }
         
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

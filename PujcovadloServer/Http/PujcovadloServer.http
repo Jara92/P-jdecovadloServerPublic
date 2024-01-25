@@ -61,3 +61,27 @@ Content-Type: application/json
   "name": "Testovací kategorie",
   "description": "Popis testovací kategorie."
 }
+
+###
+POST {{PujcovadloServer_HostAddress}}/api/Authenticate/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "MojekrasneHeslo_123"
+}
+
+###
+POST {{PujcovadloServer_HostAddress}}/api/Authenticate/register
+Content-Type: application/json
+
+{
+  "firstName": "Jaroslav",
+  "lastName": "Fikar",
+  "username": "admin",
+  "password": "MojekrasneHeslo_123",
+  "passwordConfirmation": "MojekrasneHeslo_123",
+  "email": "jara.fikar@seznam.cz"
+}
+
+###
