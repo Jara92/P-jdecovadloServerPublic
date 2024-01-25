@@ -1,6 +1,7 @@
 using System.Text;
 using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -11,6 +12,7 @@ using PujcovadloServer.Data;
 using PujcovadloServer.Data.Repositories;
 using NSwag;
 using PujcovadloServer.Authentication;
+using PujcovadloServer.AuthorizationHandlers;
 using PujcovadloServer.Business.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -89,6 +91,9 @@ builder.Services.AddAuthentication(options =>
     });
 
 builder.Services.AddScoped<IAuthenticateService, AuthenticateService>();
+
+// Authorization handlers
+builder.Services.AddScoped<IAuthorizationHandler, ItemAuthorizationHandler>();
 
 builder.Services.AddScoped<IItemRepository, ItemRepository>();
 builder.Services.AddScoped<IItemCategoryRepository, ItemCategoryRepository>();

@@ -1,7 +1,10 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using PujcovadloServer.AuthorizationHandlers;
 using PujcovadloServer.Business.Entities;
+using PujcovadloServer.Business.Enums;
 using PujcovadloServer.Business.Exceptions;
 using PujcovadloServer.Business.Facades;
 using PujcovadloServer.Business.Filters;
@@ -22,10 +25,12 @@ public class ItemController : ACrudController
     private readonly ItemFacade _itemFacade;
     private readonly ItemCategoryFacade _itemCategoryFacade;
     private readonly LinkGenerator _urlHelper;
+    private readonly IAuthorizationService _authorizationService;
 
     public ItemController(IItemRepository itemsRepository, ItemFacade itemFacade,
         ItemCategoryFacade itemCategoryFacade, IMapper mapper,
-        ItemService itemService, LinkGenerator urlHelper) : base(urlHelper)
+        ItemService itemService, LinkGenerator urlHelper,
+        IAuthorizationService authorizationService) : base(urlHelper)
     {
         _itemsRepository = itemsRepository;
         _itemFacade = itemFacade;
@@ -33,6 +38,7 @@ public class ItemController : ACrudController
         _mapper = mapper;
         _itemService = itemService;
         _urlHelper = urlHelper;
+        _authorizationService = authorizationService;
     }
 
     /// <summary>
@@ -110,6 +116,7 @@ public class ItemController : ACrudController
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [Authorize(Roles = UserRoles.Owner)]
     public async Task<ActionResult<ItemResponse>> Create([FromBody] ItemRequest request)
     {
         var newItem = await _itemFacade.CreateItem(request);
@@ -141,6 +148,15 @@ public class ItemController : ACrudController
         {
             return BadRequest("Id in url and body must be the same.");
         }
+
+        var item = await _itemService.Get(id);
+        
+        // Authorization
+        var res = await _authorizationService.AuthorizeAsync(User, item,
+            ItemAuthorizationHandler.Operations.Update);
+        
+        if (!res.Succeeded)
+            return Forbid();
 
         try
         {

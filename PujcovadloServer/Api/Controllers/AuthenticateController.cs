@@ -2,6 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Mvc;
 using PujcovadloServer.Authentication;
 using PujcovadloServer.Authentication.Exceptions;
+using PujcovadloServer.Business.Services.Interfaces;
 
 namespace PujcovadloServer.Api.Controllers;
 
@@ -10,9 +11,9 @@ namespace PujcovadloServer.Api.Controllers;
 public class AuthenticateController : ControllerBase
 {
     
-    private readonly AuthenticateService _authenticateService;
+    private readonly IAuthenticateService _authenticateService;
     
-    public AuthenticateController(AuthenticateService authenticateService)
+    public AuthenticateController(IAuthenticateService authenticateService)
     {
         _authenticateService = authenticateService;
     }
