@@ -1,10 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 using PujcovadloServer.Authentication;
+using PujcovadloServer.Authentication.Exceptions;
 
 namespace PujcovadloServer.Api.Controllers;
 
@@ -12,88 +9,73 @@ namespace PujcovadloServer.Api.Controllers;
 [ApiController]
 public class AuthenticateController : ControllerBase
 {
-    private readonly UserManager<ApplicationUser> _userManager;
-    private readonly RoleManager<IdentityRole<int>> _roleManager;
-    private readonly IConfiguration _configuration;
-
-    public AuthenticateController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole<int>> roleManager,
-        IConfiguration configuration)
+    
+    private readonly AuthenticateService _authenticateService;
+    
+    public AuthenticateController(AuthenticateService authenticateService)
     {
-        _userManager = userManager;
-        _roleManager = roleManager;
-        _configuration = configuration;
+        _authenticateService = authenticateService;
     }
-
+    
+    /// <summary>
+    /// Performs login and returns JWT token.
+    /// </summary>
+    /// <param name="request">Login request</param>
+    /// <returns>JWT token for authorization.</returns>
+    /// <response code="200">Returns JWT token for authorization.</response>
+    /// <response code="401">Invalid credentials.</response>
     [HttpPost]
     [Route("login")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
-        var user = await _userManager.FindByNameAsync(request.Username);
-
-        if (user != null && await _userManager.CheckPasswordAsync(user, request.Password))
+        try
         {
-            var userRoles = await _userManager.GetRolesAsync(user);
+            // Try to login and get JWT token
+            var token = await _authenticateService.Login(request);
 
-            var authClaims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, user.UserName),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            };
-
-            foreach (var userRole in userRoles)
-            {
-                authClaims.Add(new Claim(ClaimTypes.Role, userRole));
-            }
-
-            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
-
-            var token = new JwtSecurityToken(
-                issuer: _configuration["JWT:ValidIssuer"],
-                audience: _configuration["JWT:ValidAudience"],
-                expires: DateTime.Now.AddHours(3),
-                claims: authClaims,
-                signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
-            );
-
+            // Return token
             return Ok(new
             {
                 token = new JwtSecurityTokenHandler().WriteToken(token),
                 expiration = token.ValidTo
             });
         }
-
-        return Unauthorized();
+        catch (AuthenticationFailedException e)
+        {
+            return Unauthorized(e.Message);
+        }
     }
 
+    /// <summary>
+    /// Performs registration of a new user.
+    /// </summary>
+    /// <param name="request">Registration request.</param>
+    /// <returns></returns>
+    /// <response code="200">User was registered successfully.</response>
+    /// <response code="400">Invalid request.</response>
+    /// <response code="409">User with given credentials already exists.</response>
     [HttpPost]
     [Route("register")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
-        var userExists = await _userManager.FindByNameAsync(request.Username);
-        if (userExists != null)
-            return StatusCode(StatusCodes.Status500InternalServerError,
-                new RegisterResponse { Status = "Error", Messages = new List<string> { "User already exists!" } });
-
-        ApplicationUser user = new ApplicationUser()
+        try
         {
-            FirstName = request.FirstName,
-            LastName = request.LastName,
-            DateOfBirth = request.DateOfBirth,
-            Email = request.Email,
-            SecurityStamp = Guid.NewGuid().ToString(),
-            UserName = request.Username
-        };
+            await _authenticateService.RegisterUser(request);
 
-        var result = await _userManager.CreateAsync(user, request.Password);
-
-        if (!result.Succeeded)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError,
-                new RegisterResponse
-                    { Status = "Error", Messages = result.Errors.Select(e => e.Description).ToList() });
+            return Ok();
         }
-
-        return Ok(new RegisterResponse
-            { Status = "Success", Messages = new List<string> { "User created successfully!" } });
+        catch (UserAlreadyExistsException e)
+        {
+            return Conflict(e.Message);
+        }
+        catch (RegistrationFailedException e)
+        {
+            return BadRequest(e.Messages);
+        }
     }
 }

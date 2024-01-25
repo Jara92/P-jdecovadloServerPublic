@@ -87,6 +87,8 @@ builder.Services.AddAuthentication(options =>
         };
     });
 
+builder.Services.AddScoped<AuthenticateService>();
+
 builder.Services.AddScoped<IItemRepository, ItemRepository>();
 builder.Services.AddScoped<IItemCategoryRepository, ItemCategoryRepository>();
 

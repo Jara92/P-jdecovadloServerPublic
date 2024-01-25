@@ -1,0 +1,12 @@
+namespace PujcovadloServer.Authentication.Exceptions;
+
+public class UserAlreadyExistsException : Exception
+{
+    public UserAlreadyExistsException()
+    {
+    }
+    
+    public UserAlreadyExistsException(string message) : base(message)
+    {
+    }
+}
