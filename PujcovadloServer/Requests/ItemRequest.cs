@@ -2,9 +2,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace PujcovadloServer.Requests;
 
-public class ItemRequest
+public class ItemRequest: EntityRequest
 {
-    public int Id { get; set; }
     
     public string Name { get; set; } = default!;
     

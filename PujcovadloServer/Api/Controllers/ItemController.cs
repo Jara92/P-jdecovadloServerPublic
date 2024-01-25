@@ -140,15 +140,9 @@ public class ItemController : ACrudController
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ValidateIdFilter]
     public async Task<IActionResult> Update(int id, [FromBody] ItemRequest request)
     {
-        // Check if item with given id exists
-        // TODO: make filter for this
-        if (request.Id != id)
-        {
-            return BadRequest("Id in url and body must be the same.");
-        }
-
         // Update the item
         await _itemFacade.UpdateItem(request);
 
