@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using PujcovadloServer.Authentication;
 using PujcovadloServer.Business.Enums;
 
 namespace PujcovadloServer.Business.Entities;
@@ -31,6 +32,8 @@ public class Item : BaseEntity
     public float? SellingPrice { get; set; }
 
     public virtual ICollection<ItemCategory> Categories { get; } = new List<ItemCategory>();
+    
+    public virtual ApplicationUser Owner { get; set; } = default!;
     
     [ReadOnly(true)]
     public DateTime CreatedAt { get; set; } = DateTime.Now;

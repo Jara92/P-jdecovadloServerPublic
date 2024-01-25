@@ -19,15 +19,12 @@ public class MyItemController : ACrudController
     private readonly ItemService _itemService;
     private readonly ItemFacade _itemFacade;
     private readonly IMapper _mapper;
-    private readonly AuthenticateService _authenticateService;
 
-    public MyItemController(ItemFacade itemFacade, ItemService itemService, LinkGenerator urlHelper, IMapper mapper,
-        AuthenticateService authenticateService) : base(urlHelper)
+    public MyItemController(ItemFacade itemFacade, ItemService itemService, LinkGenerator urlHelper, IMapper mapper) : base(urlHelper)
     {
         _itemService = itemService;
         _itemFacade = itemFacade;
         _mapper = mapper;
-        _authenticateService = authenticateService;
     }
 
     [HttpGet]
@@ -36,12 +33,8 @@ public class MyItemController : ACrudController
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> Index([FromQuery] ItemFilter filter)
     {
-        // Get current user
-        // TODO: Catch exception when user is not found - should not happen
-        var user = await _authenticateService.GetUser(User);
-
         // Get items
-        var items = await _itemFacade.GetMyItems(filter, user);
+        var items = await _itemFacade.GetMyItems(filter);
 
         // Map items to response
         var responseItems = _mapper.Map<List<ItemResponse>>(items);

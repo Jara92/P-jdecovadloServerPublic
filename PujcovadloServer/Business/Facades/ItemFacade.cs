@@ -6,6 +6,7 @@ using PujcovadloServer.Business.Exceptions;
 using PujcovadloServer.Business.Filters;
 using PujcovadloServer.Business.Interfaces;
 using PujcovadloServer.Business.Services;
+using PujcovadloServer.Business.Services.Interfaces;
 using PujcovadloServer.Helpers;
 using PujcovadloServer.Lib;
 using PujcovadloServer.Requests;
@@ -16,12 +17,14 @@ public class ItemFacade
 {
     private readonly IItemRepository _itemRepository;
     private readonly ItemService _itemService;
+    private readonly IAuthenticateService _authenticateService;
     private readonly IMapper _mapper;
 
-    public ItemFacade(IItemRepository itemRepository, ItemService itemService, IMapper mapper)
+    public ItemFacade(IItemRepository itemRepository, ItemService itemService, IAuthenticateService authenticateService, IMapper mapper)
     {
         _itemRepository = itemRepository;
         _itemService = itemService;
+        _authenticateService = authenticateService;
         _mapper = mapper;
     }
 
@@ -31,6 +34,9 @@ public class ItemFacade
     /// <param name="request"></param>
     public async Task<Item> CreateItem(ItemRequest request)
     {
+        var user = await _authenticateService.GetCurrentUser();
+        if(user == null) throw new UnauthorizedAccessException("User not found.");
+        
         // Map request to item
         var item = _mapper.Map<Item>(request);
 
@@ -39,6 +45,9 @@ public class ItemFacade
 
         // Set alias
         item.Alias = UrlHelper.CreateUrlStub(item.Name);
+        
+        // Set owner
+        item.Owner = user;
 
         // Create the item  
         await _itemService.Create(item);
@@ -92,10 +101,14 @@ public class ItemFacade
         await _itemService.Delete(item);
     }
     
-    public async Task<PaginatedList<Item>> GetMyItems(ItemFilter filter, ApplicationUser user)
+    public async Task<PaginatedList<Item>> GetMyItems(ItemFilter filter)
     {
+        var user = await _authenticateService.GetCurrentUser();
+        
+        if (user == null) throw new UnauthorizedAccessException("User not found.");
+        
         // Set owner id
-        filter.OnwerId = user.Id;
+        filter.OwnerId = user.Id;
         
         // Get items
         var items = await _itemService.GetAll(filter);

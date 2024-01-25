@@ -35,4 +35,9 @@ public class ItemFilter : BaseFilter
     /// Item category.
     /// </summary>
     public int? CategoryId { get; set; }
+    
+    /// <summary>
+    /// Owner (user) id.
+    /// </summary>
+    public int? OwnerId { get; set; }
 }

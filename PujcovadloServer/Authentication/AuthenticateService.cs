@@ -5,23 +5,29 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using PujcovadloServer.Authentication.Exceptions;
 using PujcovadloServer.Business.Enums;
+using PujcovadloServer.Business.Services.Interfaces;
 
 namespace PujcovadloServer.Authentication;
 
-public class AuthenticateService
+public class AuthenticateService : IAuthenticateService
 {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly RoleManager<IdentityRole<int>> _roleManager;
     private readonly IConfiguration _configuration;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
     public AuthenticateService(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole<int>> roleManager,
-        IConfiguration configuration)
+        IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
     {
         _userManager = userManager;
         _roleManager = roleManager;
         _configuration = configuration;
+        _httpContextAccessor = httpContextAccessor;
     }
 
+    /// <summary>
+    /// Create roles if they don't exist.
+    /// </summary>
     private async Task CreateRoles()
     {
         // Create roles if they don't exist
@@ -38,6 +44,7 @@ public class AuthenticateService
             await _roleManager.CreateAsync(new IdentityRole<int>(UserRoles.Owner));
     }
 
+    /// <inheritdoc cref="IAuthenticateService"/>
     public async Task AddRole(ApplicationUser user, string role)
     {
         if (await _roleManager.RoleExistsAsync(role))
@@ -46,12 +53,7 @@ public class AuthenticateService
         }
     }
 
-    /// <summary>
-    /// Registers a new user in the database.
-    /// </summary>
-    /// <param name="request">Registration request</param>
-    /// <exception cref="UserAlreadyExistsException">User with given credentials already exists.</exception>
-    /// <exception cref="RegistrationFailedException">Thrown when some other problem occurs.</exception>
+    /// <inheritdoc cref="IAuthenticateService"/>
     public async Task RegisterUser(RegisterRequest request)
     {
         // Check if user exists
@@ -98,12 +100,7 @@ public class AuthenticateService
         await AddRole(user, UserRoles.Owner);
     }
 
-    /// <summary>
-    /// Performs user login and returns JWT token
-    /// </summary>
-    /// <param name="request">Login request</param>
-    /// <returns>JWT token for the client.</returns>
-    /// <exception cref="AuthenticationFailedException">Thrown when entered credentials are not valid.</exception>
+    /// <inheritdoc cref="IAuthenticateService"/>
     public async Task<JwtSecurityToken> Login(LoginRequest request)
     {
         // Get user by username
@@ -144,19 +141,21 @@ public class AuthenticateService
 
         throw new AuthenticationFailedException("Invalid username or password.");
     }
-    
-    public async Task<ApplicationUser> GetUser(ClaimsPrincipal principal)
+
+    /// <inheritdoc cref="IAuthenticateService"/>
+    public async Task<ApplicationUser?> GetCurrentUser()
     {
+        var principal = _httpContextAccessor.HttpContext?.User;
+
+        if (principal == null)
+            return null;
+
         // Get user id from claims
         var userId = principal.Identity?.Name;
         if (userId == null)
-            throw new AuthenticationFailedException("User not authenticated.");
+            return null;
 
-        // Get user by id
-        var user = await _userManager.FindByNameAsync(userId);
-        if (user == null)
-            throw new AuthenticationFailedException("User not authenticated.");
-        
-        return user;
+        // Return user by id
+        return await _userManager.FindByNameAsync(userId);
     }
 }

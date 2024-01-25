@@ -17,8 +17,6 @@ public class ItemRepository : ACrudRepository<Item, ItemFilter>, IItemRepository
         _context = context;
         _dbSet = context.Item;
     }
-
-    // TODO: get all is not actually overriding the base method because of the different parameter type.
     
     public async Task<PaginatedList<Item>> GetAll(ItemFilter filter)
     {
@@ -35,6 +33,10 @@ public class ItemRepository : ACrudRepository<Item, ItemFilter>, IItemRepository
         // Search by name or description
         if(filter.Search != null)
             query = query.Where(i => i.Name.Contains(filter.Search) || i.Description.Contains(filter.Search));
+        
+        // Search by owner
+        if(filter.OwnerId != null)
+            query = query.Where(i => i.Owner.Id == filter.OwnerId);
 
         switch (filter.Sortby)
         {

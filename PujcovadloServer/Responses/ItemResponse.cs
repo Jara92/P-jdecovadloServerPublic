@@ -17,6 +17,8 @@ public class ItemResponse
     
     public float PricePerDay { get; set; }
     
+    public UserResponse Owner { get; set; } = default!;
+    
     //public string? Href { get; set; }
     public IList<LinkResponse> Links { get; private set; } = new List<LinkResponse>();
  

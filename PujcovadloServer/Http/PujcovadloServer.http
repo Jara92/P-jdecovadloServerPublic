@@ -29,6 +29,7 @@ Accept: application/json
 
 POST {{PujcovadloServer_HostAddress}}/api/items/
 Content-Type: application/json
+Authorization: Bearer {{PujcovadloServer_Token}}
 
 {
   "name": "Test item",

@@ -11,6 +11,7 @@ using PujcovadloServer.Data;
 using PujcovadloServer.Data.Repositories;
 using NSwag;
 using PujcovadloServer.Authentication;
+using PujcovadloServer.Business.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -87,7 +88,7 @@ builder.Services.AddAuthentication(options =>
         };
     });
 
-builder.Services.AddScoped<AuthenticateService>();
+builder.Services.AddScoped<IAuthenticateService, AuthenticateService>();
 
 builder.Services.AddScoped<IItemRepository, ItemRepository>();
 builder.Services.AddScoped<IItemCategoryRepository, ItemCategoryRepository>();

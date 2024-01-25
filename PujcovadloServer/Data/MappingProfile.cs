@@ -1,4 +1,5 @@
 using AutoMapper;
+using PujcovadloServer.Authentication;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Requests;
 using PujcovadloServer.Responses;
@@ -15,7 +16,9 @@ public class MappingProfile : Profile
         
         CreateMap<ItemCategory, ItemCategoryResponse>();
         CreateMap<ItemCategoryRequest, ItemCategory>();
-        
+
+        CreateMap<ApplicationUser, UserResponse>();
+
         // CreateMap<ItemCategory, ItemCategoryDto>();
         //CreateMap<ItemCategoryDto, ItemCategory>();
     }
