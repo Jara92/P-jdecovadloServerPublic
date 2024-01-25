@@ -11,6 +11,7 @@ using PujcovadloServer.Business.Services;
 using PujcovadloServer.Data;
 using PujcovadloServer.Data.Repositories;
 using NSwag;
+using PujcovadloServer.Api.Filters;
 using PujcovadloServer.Authentication;
 using PujcovadloServer.AuthorizationHandlers;
 using PujcovadloServer.Business.Services.Interfaces;
@@ -103,6 +104,9 @@ builder.Services.AddScoped<ItemCategoryService>();
 
 builder.Services.AddScoped<ItemFacade>();
 builder.Services.AddScoped<ItemCategoryFacade>();
+
+// Filters
+builder.Services.AddScoped<ExceptionFilter>();
 
 // AutoMapper configuration
 var config = new MapperConfiguration(cfg =>

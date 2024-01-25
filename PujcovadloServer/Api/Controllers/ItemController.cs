@@ -2,6 +2,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using PujcovadloServer.Api.Filters;
 using PujcovadloServer.AuthorizationHandlers;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Enums;
@@ -17,6 +18,7 @@ namespace PujcovadloServer.Api.Controllers;
 
 [ApiController]
 [Route("api/items")]
+[ServiceFilter(typeof(ExceptionFilter))]
 public class ItemController : ACrudController
 {
     private readonly IMapper _mapper;
@@ -92,11 +94,8 @@ public class ItemController : ACrudController
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ItemDetailResponse>> Get(int id)
     {
-        var item = await _itemService.Get(id);
-
-        if (item == null)
-            return NotFound($"Item with {id} not found.");
-
+        // Get the item and convert it to response
+        var item = await _itemFacade.GetItem(id);
         var responseItem = _mapper.Map<ItemDetailResponse>(item);
 
         // Hateos links
@@ -144,32 +143,14 @@ public class ItemController : ACrudController
     public async Task<IActionResult> Update(int id, [FromBody] ItemRequest request)
     {
         // Check if item with given id exists
+        // TODO: make filter for this
         if (request.Id != id)
         {
             return BadRequest("Id in url and body must be the same.");
         }
 
-        var item = await _itemService.Get(id);
-        
-        // Authorization
-        var res = await _authorizationService.AuthorizeAsync(User, item,
-            ItemAuthorizationHandler.Operations.Update);
-        
-        if (!res.Succeeded)
-            return Forbid();
-
-        try
-        {
-            await _itemFacade.UpdateItem(request);
-        }
-        catch (EntityNotFoundException)
-        {
-            return NotFound($"Item with {id} was not found.");
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            return Conflict($"Item with {id} was updated in the meantime. Try again.");
-        }
+        // Update the item
+        await _itemFacade.UpdateItem(request);
 
         return Ok();
     }
@@ -186,14 +167,7 @@ public class ItemController : ACrudController
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(int id)
     {
-        try
-        {
-            await _itemFacade.DeleteItem(id);
-        }
-        catch (EntityNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
+        await _itemFacade.DeleteItem(id);
 
         return NoContent();
     }
@@ -208,13 +182,15 @@ public class ItemController : ACrudController
     [HttpGet("{id}/categories")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<List<ItemCategory>>> GetCategories(int id)
+    public async Task<ActionResult<List<ItemCategoryResponse>>> GetCategories(int id)
     {
+        // Get item
         var item = await _itemsRepository.Get(id);
+        if (item == null) return NotFound($"Item with {id} not found.");
+        
+        // Get categories
+        var categoriesResponse = _mapper.Map<List<ItemCategoryResponse>>(item.Categories);
 
-        if (item == null)
-            return NotFound($"Item with {id} not found.");
-
-        return Ok(item.Categories);
+        return Ok(categoriesResponse);
     }
 }
