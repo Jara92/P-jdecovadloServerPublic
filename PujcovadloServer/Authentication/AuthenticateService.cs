@@ -1,5 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Principal;
 using System.Text;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
@@ -157,5 +158,11 @@ public class AuthenticateService : IAuthenticateService
 
         // Return user by id
         return await _userManager.FindByNameAsync(userId);
+    }
+
+    /// <inheritdoc cref="IAuthenticateService"/>
+    public ClaimsPrincipal? GetPrincipal()
+    {
+        return _httpContextAccessor.HttpContext?.User;
     }
 }

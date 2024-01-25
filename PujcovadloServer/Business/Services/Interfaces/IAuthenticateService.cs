@@ -1,5 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Principal;
 using PujcovadloServer.Authentication;
 using PujcovadloServer.Authentication.Exceptions;
 using PujcovadloServer.Business.Enums;
@@ -37,4 +38,10 @@ public interface IAuthenticateService
     /// </summary>
     /// <returns>Current user entity or null if not authentized.</returns>
     public Task<ApplicationUser?> GetCurrentUser();
+
+    /// <summary>
+    /// Returns current user identity.
+    /// </summary>
+    /// <returns></returns>
+    public ClaimsPrincipal? GetPrincipal();
 }

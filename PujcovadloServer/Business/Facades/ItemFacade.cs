@@ -1,5 +1,9 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization.Infrastructure;
 using PujcovadloServer.Authentication;
+using PujcovadloServer.AuthorizationHandlers;
+using PujcovadloServer.AuthorizationHandlers.Exceptions;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Enums;
 using PujcovadloServer.Business.Exceptions;
@@ -19,13 +23,16 @@ public class ItemFacade
     private readonly ItemService _itemService;
     private readonly IAuthenticateService _authenticateService;
     private readonly IMapper _mapper;
+    private readonly IAuthorizationService _authorizationService;
 
-    public ItemFacade(IItemRepository itemRepository, ItemService itemService, IAuthenticateService authenticateService, IMapper mapper)
+    public ItemFacade(IItemRepository itemRepository, ItemService itemService, IAuthenticateService authenticateService,
+        IMapper mapper, IAuthorizationService authorizationService)
     {
         _itemRepository = itemRepository;
         _itemService = itemService;
         _authenticateService = authenticateService;
         _mapper = mapper;
+        _authorizationService = authorizationService;
     }
 
     /// <summary>
@@ -35,8 +42,8 @@ public class ItemFacade
     public async Task<Item> CreateItem(ItemRequest request)
     {
         var user = await _authenticateService.GetCurrentUser();
-        if(user == null) throw new UnauthorizedAccessException("User not found.");
-        
+        if (user == null) throw new UnauthorizedAccessException("User not found.");
+
         // Map request to item
         var item = _mapper.Map<Item>(request);
 
@@ -45,9 +52,12 @@ public class ItemFacade
 
         // Set alias
         item.Alias = UrlHelper.CreateUrlStub(item.Name);
-        
+
         // Set owner
         item.Owner = user;
+        
+        // Check permissions
+        await CheckPermissions(item, ItemAuthorizationHandler.Operations.Create);
 
         // Create the item  
         await _itemService.Create(item);
@@ -61,6 +71,9 @@ public class ItemFacade
         var item = await _itemRepository.Get(request.Id);
 
         if (item == null) throw new EntityNotFoundException($"Item with id {request.Id} not found.");
+
+        // Check authorization
+        await CheckPermissions(item, ItemAuthorizationHandler.Operations.Update);
 
         // Map request to item
         item.Name = request.Name;
@@ -78,41 +91,95 @@ public class ItemFacade
         {
             item.Categories.Add(_mapper.Map<ItemCategory>(category));
         }
-        
+
         // Item updated so we need to approve it
-        if(item.Status == ItemStatus.Denied)
+        if (item.Status == ItemStatus.Denied)
             item.Status = ItemStatus.Approving;
-        
+
         // Todo: update images
-        
+
         // Update the item
         await _itemService.Update(item);
     }
-    
+
     public async Task DeleteItem(int id)
     {
         // Get the item
         var item = await _itemService.Get(id);
         if (item == null) throw new EntityNotFoundException($"Item with id {id} not found.");
         
-        // TODO: Check that the item can be deleted (no active rentals etc.)
+        // Check permissions
+        await CheckPermissions(item, ItemAuthorizationHandler.Operations.Delete);
         
+        // TODO: Check that the item can be deleted (no active rentals etc.)
+
         // Delete the item
         await _itemService.Delete(item);
     }
-    
+
     public async Task<PaginatedList<Item>> GetMyItems(ItemFilter filter)
     {
         var user = await _authenticateService.GetCurrentUser();
-        
+
         if (user == null) throw new UnauthorizedAccessException("User not found.");
-        
+
         // Set owner id
         filter.OwnerId = user.Id;
-        
+
         // Get items
         var items = await _itemService.GetAll(filter);
-        
+
         return items;
+    }
+    
+    /// <summary>
+    /// Returns item with given id.
+    /// </summary>
+    /// <param name="id">Item's id</param>
+    /// <returns>Item</returns>
+    /// <exception cref="EntityNotFoundException">Thrown when item id is invalid.</exception>
+    public async Task<Item> GetItem(int id)
+    {
+        var item = await _itemService.Get(id);
+        
+        // Check if item exists
+        if (item == null) throw new EntityNotFoundException($"Item with id {id} not found.");
+        
+        // Check permissions
+        await CheckPermissions(item, ItemAuthorizationHandler.Operations.Read);
+        
+        // Return item
+        return item;
+    }
+
+    /// <summary>
+    /// Checks if the user has permissions to perform the operation on the item.
+    /// </summary>
+    /// <param name="item">The item.</param>
+    /// <param name="requirement">Required action</param>
+    /// <exception cref="ForbiddenAccessException">User does not have permission to perform the action.</exception>
+    /// <exception cref="UnauthorizedAccessException">User is not authorized.</exception>
+    private async Task CheckPermissions(Item item, OperationAuthorizationRequirement requirement)
+    {
+        // Get current principal
+        var principal = _authenticateService.GetPrincipal();
+        if(principal == null) throw new UnauthorizedAccessException();
+        
+        // Check requirement permissions
+        var authorizationResult = await _authorizationService.AuthorizeAsync(
+            principal, item, requirement);
+
+        // Throw exception if not authorized
+        if (!authorizationResult.Succeeded)
+        {
+            var identity = principal.Identity;
+         
+            // Throw UnauthorizedAccessException if not authenticated
+            if (identity == null || !identity.IsAuthenticated)
+                throw new UnauthorizedAccessException();
+            
+            // Throw ForbiddenAccessException if not authorized
+            throw new ForbiddenAccessException("You are not authorized to perform this operation.");
+        }
     }
 }
