@@ -5,7 +5,7 @@ using PujcovadloServer.Business.Interfaces;
 
 namespace PujcovadloServer.Business.Services;
 
-public class ItemService(IItemRepository repository) : ACrudService<Item, ItemFilter>(repository)
+public class ItemService(IItemRepository repository) : ACrudService<Item, IItemRepository, ItemFilter>(repository)
 {
     
     public override async Task Update(Item item)

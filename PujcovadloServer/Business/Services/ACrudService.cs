@@ -12,11 +12,13 @@ namespace PujcovadloServer.Business.Services;
 /// Implements all CRUD base methods.
 /// </summary>
 /// <typeparam name="T">Managed entity</typeparam>
-public abstract class ACrudService<T, G> : ICrudService<T, G> where T : BaseEntity where G : BaseFilter
+/// <typeparam name="R">Repository class</typeparam>
+/// <typeparam name="G">Filter class</typeparam>
+public abstract class ACrudService<T, R, G> : ICrudService<T, R, G> where T : BaseEntity where R: ICrudRepository<T, G> where G : BaseFilter
 {
-    protected readonly ICrudRepository<T, G> _repository;
+    protected readonly R _repository;
 
-    protected ACrudService(ICrudRepository<T, G> repository)
+    protected ACrudService(R repository)
     {
         _repository = repository;
     }

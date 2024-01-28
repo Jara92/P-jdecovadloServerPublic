@@ -4,13 +4,10 @@ using PujcovadloServer.Business.Interfaces;
 
 namespace PujcovadloServer.Business.Services;
 
-public class ItemCategoryService : ACrudService<ItemCategory, ItemCategoryFilter>
+public class ItemCategoryService : ACrudService<ItemCategory, IItemCategoryRepository, ItemCategoryFilter>
 {
-    protected IItemCategoryRepository _repository;
-    
     public ItemCategoryService(IItemCategoryRepository repository) : base(repository)
     {
-        _repository = repository;
     }
     
     public async Task<IList<ItemCategory>> GetByIds(IEnumerable<int> ids)
