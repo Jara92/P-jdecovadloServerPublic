@@ -1,5 +1,6 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using PujcovadloServer.Api.Filters;
 using PujcovadloServer.Business.Facades;
 using PujcovadloServer.Business.Filters;
 using PujcovadloServer.Business.Services;
@@ -9,6 +10,7 @@ namespace PujcovadloServer.Api.Controllers;
 
 [ApiController]
 [Route("api/item-categories")]
+[ServiceFilter(typeof(ExceptionFilter))]
 public class ItemCategoryController : ACrudController
 {
     private readonly ItemCategoryFacade _itemCategoryFacade;
@@ -78,8 +80,7 @@ public class ItemCategoryController : ACrudController
     public async Task<ActionResult<ItemCategoryResponse>> Get(int id)
     {
         // Get the category
-        var category = await _itemCategoryService.Get(id);
-        if (category == null) return NotFound($"ItemCategory with {id} not found.");
+        var category = await _itemCategoryFacade.Get(id);
         
         // Map to response
         var categoryResponse = _mapper.Map<ItemCategoryResponse>(category);

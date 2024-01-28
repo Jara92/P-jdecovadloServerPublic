@@ -1,4 +1,5 @@
 using PujcovadloServer.Business.Entities;
+using PujcovadloServer.Business.Exceptions;
 using PujcovadloServer.Business.Services;
 using PujcovadloServer.Helpers;
 
@@ -13,9 +14,19 @@ public class ItemCategoryFacade
         _itemCategoryService = itemCategoryService;
     }
 
-    public async Task<ItemCategory?> Get(int id)
+    /// <summary>
+    /// Returns category by given id.
+    /// </summary>
+    /// <param name="id">Category id</param>
+    /// <returns>Category identified by given id</returns>
+    /// <exception cref="EntityNotFoundException">Thrown if category with the id does not exist.</exception>
+    public async Task<ItemCategory> Get(int id)
     {
-        return await _itemCategoryService.Get(id);
+        var category =  await _itemCategoryService.Get(id);
+        
+        if (category == null) throw new EntityNotFoundException($"ItemCategory with {id} not found.");
+        
+        return category;
     }
 
     public async Task Create(ItemCategory newCategory)
