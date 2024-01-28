@@ -12,6 +12,7 @@ public class MappingProfile : Profile
     {
         CreateMap<Item, ItemResponse>();
         CreateMap<Item, ItemDetailResponse>();
+        CreateMap<Item, ItemOwnerResponse>();
         CreateMap<ItemRequest, Item>();
         
         CreateMap<ItemCategory, ItemCategoryResponse>();

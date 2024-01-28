@@ -3,6 +3,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using PujcovadloServer.Api.Filters;
 using PujcovadloServer.Authentication;
 using PujcovadloServer.Business.Enums;
 using PujcovadloServer.Business.Facades;
@@ -14,6 +15,8 @@ namespace PujcovadloServer.Api.Controllers;
 
 [ApiController]
 [Route("api/my-items")]
+[Authorize(Roles = UserRoles.Owner)]
+[ServiceFilter(typeof(ExceptionFilter))]
 public class MyItemController : ACrudController
 {
     private readonly ItemService _itemService;
@@ -28,16 +31,15 @@ public class MyItemController : ACrudController
     }
 
     [HttpGet]
-    [Authorize(Roles = UserRoles.Owner)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult> Index([FromQuery] ItemFilter filter)
+    public async Task<ActionResult<ItemOwnerResponse>> Index([FromQuery] ItemFilter filter)
     {
         // Get items
         var items = await _itemFacade.GetMyItems(filter);
 
         // Map items to response
-        var responseItems = _mapper.Map<List<ItemResponse>>(items);
+        var responseItems = _mapper.Map<List<ItemOwnerResponse>>(items);
 
         // Hateos item links
         foreach (var item in responseItems)
@@ -57,10 +59,31 @@ public class MyItemController : ACrudController
         var links = GeneratePaginationLinks(items, filter, nameof(Index));
 
         // Return response
-        return Ok(new ResponseList<ItemResponse>
+        return Ok(new ResponseList<ItemOwnerResponse>
         {
             Data = responseItems,
             Links = links
         });
+    }
+
+    /// <summary>
+    /// Returns full item by given id.
+    /// </summary>
+    /// <param name="id">Id of the item</param>
+    /// <returns>Returns all information about the item.</returns>
+    [HttpGet("{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<ItemOwnerResponse>> Get(int id)
+    {
+        var item = await _itemFacade.GetMyItem(id);
+        
+        var response = _mapper.Map<ItemOwnerResponse>(item);
+        
+        response.Links.Add(new LinkResponse(
+            _urlHelper.GetUriByAction(HttpContext, nameof(MyItemController.Get), "MyItem", values: new { response.Id }),
+            "SELF", "GET"));
+
+        return Ok(response);
     }
 }

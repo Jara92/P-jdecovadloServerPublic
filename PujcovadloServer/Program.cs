@@ -127,7 +127,7 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseDeveloperExceptionPage();
+   // app.UseDeveloperExceptionPage();
     
     // Add OpenAPI 3.0 document serving middleware
     // Available at: http://localhost:<port>/swagger/v1/swagger.json
@@ -137,7 +137,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+if (app.Environment.IsProduction())
+{
+    app.UseHttpsRedirection();
+}
+
 
 // Route controller actions
 app.MapControllers();

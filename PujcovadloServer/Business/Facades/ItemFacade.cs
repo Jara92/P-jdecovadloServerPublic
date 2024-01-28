@@ -156,6 +156,23 @@ public class ItemFacade
         // Return item
         return item;
     }
+    
+    /// <summary>
+    /// Returns item with given id if it belongs to the user.
+    /// </summary>
+    /// <param name="id">Id of the item</param>
+    /// <returns>The item.</returns>
+    /// <exception cref="ForbiddenAccessException">Throw if the user is not the owner</exception>
+    public async Task<Item> GetMyItem(int id)
+    {
+        var item = await GetItem(id);
+        
+        // Check if item belongs to the user
+        if(item.Owner.Id != (await _authenticateService.GetCurrentUser()).Id)
+            throw new ForbiddenAccessException("You are not authorized to perform this operation.");
+        
+        return item;
+    }
 
     /// <summary>
     /// Checks if the user has permissions to perform the operation on the item.
