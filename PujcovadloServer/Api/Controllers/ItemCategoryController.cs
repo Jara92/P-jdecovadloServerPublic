@@ -1,4 +1,5 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PujcovadloServer.Api.Filters;
 using PujcovadloServer.Business.Facades;
@@ -37,6 +38,7 @@ public class ItemCategoryController : ACrudController
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [Authorize]
     public async Task<ActionResult<List<ItemCategoryResponse>>> Index([FromQuery]ItemCategoryFilter filter)
     {
         // get categories by filter
@@ -77,6 +79,7 @@ public class ItemCategoryController : ACrudController
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [Authorize]
     public async Task<ActionResult<ItemCategoryResponse>> Get(int id)
     {
         // Get the category

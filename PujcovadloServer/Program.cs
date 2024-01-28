@@ -91,17 +91,22 @@ builder.Services.AddAuthentication(options =>
         };
     });
 
+// Authentication service
 builder.Services.AddScoped<IAuthenticateService, AuthenticateService>();
 
 // Authorization handlers
 builder.Services.AddScoped<IAuthorizationHandler, ItemAuthorizationHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, ItemCategoryAuthorizationHandler>();
 
+// Repositories
 builder.Services.AddScoped<IItemRepository, ItemRepository>();
 builder.Services.AddScoped<IItemCategoryRepository, ItemCategoryRepository>();
 
+// Services
 builder.Services.AddScoped<ItemService>();
 builder.Services.AddScoped<ItemCategoryService>();
 
+// Facades
 builder.Services.AddScoped<ItemFacade>();
 builder.Services.AddScoped<ItemCategoryFacade>();
 
