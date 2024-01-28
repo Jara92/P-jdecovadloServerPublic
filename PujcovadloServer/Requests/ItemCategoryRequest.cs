@@ -9,5 +9,5 @@ public class ItemCategoryRequest : EntityRequest
     
     public string? Alias { get; set; }
     
-    public string Description { get; set; } = default!;
+    public string? Description { get; set; }
 }

@@ -18,7 +18,6 @@ public class ItemRequest: EntityRequest
     public float? SellingPrice { get; set; }
     
     public float? PurchasePrice { get; set; }
-
-    // todo make DTOs
-    public virtual ICollection<ItemCategoryRequest> Categories { get; } = new List<ItemCategoryRequest>();
+    
+    public virtual ICollection<ItemCategoryRequest> Categories { get; set; } = new List<ItemCategoryRequest>();
 }

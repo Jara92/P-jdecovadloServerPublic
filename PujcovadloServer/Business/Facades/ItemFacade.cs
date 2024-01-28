@@ -1,6 +1,7 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
+using NuGet.Packaging;
 using PujcovadloServer.Authentication;
 using PujcovadloServer.AuthorizationHandlers;
 using PujcovadloServer.AuthorizationHandlers.Exceptions;
@@ -21,15 +22,17 @@ public class ItemFacade
 {
     private readonly IItemRepository _itemRepository;
     private readonly ItemService _itemService;
+    private readonly ItemCategoryService _itemCategoryService;
     private readonly IAuthenticateService _authenticateService;
     private readonly IMapper _mapper;
     private readonly IAuthorizationService _authorizationService;
 
-    public ItemFacade(IItemRepository itemRepository, ItemService itemService, IAuthenticateService authenticateService,
-        IMapper mapper, IAuthorizationService authorizationService)
+    public ItemFacade(IItemRepository itemRepository, ItemService itemService, ItemCategoryService itemCategoryService,
+        IAuthenticateService authenticateService, IMapper mapper, IAuthorizationService authorizationService)
     {
         _itemRepository = itemRepository;
         _itemService = itemService;
+        _itemCategoryService = itemCategoryService;
         _authenticateService = authenticateService;
         _mapper = mapper;
         _authorizationService = authorizationService;
@@ -85,12 +88,13 @@ public class ItemFacade
         item.PurchasePrice = request.PurchasePrice;
         item.SellingPrice = request.SellingPrice;
 
+        // New categories
+        var ids = request.Categories.Select(c => c.Id);
+        var categories = await _itemCategoryService.GetByIds(ids);
+        
         // Update categories
         item.Categories.Clear();
-        foreach (var category in request.Categories)
-        {
-            item.Categories.Add(_mapper.Map<ItemCategory>(category));
-        }
+        item.Categories.AddRange(categories);
 
         // Item updated so we need to approve it
         if (item.Status == ItemStatus.Denied)
@@ -99,6 +103,7 @@ public class ItemFacade
         // Todo: update images
 
         // Update the item
+        // 
         await _itemService.Update(item);
     }
 
