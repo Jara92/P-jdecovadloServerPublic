@@ -82,8 +82,13 @@ public class TenantFacade
         newLoan.PricePerUnit = item.PricePerDay;
         newLoan.RefundableDeposit = item.RefundableDeposit;
         
-        // Calculate the price
-        newLoan.Days = (int) (newLoan.To - newLoan.From).TotalDays;
+        // Calculate the price - take dates only to get rid of time so we get pretty accurate days
+        var days = (newLoan.To.Date - newLoan.From.Date).TotalDays;
+        // Set days to one if To and From are the same
+        if (days < 1) days = 1;
+        
+        // Set the days and expected price
+        newLoan.Days = (int) Math.Ceiling(days);
         newLoan.ExpectedPrice = newLoan.Days * newLoan.PricePerUnit;
 
         // create the loan

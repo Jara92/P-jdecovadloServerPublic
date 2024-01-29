@@ -1,6 +1,7 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PujcovadloServer.Api.Filters;
 using PujcovadloServer.Business.Enums;
 using PujcovadloServer.Business.Facades;
 using PujcovadloServer.Business.Filters;
@@ -12,6 +13,7 @@ namespace PujcovadloServer.Api.Controllers;
 [ApiController]
 [Route("api/my-tenant-loans")]
 [Authorize(Roles = UserRoles.Tenant)]
+[ServiceFilter(typeof(ExceptionFilter))]
 public class TenantLoanController : ACrudController
 {
     private readonly TenantFacade _tenantFacade;
@@ -93,8 +95,6 @@ public class TenantLoanController : ACrudController
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<LoanResponse>> CreateLoan([FromBody] TenantLoanRequest request)
     {
-        // todo: validation not working
-
         var loan = await _tenantFacade.CreateLoan(request);
         var responseLoan = _mapper.Map<LoanResponse>(loan);
 
