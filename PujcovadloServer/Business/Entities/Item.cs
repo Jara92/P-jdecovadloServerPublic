@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using PujcovadloServer.Authentication;
 using PujcovadloServer.Business.Enums;
 
@@ -8,14 +9,16 @@ namespace PujcovadloServer.Business.Entities;
 public class Item : BaseEntity
 {
     [Required]
+    [Column(TypeName = "VARCHAR")]
     [StringLength(64, MinimumLength = 6)]
     [RegularExpression(@"^[A-Z]+[a-zA-Z]+[0-9]*$")]
-    public string Name { get; set; }
+    public string Name { get; set; } = default!;
     
+    [Column(TypeName = "VARCHAR")]
     [StringLength(64, MinimumLength = 1)]
     public string? Alias { get; set; }
-    
-    public string Description { get; set; }
+
+    public string Description { get; set; } = default!;
     
     [ReadOnly(true)]
     public ItemStatus Status { get; set; } = ItemStatus.Public;

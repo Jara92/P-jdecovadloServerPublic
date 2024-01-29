@@ -1,33 +1,34 @@
-@PujcovadloServer_HostAddress = http://localhost:5046
-@PujcovadloServer_Token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiYWRtaW4iLCJqdGkiOiIxYTYxMjk2Ny04ODhmLTQ4MTUtOTZmYi1mOWEzMzRkN2JkYzYiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOlsiVXNlciIsIlRlbmFudCIsIk93bmVyIl0sImV4cCI6MTcwNjIwMzAxNywiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo1MDQ2IiwiYXVkIjoiaHR0cDovL2xvY2FsaG9zdDo1MDQ2In0.eOkFOEvnjHpqMPA-MJGLPOMFNUgDI7mHFW9ioqm-qoM
+@PujcovadloServer_HostAddress = http://localhost:5046/api
+@PujcovadloServer_Token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiYWRtaW4iLCJqdGkiOiI1ZGM3M2E4ZC03NzcwLTQ2NzMtYjk4Yy1kMTYwMTRkMzFiMWUiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOlsiVXNlciIsIlRlbmFudCIsIk93bmVyIl0sImV4cCI6MTcwNjY4OTIyNCwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo1MDQ2IiwiYXVkIjoiaHR0cDovL2xvY2FsaG9zdDo1MDQ2In0.RpmVtSozIO0cTFXSnJprUvMC6Ocdmrq83VekpVBimw4
 
-GET {{PujcovadloServer_HostAddress}}/api/items/
+GET {{PujcovadloServer_HostAddress}}/items/
 Accept: application/json
 
 ###
-GET {{PujcovadloServer_HostAddress}}/api/my-items/
+GET {{PujcovadloServer_HostAddress}}/my-items/
 Accept: application/json
 Authorization: Bearer {{PujcovadloServer_Token}}
 
 ###
-GET {{PujcovadloServer_HostAddress}}/api/items/?Page=1&PageSize=3&Sortby=Id&SortOrder=True&status=3
+GET {{PujcovadloServer_HostAddress}}/items/?Page=1&PageSize=3&Sortby=Id&SortOrder=True&status=3
 Accept: application/json
 
 ###
-GET {{PujcovadloServer_HostAddress}}/api/items/1
+GET {{PujcovadloServer_HostAddress}}/items/1
+Accept: application/json
+Authorization: Bearer {{PujcovadloServer_Token}}
+
+###
+GET {{PujcovadloServer_HostAddress}}/items/1/categories
 Accept: application/json
 
 ###
-GET {{PujcovadloServer_HostAddress}}/api/items/1/categories
-Accept: application/json
-
-###
-GET {{PujcovadloServer_HostAddress}}/api/item-categories/1/items
+GET {{PujcovadloServer_HostAddress}}/item-categories/1/items
 Accept: application/json
 
 ###
 
-POST {{PujcovadloServer_HostAddress}}/api/items/
+POST {{PujcovadloServer_HostAddress}}/items/
 Content-Type: application/json
 Authorization: Bearer {{PujcovadloServer_Token}}
 
@@ -41,12 +42,13 @@ Authorization: Bearer {{PujcovadloServer_Token}}
 }
 
 ###
-PUT {{PujcovadloServer_HostAddress}}/api/items/1
+PUT {{PujcovadloServer_HostAddress}}/items/1
 Content-Type: application/json
+Authorization: Bearer {{PujcovadloServer_Token}}
 
 {
   "id": 1,
-  "name": "Úprava testovací položky 16",
+  "name": "Úprava testovací položky 1",
   "description": "Popis testovacího itemu.",
   "status": 2,
   "parameters": "velikost 12",
@@ -54,15 +56,17 @@ Content-Type: application/json
 }
 
 ###
-DELETE {{PujcovadloServer_HostAddress}}/api/items/1
+DELETE {{PujcovadloServer_HostAddress}}/items/1
 
 ###
-GET {{PujcovadloServer_HostAddress}}/api/item-categories
+GET {{PujcovadloServer_HostAddress}}/item-categories
 Accept: application/json
+Authorization: Bearer {{PujcovadloServer_Token}}
 
 ###
-POST {{PujcovadloServer_HostAddress}}/api/item-categories
+POST {{PujcovadloServer_HostAddress}}/item-categories
 Content-Type: application/json
+Authorization: Bearer {{PujcovadloServer_Token}}
 
 {
   "name": "Testovací kategorie",
@@ -70,7 +74,7 @@ Content-Type: application/json
 }
 
 ###
-POST {{PujcovadloServer_HostAddress}}/api/Authenticate/login
+POST {{PujcovadloServer_HostAddress}}/Authenticate/login
 Content-Type: application/json
 
 {
@@ -79,7 +83,7 @@ Content-Type: application/json
 }
 
 ###
-POST {{PujcovadloServer_HostAddress}}/api/Authenticate/register
+POST {{PujcovadloServer_HostAddress}}/Authenticate/register
 Content-Type: application/json
 
 {

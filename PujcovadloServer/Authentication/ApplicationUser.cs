@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Identity;
 
 namespace PujcovadloServer.Authentication;
@@ -6,13 +7,9 @@ namespace PujcovadloServer.Authentication;
 public class ApplicationUser : IdentityUser<int>
 {
     
-    [Required] [MaxLength(32)] public string FirstName { get; set; } = null!;
+    [Required] [MaxLength(32)] [Column(TypeName = "VARCHAR")] public string FirstName { get; set; } = null!;
 
-    [Required] [MaxLength(32)] public string LastName { get; set; } = null!;
-
-    [Required] [MaxLength(64)] public string Email { get; set; } = null!;
-
-    [MaxLength(20)] public string? PhoneNumber { get; set; }
+    [Required] [MaxLength(32)] [Column(TypeName = "VARCHAR")] public string LastName { get; set; } = null!;
 
     public DateTime? DateOfBirth { get; set; }
 
