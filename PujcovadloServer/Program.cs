@@ -14,6 +14,7 @@ using NSwag;
 using PujcovadloServer.Api.Filters;
 using PujcovadloServer.Authentication;
 using PujcovadloServer.AuthorizationHandlers;
+using PujcovadloServer.Business.Factories.State;
 using PujcovadloServer.Business.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -97,6 +98,9 @@ builder.Services.AddScoped<IAuthenticateService, AuthenticateService>();
 // Authorization handlers
 builder.Services.AddScoped<IAuthorizationHandler, ItemAuthorizationHandler>();
 builder.Services.AddScoped<IAuthorizationHandler, ItemCategoryAuthorizationHandler>();
+
+//Factories
+builder.Services.AddScoped<LoanStateFactory>();
 
 // Repositories
 builder.Services.AddScoped<IItemRepository, ItemRepository>();

@@ -99,52 +99,21 @@ public class TenantFacade
 
     public async Task UpdateMyLoan(TenantLoanRequest request)
     {
+        // Get current user
+        var user = await _authenticateService.GetCurrentUser();
+        if (user == null) throw new AuthenticationException();
+        
+        // Get the loan
         var oldLoan = await GetMyLoan(request.Id);
 
-        if (request.Status != null)
+        // Check if the status has been changed
+        if (request.Status != null && request.Status != oldLoan.Status)
         {
-            // Original status Inquired, Approved, PreparedForPickup
-            if (oldLoan.Status == LoanStatus.Inquired || oldLoan.Status == LoanStatus.Approved ||
-                oldLoan.Status == LoanStatus.PreparedForPickup)
-            {
-                // New status cancelled
-                if (request.Status == LoanStatus.Cancelled)
-                {
-                    // TODO: Notice owner
-                    oldLoan.Status = LoanStatus.Cancelled;
-                }
-            }
-
-            // Original status PreparedForPickup
-            if (oldLoan.Status == LoanStatus.PreparedForPickup)
-            {
-                // Pickup was denied
-                if (request.Status == LoanStatus.PickupDenied)
-                {
-                    oldLoan.Status = LoanStatus.PickupDenied;
-                }
-                // Pickup was approved
-                else if (request.Status == LoanStatus.Active)
-                {
-                    oldLoan.Status = LoanStatus.Active;
-                }
-            }
-
-            // LoanStatus.Active -> LoanStatus.PreparedForReturn available for the owner only
-
-            if (oldLoan.Status == LoanStatus.PreparedForReturn)
-            {
-                // Return was denied
-                if (request.Status == LoanStatus.ReturnDenied)
-                {
-                    oldLoan.Status = LoanStatus.ReturnDenied;
-                }
-                // return was approved
-                else if (request.Status == LoanStatus.Returned)
-                {
-                    oldLoan.Status = LoanStatus.Returned;
-                }
-            }
+            // get current state
+            var state = _loanService.GetState(oldLoan);
+            
+            // handle the request
+            state.HandleTenant(oldLoan, request.Status.Value);
         }
 
         /*

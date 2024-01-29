@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
@@ -27,6 +28,10 @@ public class ExceptionFilter : IExceptionFilter
             context.Result = new ConflictResult();
         }
         else if (context.Exception is ArgumentNullException)
+        {
+            context.Result = new BadRequestResult();
+        }
+        else if (context.Exception is ActionNotAllowedException)
         {
             context.Result = new BadRequestResult();
         }

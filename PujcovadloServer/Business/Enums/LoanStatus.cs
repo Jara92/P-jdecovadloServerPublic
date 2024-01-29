@@ -3,8 +3,8 @@ namespace PujcovadloServer.Business.Enums;
 public enum LoanStatus
 {
     Inquired = 1,
-    Approved = 2,
-    Rejected = 3,
+    Accepted = 2,
+    Denied = 3,
     Cancelled = 4,
     PreparedForPickup = 5,
     PickupDenied = 6,
