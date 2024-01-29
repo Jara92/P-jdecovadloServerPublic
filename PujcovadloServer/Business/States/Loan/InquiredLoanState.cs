@@ -8,6 +8,8 @@ public class InquiredLoanState : ILoanState
     /// <inheritdoc cref="ILoanState"/>
     public void HandleTenant(Entities.Loan loan, LoanStatus newStatus)
     {
+        if (loan.Status == newStatus) return;
+        
         switch (newStatus)
         {
             // Tenant can cancel the loan
@@ -23,6 +25,9 @@ public class InquiredLoanState : ILoanState
     /// <inheritdoc cref="ILoanState"/>
     public void HandleOwner(Entities.Loan loan, LoanStatus newStatus)
     {
+        // TODO: FIND A BETTER WAY
+        if (loan.Status == newStatus) return;
+        
         switch (newStatus)
         {
             // Owner can accept or deny the loan
