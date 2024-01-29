@@ -19,5 +19,6 @@ public class TenantLoanRequest : EntityRequest
 
     public string? TenantNote { get; set; }
 
+    [Required]
     public ItemRequest Item { get; set; } = default!;
 }

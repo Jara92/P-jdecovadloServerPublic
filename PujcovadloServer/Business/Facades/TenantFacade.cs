@@ -79,7 +79,7 @@ public class TenantFacade
         
         // Set the item
         newLoan.Item = item;
-        newLoan.PricePerUnit = item.PricePerDay;
+        newLoan.PricePerDay = item.PricePerDay;
         newLoan.RefundableDeposit = item.RefundableDeposit;
         
         // Calculate the price - take dates only to get rid of time so we get pretty accurate days
@@ -89,7 +89,7 @@ public class TenantFacade
         
         // Set the days and expected price
         newLoan.Days = (int) Math.Ceiling(days);
-        newLoan.ExpectedPrice = newLoan.Days * newLoan.PricePerUnit;
+        newLoan.ExpectedPrice = newLoan.Days * newLoan.PricePerDay;
 
         // create the loan
         await _loanService.Create(newLoan);
