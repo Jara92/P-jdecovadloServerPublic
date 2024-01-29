@@ -122,7 +122,7 @@ public class ItemController : ACrudController
         var responseItem = _mapper.Map<ItemResponse>(newItem);
 
         // generate response with location header
-        return Created(_urlHelper.GetUriByAction(HttpContext, nameof(Get), values: newItem.Id), responseItem);
+        return CreatedAtAction(_urlHelper.GetUriByAction(HttpContext, nameof(Get), values: newItem.Id), responseItem);
     }
 
     /// <summary>
