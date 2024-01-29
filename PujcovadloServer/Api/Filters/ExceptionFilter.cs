@@ -26,5 +26,9 @@ public class ExceptionFilter : IExceptionFilter
         {
             context.Result = new ConflictResult();
         }
+        else if (context.Exception is ArgumentNullException)
+        {
+            context.Result = new BadRequestResult();
+        }
     }
 }

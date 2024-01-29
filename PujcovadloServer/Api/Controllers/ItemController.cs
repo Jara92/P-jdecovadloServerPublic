@@ -141,6 +141,7 @@ public class ItemController : ACrudController
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ValidateIdFilter]
+    [Authorize(Roles = UserRoles.Owner)]
     public async Task<IActionResult> Update(int id, [FromBody] ItemRequest request)
     {
         // Update the item

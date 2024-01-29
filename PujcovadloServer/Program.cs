@@ -101,14 +101,18 @@ builder.Services.AddScoped<IAuthorizationHandler, ItemCategoryAuthorizationHandl
 // Repositories
 builder.Services.AddScoped<IItemRepository, ItemRepository>();
 builder.Services.AddScoped<IItemCategoryRepository, ItemCategoryRepository>();
+builder.Services.AddScoped<ILoanRepository, LoanRepository>();
 
 // Services
 builder.Services.AddScoped<ItemService>();
 builder.Services.AddScoped<ItemCategoryService>();
+builder.Services.AddScoped<LoanService>();
 
 // Facades
 builder.Services.AddScoped<ItemFacade>();
 builder.Services.AddScoped<ItemCategoryFacade>();
+builder.Services.AddScoped<LoanFacade>();
+builder.Services.AddScoped<TenantFacade>();
 
 // Filters
 builder.Services.AddScoped<ExceptionFilter>();

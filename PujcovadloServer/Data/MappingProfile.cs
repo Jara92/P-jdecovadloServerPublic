@@ -19,6 +19,9 @@ public class MappingProfile : Profile
         CreateMap<ItemCategoryRequest, ItemCategory>();
 
         CreateMap<ApplicationUser, UserResponse>();
+        
+        CreateMap<Loan, LoanResponse>();
+        CreateMap<TenantLoanRequest, Loan>();
 
         // CreateMap<ItemCategory, ItemCategoryDto>();
         //CreateMap<ItemCategoryDto, ItemCategory>();

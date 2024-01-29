@@ -15,6 +15,7 @@ namespace PujcovadloServer.Data
 
         public DbSet<Item> Item { get; set; } = default!;
         public DbSet<ItemCategory> ItemCategory { get; set; } = default!;
+        public DbSet<Loan> Loan { get; set; } = default!;
        // public DbSet<User> User { get; set; } = default!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
