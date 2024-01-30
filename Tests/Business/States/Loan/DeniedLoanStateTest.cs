@@ -3,34 +3,35 @@ using PujcovadloServer.Business.Exceptions;
 
 namespace Tests.Business.States.Loan;
 
-public class InquiredLoanStateTest : ALoanStateTest
+public class DeniedLoanStateTest : ALoanStateTest
 {
     [SetUp]
     public void Setup()
     {
-        Setup(LoanStatus.Inquired);
+        Setup(LoanStatus.Denied);
     }
 
     #region Tenanttests
 
     [Test]
-    public void HandleTenant_ChangesStatusToCancelled()
+    public void HandleTenant_ChangesStatusToAllowed()
     {
-        // Act
-        _state.HandleTenant(_loan, LoanStatus.Cancelled);
+        var allowed = new List<LoanStatus>
+        {
+            _status
+        };
 
-        // Should be able to cancel the loan
-        Assert.That(_loan.Status, Is.EqualTo(LoanStatus.Cancelled));
-    }
+        // Check all allowed statuses
+        foreach (var status in allowed)
+        {
+            _loan.Status = _status;
 
-    [Test]
-    public void HandleTenant_ChangesStatusToInquired()
-    {
-        // Act 
-        _state.HandleTenant(_loan, _status);
+            // Act
+            _state.HandleTenant(_loan, status);
 
-        // Should be the same and not throw an exception
-        Assert.That(_loan.Status, Is.EqualTo(_status));
+            // Should be able to change the status
+            Assert.That(_loan.Status, Is.EqualTo(status));
+        }
     }
 
     [Test]
@@ -38,16 +39,16 @@ public class InquiredLoanStateTest : ALoanStateTest
     {
         var disallowed = new List<LoanStatus>
         {
+            LoanStatus.Inquired,
             LoanStatus.Accepted,
-            LoanStatus.Denied,
+            LoanStatus.Cancelled,
+            LoanStatus.Active,
             LoanStatus.PreparedForPickup,
             LoanStatus.PickupDenied,
-            LoanStatus.Active,
             LoanStatus.PreparedForReturn,
             LoanStatus.ReturnDenied,
             LoanStatus.Returned,
         };
-
         foreach (var status in disallowed)
         {
             // Act & Assert
@@ -66,8 +67,6 @@ public class InquiredLoanStateTest : ALoanStateTest
         var allowed = new List<LoanStatus>
         {
             _status,
-            LoanStatus.Denied,
-            LoanStatus.Accepted,
         };
 
         // Check all allowed statuses
@@ -89,6 +88,8 @@ public class InquiredLoanStateTest : ALoanStateTest
         // Disallowed statuses
         var disallowed = new List<LoanStatus>
         {
+            LoanStatus.Inquired,
+            LoanStatus.Accepted,
             LoanStatus.Cancelled,
             LoanStatus.PreparedForPickup,
             LoanStatus.PickupDenied,

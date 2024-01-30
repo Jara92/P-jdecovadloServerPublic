@@ -8,6 +8,7 @@ public abstract class ALoanStateTest
 {
     protected PujcovadloServer.Business.Entities.Loan _loan;
     protected ILoanState _state;
+    protected LoanStatus _status;
     
     
     public void Setup(LoanStatus status)
@@ -22,5 +23,6 @@ public abstract class ALoanStateTest
 
         // Should not be like this but it is the easiest way to test it
         _state = new LoanStateFactory().GetState(status);
+        _status = status;
     }
 }

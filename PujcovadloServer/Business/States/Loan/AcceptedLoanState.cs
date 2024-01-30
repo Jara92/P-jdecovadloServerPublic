@@ -25,8 +25,9 @@ public class AcceptedLoanState : ALoanState
     {
         switch (newStatus)
         {
-            // Owner can accept or deny the loan
+            // Can cancel, activate or prepare for pickup
             case LoanStatus.Cancelled:
+            case LoanStatus.Active:
             case LoanStatus.PreparedForPickup:
                 loan.Status = newStatus;
                 break;

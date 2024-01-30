@@ -18,8 +18,9 @@ public class ActiveLoanState : ALoanState
     {
         switch (newStatus)
         {
-            // Owner can prepare the loan for return
+            // Owner can prepare the loan for return or return the loan
             case LoanStatus.PreparedForReturn:
+            case LoanStatus.Returned:
                 loan.Status = newStatus;
                 break;
             default:

@@ -5,5 +5,12 @@
     &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.Business.States.Loan.InquiredLoanStatusTest.HandleTenant_ChangesStatusToInquired&lt;/TestId&gt;
     &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.Business.States.Loan.InquiredLoanStatusTest.HandleOwner_ChangesStatusToAllowed&lt;/TestId&gt;
     &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.Business.States.Loan.InquiredLoanStatusTest.HandleOwner_ThrowsException_WhenOtherStatusCalled&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.Business.States.Loan.AcceptedStateTest&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.Business.States.Loan.CanceledStateTest&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.Business.States.Loan.DeniedStateTest&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.Business.States.Loan.ActiveLoanStateTest&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.Business.States.Loan.PrepareForPickupLoanStateTest&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.Business.States.Loan.PickupDeniedLoanStateTest&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.Business.States.Loan.PrepareForReturnLoanStateTest&lt;/TestId&gt;
   &lt;/TestAncestor&gt;
 &lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>
