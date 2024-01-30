@@ -25,6 +25,10 @@ public class LoanRepository : ACrudRepository<Loan, LoanFilter>, ILoanRepository
         // Filter by tenant
         if(filter.TenantId != null)
             query = query.Where(l => l.Tenant.Id == filter.TenantId);
+
+        // Filter by owner
+        if (filter.OwnerId != null)
+            query = query.Where(l => l.Item.Owner.Id == filter.OwnerId);
         
         return base.GetAll(query, filter);
     }

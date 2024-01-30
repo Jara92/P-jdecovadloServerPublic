@@ -126,6 +126,7 @@ builder.Services.AddScoped<ItemFacade>();
 builder.Services.AddScoped<ItemCategoryFacade>();
 builder.Services.AddScoped<LoanFacade>();
 builder.Services.AddScoped<TenantFacade>();
+builder.Services.AddScoped<OwnerFacade>();
 
 // Filters
 builder.Services.AddScoped<ExceptionFilter>();

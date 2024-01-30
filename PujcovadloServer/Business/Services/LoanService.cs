@@ -30,4 +30,10 @@ public class LoanService : ACrudService<Loan, ILoanRepository, LoanFilter>
     {
         return _loanStateFactory.GetState(loan.Status);
     }
+
+    public async Task<PaginatedList<Loan>> GetLoansByOwner(ApplicationUser user, LoanFilter filter)
+    {
+        filter.OwnerId = user.Id;
+        return await _repository.GetAll(filter);
+    }
 }
