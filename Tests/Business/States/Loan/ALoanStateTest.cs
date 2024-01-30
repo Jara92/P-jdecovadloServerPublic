@@ -4,7 +4,7 @@ using PujcovadloServer.Business.States.Loan;
 
 namespace Tests.Business.States.Loan;
 
-public abstract class ALoanStatusTest
+public abstract class ALoanStateTest
 {
     protected PujcovadloServer.Business.Entities.Loan _loan;
     protected ILoanState _state;

@@ -3,7 +3,7 @@ using PujcovadloServer.Business.Exceptions;
 
 namespace Tests.Business.States.Loan;
 
-public class InquiredLoanStatusTest : ALoanStatusTest
+public class InquiredLoanStateTest : ALoanStateTest
 {
     [SetUp]
     public void Setup()

@@ -3,10 +3,10 @@ using PujcovadloServer.Business.Exceptions;
 
 namespace PujcovadloServer.Business.States.Loan;
 
-public class PickupDeniedLoanState : ILoanState
+public class PickupDeniedLoanState : ALoanState
 {
     /// <inheritdoc cref="ILoanState"/>
-    public void HandleTenant(Entities.Loan loan, LoanStatus newStatus)
+    protected override void HandleTenantImplementation(Entities.Loan loan, LoanStatus newStatus)
     {
         switch (newStatus)
         {
@@ -21,7 +21,7 @@ public class PickupDeniedLoanState : ILoanState
     }
 
     /// <inheritdoc cref="ILoanState"/>
-    public void HandleOwner(Entities.Loan loan, LoanStatus newStatus)
+    protected override void HandleOwnerImplementation(Entities.Loan loan, LoanStatus newStatus)
     {
         switch (newStatus)
         {
