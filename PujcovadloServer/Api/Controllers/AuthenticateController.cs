@@ -1,4 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PujcovadloServer.Authentication;
 using PujcovadloServer.Authentication.Exceptions;
@@ -8,6 +9,7 @@ namespace PujcovadloServer.Api.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[AllowAnonymous]
 public class AuthenticateController : ControllerBase
 {
     

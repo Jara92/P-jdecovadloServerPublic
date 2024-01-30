@@ -92,6 +92,15 @@ builder.Services.AddAuthentication(options =>
         };
     });
 
+// Authorization setup
+builder.Services.AddAuthorization(options =>
+{
+    // Require authenticated users for all requests
+    options.FallbackPolicy = new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build();
+});
+
 // Authentication service
 builder.Services.AddScoped<IAuthenticateService, AuthenticateService>();
 
