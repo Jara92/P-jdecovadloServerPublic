@@ -64,7 +64,7 @@ else
 }
 
 // For Identity
-builder.Services.AddIdentity<ApplicationUser, IdentityRole<int>>()
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<PujcovadloServerContext>()
     .AddDefaultTokenProviders();
 

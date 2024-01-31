@@ -6,7 +6,7 @@ using PujcovadloServer.Business.Entities;
 
 namespace PujcovadloServer.Data
 {
-    public class PujcovadloServerContext : IdentityDbContext<ApplicationUser, IdentityRole<int>, int>
+    public class PujcovadloServerContext : IdentityDbContext<ApplicationUser, IdentityRole, string>
     {
         public PujcovadloServerContext(DbContextOptions<PujcovadloServerContext> options)
             : base(options)

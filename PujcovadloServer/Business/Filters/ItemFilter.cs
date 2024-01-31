@@ -39,5 +39,5 @@ public class ItemFilter : BaseFilter
     /// <summary>
     /// Owner (user) id.
     /// </summary>
-    public int? OwnerId { get; set; }
+    public string? OwnerId { get; set; }
 }

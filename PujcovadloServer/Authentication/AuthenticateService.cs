@@ -13,11 +13,11 @@ namespace PujcovadloServer.Authentication;
 public class AuthenticateService : IAuthenticateService
 {
     private readonly UserManager<ApplicationUser> _userManager;
-    private readonly RoleManager<IdentityRole<int>> _roleManager;
+    private readonly RoleManager<IdentityRole> _roleManager;
     private readonly IConfiguration _configuration;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public AuthenticateService(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole<int>> roleManager,
+    public AuthenticateService(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager,
         IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
     {
         _userManager = userManager;
@@ -33,16 +33,16 @@ public class AuthenticateService : IAuthenticateService
     {
         // Create roles if they don't exist
         if (!await _roleManager.RoleExistsAsync(UserRoles.Admin))
-            await _roleManager.CreateAsync(new IdentityRole<int>(UserRoles.Admin));
+            await _roleManager.CreateAsync(new IdentityRole(UserRoles.Admin));
 
         if (!await _roleManager.RoleExistsAsync(UserRoles.User))
-            await _roleManager.CreateAsync(new IdentityRole<int>(UserRoles.User));
+            await _roleManager.CreateAsync(new IdentityRole(UserRoles.User));
 
         if (!await _roleManager.RoleExistsAsync(UserRoles.Tenant))
-            await _roleManager.CreateAsync(new IdentityRole<int>(UserRoles.Tenant));
+            await _roleManager.CreateAsync(new IdentityRole(UserRoles.Tenant));
 
         if (!await _roleManager.RoleExistsAsync(UserRoles.Owner))
-            await _roleManager.CreateAsync(new IdentityRole<int>(UserRoles.Owner));
+            await _roleManager.CreateAsync(new IdentityRole(UserRoles.Owner));
     }
 
     /// <inheritdoc cref="IAuthenticateService"/>

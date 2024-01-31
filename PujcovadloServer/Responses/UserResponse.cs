@@ -2,8 +2,7 @@ namespace PujcovadloServer.Responses;
 
 public class UserResponse
 {
-    // TODO: EntityResponse instead of this
-    public int Id { get; set; }
+    public string Id { get; set; } = default!;
     
     public string Username { get; set; } = default!;
     

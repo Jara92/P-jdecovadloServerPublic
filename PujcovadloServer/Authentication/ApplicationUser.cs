@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace PujcovadloServer.Authentication;
 
-public class ApplicationUser : IdentityUser<int>
+public class ApplicationUser : IdentityUser
 {
     
     [Required] [MaxLength(32)] [Column(TypeName = "VARCHAR")] public string FirstName { get; set; } = null!;
