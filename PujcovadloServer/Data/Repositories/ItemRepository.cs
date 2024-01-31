@@ -18,9 +18,11 @@ public class ItemRepository : ACrudRepository<Item, ItemFilter>, IItemRepository
         _dbSet = context.Item;
     }
     
-    public async Task<PaginatedList<Item>> GetAll(ItemFilter filter)
+    public override async Task<PaginatedList<Item>> GetAll(ItemFilter filter)
     {
         var query = _dbSet.AsQueryable();
+        
+        // Todo: dont show deleted items
         
         // Filter by status
         if(filter.Status != null)
@@ -49,14 +51,15 @@ public class ItemRepository : ACrudRepository<Item, ItemFilter>, IItemRepository
         return await base.GetAll(query, filter);
     }
 
-    public async Task<Item?> Get(int id)
+    public override async Task<Item?> Get(int id)
     {
+        // Todo: dont show deleted items
         return await _dbSet.
             // Include(i => i.ItemCategories).
             FirstOrDefaultAsync(m => m.Id == id);
     }
 
-    public async Task Create(Item item)
+    public override async Task Create(Item item)
     {
         item.CreatedAt = DateTime.Now;
 
@@ -64,7 +67,7 @@ public class ItemRepository : ACrudRepository<Item, ItemFilter>, IItemRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task Update(Item item)
+    public override async Task Update(Item item)
     {
         var oldItem = await Get(item.Id);
 
@@ -83,7 +86,7 @@ public class ItemRepository : ACrudRepository<Item, ItemFilter>, IItemRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task Delete(Item item)
+    public override async Task Delete(Item item)
     {
         _context.Remove(item);
         await _context.SaveChangesAsync();
