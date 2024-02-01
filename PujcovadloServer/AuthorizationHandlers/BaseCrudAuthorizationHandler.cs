@@ -16,7 +16,7 @@ public abstract class BaseCrudAuthorizationHandler<T, G> : AuthorizationHandler<
         _authenticateService = authenticateService;
     }
 
-    protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, T requirement, G resource)
+    protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, T requirement, G loan)
     {
         // Admin can do anything
         if (context.User.IsInRole(UserRoles.Admin))

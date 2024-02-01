@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
+using Namotion.Reflection;
 using PujcovadloServer.AuthorizationHandlers.Exceptions;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Enums;
@@ -7,18 +8,18 @@ using PujcovadloServer.Business.Services.Interfaces;
 
 namespace PujcovadloServer.AuthorizationHandlers;
 
-public class ItemAuthorizationHandler : BaseCrudAuthorizationHandler<OperationAuthorizationRequirement, Item>
+public class LoanAuthorizationHandler : BaseCrudAuthorizationHandler<OperationAuthorizationRequirement, Loan>
 {
-    public ItemAuthorizationHandler(IAuthenticateService authenticateService) : base(authenticateService)
+    public LoanAuthorizationHandler(IAuthenticateService authenticateService) : base(authenticateService)
     {
     }
 
     protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
-        OperationAuthorizationRequirement requirement, Item loan)
+        OperationAuthorizationRequirement requirement, Loan loan)
     {
         await base.HandleRequirementAsync(context, requirement, loan);
 
-        // Get current user 
+        // Get current user id
         var userId = _authenticateService.GetCurrentUserId();
         if (userId == null) return;
 
@@ -28,23 +29,19 @@ public class ItemAuthorizationHandler : BaseCrudAuthorizationHandler<OperationAu
         {
             case nameof(Operations.Create):
                 // Only owners can create a new Item
-                if (context.User.IsInRole(UserRoles.Owner))
+                if (context.User.IsInRole(UserRoles.Tenant))
                     context.Succeed(requirement);
                 break;
             case nameof(Operations.Read):
-                // Items is public
-                if (loan.Status == ItemStatus.Public)
-                    context.Succeed(requirement);
-
-                // Or I am the owner
-                if (loan.Owner.Id == userId)
+                // User is the tenant or the owner
+                if (loan.Tenant.Id == userId || loan.Item.Owner.Id == userId)
                     context.Succeed(requirement);
 
                 break;
             case nameof(Operations.Update):
             case nameof(Operations.Delete):
                 // I am the owner
-                if (loan.Owner.Id == userId)
+                if (loan.Tenant.Id == userId || loan.Item.Owner.Id == userId)
                     context.Succeed(requirement);
                 break;
             default:

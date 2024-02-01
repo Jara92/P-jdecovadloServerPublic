@@ -1,4 +1,8 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
+using PujcovadloServer.Authentication.Exceptions;
+using PujcovadloServer.AuthorizationHandlers.Exceptions;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Filters;
 using PujcovadloServer.Lib;
@@ -6,12 +10,14 @@ using PujcovadloServer.Responses;
 
 namespace PujcovadloServer.Api.Controllers;
 
-public abstract class ACrudController : ControllerBase
+public abstract class ACrudController<T> : ControllerBase where T : BaseEntity
 {
+    protected readonly IAuthorizationService _authorizationService;
     protected readonly LinkGenerator _urlHelper;
 
-    public ACrudController(LinkGenerator urlHelper)
+    public ACrudController(IAuthorizationService authorizationService, LinkGenerator urlHelper)
     {
+        _authorizationService = authorizationService;
         _urlHelper = urlHelper;
     }
 
@@ -41,5 +47,31 @@ public abstract class ACrudController : ControllerBase
         }
 
         return links;
+    }
+
+    /// <summary>
+    /// Checks if the user has permissions to perform the operation on the entity.
+    /// </summary>
+    /// <param name="entity">The entity.</param>
+    /// <param name="requirement">Required action</param>
+    /// <exception cref="ForbiddenAccessException">User does not have permission to perform the action.</exception>
+    /// <exception cref="UnauthorizedAccessException">User is not authorized.</exception>
+    protected async Task CheckPermissions(T entity, OperationAuthorizationRequirement requirement)
+    {
+        // Check requirement permissions
+        var authorizationResult = await _authorizationService.AuthorizeAsync(User, entity, requirement);
+
+        // Throw exception if not authorized
+        if (!authorizationResult.Succeeded)
+        {
+            var identity = User.Identity;
+
+            // Throw UnauthorizedAccessException if not authenticated
+            if (identity == null || !identity.IsAuthenticated)
+                throw new NotAuthenticatedException();
+
+            // Throw ForbiddenAccessException if not authorized
+            throw new ForbiddenAccessException("You are not authorized to perform this operation.");
+        }
     }
 }

@@ -44,4 +44,6 @@ public interface IAuthenticateService
     /// </summary>
     /// <returns></returns>
     public ClaimsPrincipal? GetPrincipal();
+
+    public string? GetCurrentUserId();
 }

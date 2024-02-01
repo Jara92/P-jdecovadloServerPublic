@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
+using PujcovadloServer.Authentication.Exceptions;
 using PujcovadloServer.AuthorizationHandlers.Exceptions;
 using PujcovadloServer.Business.Exceptions;
 
@@ -13,8 +14,13 @@ public class ExceptionFilter : IExceptionFilter
     {
         if (context.Exception is ForbiddenAccessException)
         {
-            context.Result = new ForbidResult(context.Exception.Message);
+            context.Result = new ForbidResult();
         }
+        else if (context.Exception is NotAuthenticatedException)
+        {
+            context.Result = new ChallengeResult();
+        }
+        // Todo: get rid of this
         else if (context.Exception is UnauthorizedAccessException)
         {
             context.Result = new UnauthorizedResult();

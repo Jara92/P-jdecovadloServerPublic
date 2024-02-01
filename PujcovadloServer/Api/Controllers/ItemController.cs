@@ -19,28 +19,24 @@ namespace PujcovadloServer.Api.Controllers;
 [ApiController]
 [Route("api/items")]
 [ServiceFilter(typeof(ExceptionFilter))]
-public class ItemController : ACrudController
+public class ItemController : ACrudController<Item>
 {
     private readonly IMapper _mapper;
     private readonly IItemRepository _itemsRepository;
     private readonly ItemService _itemService;
     private readonly ItemFacade _itemFacade;
     private readonly ItemCategoryFacade _itemCategoryFacade;
-    private readonly LinkGenerator _urlHelper;
-    private readonly IAuthorizationService _authorizationService;
 
     public ItemController(IItemRepository itemsRepository, ItemFacade itemFacade,
         ItemCategoryFacade itemCategoryFacade, IMapper mapper,
         ItemService itemService, LinkGenerator urlHelper,
-        IAuthorizationService authorizationService) : base(urlHelper)
+        IAuthorizationService authorizationService) : base(authorizationService, urlHelper)
     {
         _itemsRepository = itemsRepository;
         _itemFacade = itemFacade;
         _itemCategoryFacade = itemCategoryFacade;
         _mapper = mapper;
         _itemService = itemService;
-        _urlHelper = urlHelper;
-        _authorizationService = authorizationService;
     }
 
     /// <summary>
@@ -96,6 +92,9 @@ public class ItemController : ACrudController
     {
         // Get the item and convert it to response
         var item = await _itemFacade.GetItem(id);
+
+        await CheckPermissions(item, ItemAuthorizationHandler.Operations.Read);
+        
         var responseItem = _mapper.Map<ItemDetailResponse>(item);
 
         // Hateos links
@@ -118,7 +117,10 @@ public class ItemController : ACrudController
     [Authorize(Roles = UserRoles.Owner)]
     public async Task<ActionResult<ItemResponse>> Create([FromBody] ItemRequest request)
     {
+        await CheckPermissions(_mapper.Map<Item>(request), ItemAuthorizationHandler.Operations.Create);
+        
         var newItem = await _itemFacade.CreateItem(request);
+
         var responseItem = _mapper.Map<ItemResponse>(newItem);
 
         // generate response with location header
@@ -144,8 +146,12 @@ public class ItemController : ACrudController
     [Authorize(Roles = UserRoles.Owner)]
     public async Task<IActionResult> Update(int id, [FromBody] ItemRequest request)
     {
+        var item = await _itemFacade.GetItem(id);
+        
+        await CheckPermissions(item, ItemAuthorizationHandler.Operations.Update);
+
         // Update the item
-        await _itemFacade.UpdateItem(request);
+        await _itemFacade.UpdateItem(item, request);
 
         return Ok();
     }
@@ -162,7 +168,12 @@ public class ItemController : ACrudController
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(int id)
     {
-        await _itemFacade.DeleteItem(id);
+        // Get the item
+        var item = await _itemFacade.GetItem(id);
+
+        await CheckPermissions(item, ItemAuthorizationHandler.Operations.Delete);
+        
+        await _itemFacade.DeleteItem(item);
 
         return NoContent();
     }
@@ -182,7 +193,7 @@ public class ItemController : ACrudController
         // Get item
         var item = await _itemsRepository.Get(id);
         if (item == null) return NotFound($"Item with {id} not found.");
-        
+
         // Get categories
         var categoriesResponse = _mapper.Map<List<ItemCategoryResponse>>(item.Categories);
 

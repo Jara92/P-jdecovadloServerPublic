@@ -15,7 +15,7 @@ public class
     }
 
     protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
-        OperationAuthorizationRequirement requirement, ItemCategory category)
+        OperationAuthorizationRequirement requirement, ItemCategory loan)
     {
         
         // Check each action

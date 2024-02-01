@@ -4,6 +4,7 @@ using System.Security.Principal;
 using System.Text;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
+using Namotion.Reflection;
 using PujcovadloServer.Authentication.Exceptions;
 using PujcovadloServer.Business.Enums;
 using PujcovadloServer.Business.Services.Interfaces;
@@ -116,6 +117,7 @@ public class AuthenticateService : IAuthenticateService
             // Create claims
             var authClaims = new List<Claim>
             {
+                new Claim(ClaimTypes.PrimarySid, user.Id),
                 new Claim(ClaimTypes.Name, user.UserName),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             };
@@ -131,7 +133,7 @@ public class AuthenticateService : IAuthenticateService
 
             // Get expiration time from configuration
             int expirationTime = _configuration.GetValue<int>("JWT:TokenExpirationInMinutes");
-            
+
             // Create JWT token
             var token = new JwtSecurityToken(
                 issuer: _configuration["JWT:ValidIssuer"],
@@ -168,5 +170,11 @@ public class AuthenticateService : IAuthenticateService
     public ClaimsPrincipal? GetPrincipal()
     {
         return _httpContextAccessor.HttpContext?.User;
+    }
+
+    /// <inheritdoc cref="IAuthenticateService"/>
+    public string? GetCurrentUserId()
+    {
+        return _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.PrimarySid);
     }
 }

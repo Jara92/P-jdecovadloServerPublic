@@ -57,23 +57,20 @@ public class OwnerFacade
         return loan;
     }
 
-    public async Task UpdateMyLoan(TenantLoanRequest request)
+    public async Task UpdateMyLoan(Loan loan, TenantLoanRequest request)
     {
         // Get current user
         var user = await _authenticateService.GetCurrentUser();
         if (user == null) throw new AuthenticationException();
-        
-        // Get the loan
-        var oldLoan = await GetMyLoan(request.Id);
 
         // Check if the status has been changed
-        if (request.Status != null && request.Status != oldLoan.Status)
+        if (request.Status != null && request.Status != loan.Status)
         {
             // get current state
-            var state = _loanService.GetState(oldLoan);
+            var state = _loanService.GetState(loan);
             
             // handle the request
-            state.HandleOwner(oldLoan, request.Status.Value);
+            state.HandleOwner(loan, request.Status.Value);
         }
 
         /*
@@ -82,6 +79,6 @@ public class OwnerFacade
         But these changes are possible to be made only if the loan is in some specific statuses.
         */
 
-        await _loanService.Update(oldLoan);
+        await _loanService.Update(loan);
     }
 }

@@ -2,6 +2,8 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PujcovadloServer.Api.Filters;
+using PujcovadloServer.AuthorizationHandlers;
+using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Enums;
 using PujcovadloServer.Business.Facades;
 using PujcovadloServer.Business.Filters;
@@ -14,12 +16,13 @@ namespace PujcovadloServer.Api.Controllers;
 [Route("api/my-tenant-loans")]
 [Authorize(Roles = UserRoles.Tenant)]
 [ServiceFilter(typeof(ExceptionFilter))]
-public class TenantLoanController : ACrudController
+public class TenantLoanController : ACrudController<Loan>
 {
     private readonly TenantFacade _tenantFacade;
     private readonly IMapper _mapper;
 
-    public TenantLoanController(TenantFacade loanFacade, LinkGenerator urlHelper, IMapper mapper) : base(urlHelper)
+    public TenantLoanController(TenantFacade loanFacade, LinkGenerator urlHelper, IMapper mapper,
+        IAuthorizationService authorizationService) : base(authorizationService, urlHelper)
     {
         _tenantFacade = loanFacade;
         _mapper = mapper;
@@ -68,6 +71,9 @@ public class TenantLoanController : ACrudController
     public async Task<ActionResult<LoanResponse>> GetLoan(int id)
     {
         var loan = await _tenantFacade.GetMyLoan(id);
+
+        await CheckPermissions(loan, LoanAuthorizationHandler.Operations.Read);
+        
         var responseLoan = _mapper.Map<LoanResponse>(loan);
 
         // HATEOS links
@@ -95,6 +101,8 @@ public class TenantLoanController : ACrudController
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<LoanResponse>> CreateLoan([FromBody] TenantLoanRequest request)
     {
+        await CheckPermissions(_mapper.Map<Loan>(request), LoanAuthorizationHandler.Operations.Create);
+        
         var loan = await _tenantFacade.CreateLoan(request);
         var responseLoan = _mapper.Map<LoanResponse>(loan);
 
@@ -110,7 +118,11 @@ public class TenantLoanController : ACrudController
     [ValidateIdFilter]
     public async Task<ActionResult<LoanResponse>> UpdateLoan(int id, [FromBody] TenantLoanRequest request)
     {
-        await _tenantFacade.UpdateMyLoan(request);
+        var loan = await _tenantFacade.GetMyLoan(id);
+
+        await CheckPermissions(loan, LoanAuthorizationHandler.Operations.Update);
+        
+        await _tenantFacade.UpdateMyLoan(loan, request);
 
         return Ok();
     }

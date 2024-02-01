@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using PujcovadloServer.Api.Filters;
 using PujcovadloServer.Authentication;
+using PujcovadloServer.AuthorizationHandlers;
+using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Enums;
 using PujcovadloServer.Business.Facades;
 using PujcovadloServer.Business.Filters;
@@ -17,13 +19,14 @@ namespace PujcovadloServer.Api.Controllers;
 [Route("api/my-items")]
 [Authorize(Roles = UserRoles.Owner)]
 [ServiceFilter(typeof(ExceptionFilter))]
-public class MyItemController : ACrudController
+public class MyItemController : ACrudController<Item>
 {
     private readonly ItemService _itemService;
     private readonly ItemFacade _itemFacade;
     private readonly IMapper _mapper;
 
-    public MyItemController(ItemFacade itemFacade, ItemService itemService, LinkGenerator urlHelper, IMapper mapper) : base(urlHelper)
+    public MyItemController(ItemFacade itemFacade, ItemService itemService, LinkGenerator urlHelper, IMapper mapper,
+        IAuthorizationService authorizationService) : base(authorizationService, urlHelper)
     {
         _itemService = itemService;
         _itemFacade = itemFacade;
@@ -77,9 +80,11 @@ public class MyItemController : ACrudController
     public async Task<ActionResult<ItemOwnerResponse>> Get(int id)
     {
         var item = await _itemFacade.GetMyItem(id);
-        
+
+        await CheckPermissions(item, ItemAuthorizationHandler.Operations.Read);
+
         var response = _mapper.Map<ItemOwnerResponse>(item);
-        
+
         response.Links.Add(new LinkResponse(
             _urlHelper.GetUriByAction(HttpContext, nameof(MyItemController.Get), "MyItem", values: new { response.Id }),
             "SELF", "GET"));

@@ -67,6 +67,8 @@ public class TenantFacade
         // get the item
         var item = await _itemService.Get(request.Item.Id);
         if (item == null) throw new EntityNotFoundException($"Item with id {request.Item.Id} was not found.");
+        
+        // TODO: Check that the user has permission to create a loan for this item
 
         // Map request to loan
         var newLoan = _mapper.Map<Loan>(request);
@@ -97,23 +99,20 @@ public class TenantFacade
         return newLoan;
     }
 
-    public async Task UpdateMyLoan(TenantLoanRequest request)
+    public async Task UpdateMyLoan(Loan loan, TenantLoanRequest request)
     {
         // Get current user
         var user = await _authenticateService.GetCurrentUser();
         if (user == null) throw new AuthenticationException();
-        
-        // Get the loan
-        var oldLoan = await GetMyLoan(request.Id);
 
         // Check if the status has been changed
-        if (request.Status != null && request.Status != oldLoan.Status)
+        if (request.Status != null && request.Status != loan.Status)
         {
             // get current state
-            var state = _loanService.GetState(oldLoan);
+            var state = _loanService.GetState(loan);
             
             // handle the request
-            state.HandleTenant(oldLoan, request.Status.Value);
+            state.HandleTenant(loan, request.Status.Value);
         }
 
         /*
@@ -122,6 +121,6 @@ public class TenantFacade
         But these changes are possible to be made only if the loan is in some specific statuses.
         */
 
-        await _loanService.Update(oldLoan);
+        await _loanService.Update(loan);
     }
 }

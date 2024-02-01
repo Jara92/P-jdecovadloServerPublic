@@ -58,9 +58,6 @@ public class ItemFacade
 
         // Set owner
         item.Owner = user;
-        
-        // Check permissions
-        await CheckPermissions(item, ItemAuthorizationHandler.Operations.Create);
 
         // Create the item  
         await _itemService.Create(item);
@@ -68,16 +65,8 @@ public class ItemFacade
         return item;
     }
 
-    public async Task UpdateItem(ItemRequest request)
+    public async Task UpdateItem(Item item, ItemRequest request)
     {
-        // Updated tracked item
-        var item = await _itemRepository.Get(request.Id);
-
-        if (item == null) throw new EntityNotFoundException($"Item with id {request.Id} not found.");
-
-        // Check authorization
-        await CheckPermissions(item, ItemAuthorizationHandler.Operations.Update);
-
         // Map request to item
         item.Name = request.Name;
         item.Alias = UrlHelper.CreateUrlStub(item.Name);
@@ -107,15 +96,8 @@ public class ItemFacade
         await _itemService.Update(item);
     }
 
-    public async Task DeleteItem(int id)
+    public async Task DeleteItem(Item item)
     {
-        // Get the item
-        var item = await _itemService.Get(id);
-        if (item == null) throw new EntityNotFoundException($"Item with id {id} not found.");
-        
-        // Check permissions
-        await CheckPermissions(item, ItemAuthorizationHandler.Operations.Delete);
-        
         // TODO: Check that the item can be deleted (no active rentals etc.)
 
         // Delete the item
@@ -150,9 +132,6 @@ public class ItemFacade
         // Check if item exists
         if (item == null) throw new EntityNotFoundException($"Item with id {id} not found.");
         
-        // Check permissions
-        await CheckPermissions(item, ItemAuthorizationHandler.Operations.Read);
-        
         // Return item
         return item;
     }
@@ -172,36 +151,5 @@ public class ItemFacade
             throw new ForbiddenAccessException("You are not authorized to perform this operation.");
         
         return item;
-    }
-
-    /// <summary>
-    /// Checks if the user has permissions to perform the operation on the item.
-    /// </summary>
-    /// <param name="item">The item.</param>
-    /// <param name="requirement">Required action</param>
-    /// <exception cref="ForbiddenAccessException">User does not have permission to perform the action.</exception>
-    /// <exception cref="UnauthorizedAccessException">User is not authorized.</exception>
-    private async Task CheckPermissions(Item item, OperationAuthorizationRequirement requirement)
-    {
-        // Get current principal
-        var principal = _authenticateService.GetPrincipal();
-        if(principal == null) throw new UnauthorizedAccessException();
-        
-        // Check requirement permissions
-        var authorizationResult = await _authorizationService.AuthorizeAsync(
-            principal, item, requirement);
-
-        // Throw exception if not authorized
-        if (!authorizationResult.Succeeded)
-        {
-            var identity = principal.Identity;
-         
-            // Throw UnauthorizedAccessException if not authenticated
-            if (identity == null || !identity.IsAuthenticated)
-                throw new UnauthorizedAccessException();
-            
-            // Throw ForbiddenAccessException if not authorized
-            throw new ForbiddenAccessException("You are not authorized to perform this operation.");
-        }
     }
 }

@@ -107,6 +107,7 @@ builder.Services.AddScoped<IAuthenticateService, AuthenticateService>();
 // Authorization handlers
 builder.Services.AddScoped<IAuthorizationHandler, ItemAuthorizationHandler>();
 builder.Services.AddScoped<IAuthorizationHandler, ItemCategoryAuthorizationHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, LoanAuthorizationHandler>();
 
 //Factories
 builder.Services.AddScoped<LoanStateFactory>();

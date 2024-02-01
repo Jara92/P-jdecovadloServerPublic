@@ -2,6 +2,8 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PujcovadloServer.Api.Filters;
+using PujcovadloServer.AuthorizationHandlers;
+using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Facades;
 using PujcovadloServer.Business.Filters;
 using PujcovadloServer.Business.Services;
@@ -12,7 +14,7 @@ namespace PujcovadloServer.Api.Controllers;
 [ApiController]
 [Route("api/item-categories")]
 [ServiceFilter(typeof(ExceptionFilter))]
-public class ItemCategoryController : ACrudController
+public class ItemCategoryController : ACrudController<ItemCategory>
 {
     private readonly ItemCategoryFacade _itemCategoryFacade;
     private readonly ItemCategoryService _itemCategoryService;
@@ -20,7 +22,8 @@ public class ItemCategoryController : ACrudController
     private readonly LinkGenerator _urlHelper;
 
     public ItemCategoryController(ItemCategoryFacade itemCategoryFacade, ItemCategoryService itemCategoryService,
-        IMapper mapper, LinkGenerator linkGenerator) : base(linkGenerator)
+        IMapper mapper, LinkGenerator linkGenerator, IAuthorizationService authorizationService) : base(
+        authorizationService, linkGenerator)
     {
         _itemCategoryFacade = itemCategoryFacade;
         _itemCategoryService = itemCategoryService;
@@ -39,24 +42,25 @@ public class ItemCategoryController : ACrudController
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [Authorize]
-    public async Task<ActionResult<List<ItemCategoryResponse>>> Index([FromQuery]ItemCategoryFilter filter)
+    public async Task<ActionResult<List<ItemCategoryResponse>>> Index([FromQuery] ItemCategoryFilter filter)
     {
         // get categories by filter
         var categories = await _itemCategoryService.GetAll(filter);
-        
+
         // Convert to response items
         var categoriesResponse = _mapper.Map<List<ItemCategoryResponse>>(categories);
-        
+
         // Hateos item links
         foreach (var category in categoriesResponse)
         {
             category.Links.Add(new LinkResponse(
                 _urlHelper.GetUriByAction(HttpContext, nameof(this.Get), values: new { category.Id }), "SELF", "GET"));
-            
+
             category.Links.Add(new LinkResponse(
-                _urlHelper.GetUriByAction(HttpContext, nameof(ItemController.Index), "Item", values: new { CategoryId = category.Id }), "ITEMS", "GET"));
+                _urlHelper.GetUriByAction(HttpContext, nameof(ItemController.Index), "Item",
+                    values: new { CategoryId = category.Id }), "ITEMS", "GET"));
         }
-        
+
         var links = GeneratePaginationLinks(categories, filter, nameof(Index));
 
         // Create response list
@@ -84,14 +88,17 @@ public class ItemCategoryController : ACrudController
     {
         // Get the category
         var category = await _itemCategoryFacade.Get(id);
-        
+
+        await CheckPermissions(category, ItemCategoryAuthorizationHandler.Operations.Read);
+
         // Map to response
         var categoryResponse = _mapper.Map<ItemCategoryResponse>(category);
-        
+
         // Link to items
         categoryResponse.Links.Add(new LinkResponse(
-            _urlHelper.GetUriByAction(HttpContext, nameof(ItemController.Index), "Item", values: new { CategoryId = category.Id }), "ITEMS", "GET"));
-        
+            _urlHelper.GetUriByAction(HttpContext, nameof(ItemController.Index), "Item",
+                values: new { CategoryId = category.Id }), "ITEMS", "GET"));
+
         return Ok(categoryResponse);
     }
 }

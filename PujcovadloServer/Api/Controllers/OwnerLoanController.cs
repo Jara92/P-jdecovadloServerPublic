@@ -2,6 +2,8 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PujcovadloServer.Api.Filters;
+using PujcovadloServer.AuthorizationHandlers;
+using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Enums;
 using PujcovadloServer.Business.Facades;
 using PujcovadloServer.Business.Filters;
@@ -14,12 +16,13 @@ namespace PujcovadloServer.Api.Controllers;
 [Route("api/my-owner-loans")]
 [Authorize(Roles = UserRoles.Owner)]
 [ServiceFilter(typeof(ExceptionFilter))]
-public class OwnerLoanController : ACrudController
+public class OwnerLoanController : ACrudController<Loan>
 {
     private readonly OwnerFacade _ownerFacade;
     private readonly IMapper _mapper;
 
-    public OwnerLoanController(OwnerFacade loanFacade, LinkGenerator urlHelper, IMapper mapper) : base(urlHelper)
+    public OwnerLoanController(OwnerFacade loanFacade, LinkGenerator urlHelper, IMapper mapper,
+        IAuthorizationService authorizationService) : base(authorizationService, urlHelper)
     {
         _ownerFacade = loanFacade;
         _mapper = mapper;
@@ -68,6 +71,9 @@ public class OwnerLoanController : ACrudController
     public async Task<ActionResult<LoanResponse>> GetLoan(int id)
     {
         var loan = await _ownerFacade.GetMyLoan(id);
+
+        await CheckPermissions(loan, LoanAuthorizationHandler.Operations.Read);
+        
         var responseLoan = _mapper.Map<LoanResponse>(loan);
 
         // HATEOS links
@@ -98,7 +104,11 @@ public class OwnerLoanController : ACrudController
     [ValidateIdFilter]
     public async Task<ActionResult<LoanResponse>> UpdateLoan(int id, [FromBody] TenantLoanRequest request)
     {
-        await _ownerFacade.UpdateMyLoan(request);
+        var loan = await _ownerFacade.GetMyLoan(id);
+
+        await CheckPermissions(loan, LoanAuthorizationHandler.Operations.Update);
+        
+        await _ownerFacade.UpdateMyLoan(loan, request);
 
         return Ok();
     }
