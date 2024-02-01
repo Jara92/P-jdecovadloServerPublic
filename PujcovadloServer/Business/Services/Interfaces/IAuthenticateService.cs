@@ -34,16 +34,22 @@ public interface IAuthenticateService
     public Task<JwtSecurityToken> Login(LoginRequest request);
 
     /// <summary>
+    /// Is user authenticated?
+    /// </summary>
+    /// <returns>true is user is authenticated.</returns>
+    public bool IsAuthenticated();
+    
+    /// <summary>
     /// Returns current user.
     /// </summary>
     /// <returns>Current user entity or null if not authentized.</returns>
-    public Task<ApplicationUser?> GetCurrentUser();
+    /// /// <exception cref="NotAuthenticatedException">Thrown if user is not authenticated.</exception>
+    public Task<ApplicationUser> GetCurrentUser();
 
     /// <summary>
-    /// Returns current user identity.
+    /// Returns ID of the current user.
     /// </summary>
-    /// <returns></returns>
-    public ClaimsPrincipal? GetPrincipal();
-
-    public string? GetCurrentUserId();
+    /// <returns>Authenticated user id.</returns>
+    /// <exception cref="NotAuthenticatedException">Thrown if user is not authenticated.</exception>
+    public string GetCurrentUserId();
 }

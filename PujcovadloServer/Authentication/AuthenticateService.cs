@@ -148,33 +148,33 @@ public class AuthenticateService : IAuthenticateService
 
         throw new AuthenticationFailedException("Invalid username or password.");
     }
+    
+    /// <inheritdoc cref="IAuthenticateService"/>
+    public bool IsAuthenticated()
+    {
+        return _httpContextAccessor.HttpContext?.User.Identity?.IsAuthenticated ?? false;
+    }
 
     /// <inheritdoc cref="IAuthenticateService"/>
-    public async Task<ApplicationUser?> GetCurrentUser()
+    public async Task<ApplicationUser> GetCurrentUser()
     {
-        var principal = _httpContextAccessor.HttpContext?.User;
-
-        if (principal == null)
-            return null;
-
         // Get user id from claims
-        var userId = principal.Identity?.Name;
-        if (userId == null)
-            return null;
+        var userId = GetCurrentUserId();
+        
+        // get the user
+        var user = await _userManager.FindByIdAsync(userId);
 
         // Return user by id
-        return await _userManager.FindByNameAsync(userId);
+        return user ?? throw new NotAuthenticatedException("User is not authenticated.");
     }
 
     /// <inheritdoc cref="IAuthenticateService"/>
-    public ClaimsPrincipal? GetPrincipal()
+    public string GetCurrentUserId()
     {
-        return _httpContextAccessor.HttpContext?.User;
-    }
+        // get user id from claims
+        var id = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.PrimarySid);
 
-    /// <inheritdoc cref="IAuthenticateService"/>
-    public string? GetCurrentUserId()
-    {
-        return _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.PrimarySid);
+        // Return Id ro throw and exception
+        return id ?? throw new NotAuthenticatedException("User is not authenticated.");
     }
 }

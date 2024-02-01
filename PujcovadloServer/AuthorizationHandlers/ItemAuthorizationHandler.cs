@@ -20,7 +20,6 @@ public class ItemAuthorizationHandler : BaseCrudAuthorizationHandler<OperationAu
 
         // Get current user 
         var userId = _authenticateService.GetCurrentUserId();
-        if (userId == null) return;
 
         // TODO refactor spagety
         // Check each action

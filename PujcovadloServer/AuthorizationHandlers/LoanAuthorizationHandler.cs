@@ -21,7 +21,6 @@ public class LoanAuthorizationHandler : BaseCrudAuthorizationHandler<OperationAu
 
         // Get current user id
         var userId = _authenticateService.GetCurrentUserId();
-        if (userId == null) return;
 
         // TODO refactor spagety
         // Check each action

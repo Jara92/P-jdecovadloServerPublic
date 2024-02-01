@@ -1,10 +1,7 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Authorization.Infrastructure;
 using NuGet.Packaging;
-using PujcovadloServer.Authentication;
-using PujcovadloServer.AuthorizationHandlers;
-using PujcovadloServer.AuthorizationHandlers.Exceptions;
+using PujcovadloServer.Authentication.Exceptions;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Enums;
 using PujcovadloServer.Business.Exceptions;
@@ -45,7 +42,7 @@ public class ItemFacade
     public async Task<Item> CreateItem(ItemRequest request)
     {
         var user = await _authenticateService.GetCurrentUser();
-        if (user == null) throw new UnauthorizedAccessException("User not found.");
+        if (user == null) throw new NotAuthenticatedException("User not found.");
 
         // Map request to item
         var item = _mapper.Map<Item>(request);
@@ -80,7 +77,7 @@ public class ItemFacade
         // New categories
         var ids = request.Categories.Select(c => c.Id);
         var categories = await _itemCategoryService.GetByIds(ids);
-        
+
         // Update categories
         item.Categories.Clear();
         item.Categories.AddRange(categories);
@@ -108,7 +105,7 @@ public class ItemFacade
     {
         var user = await _authenticateService.GetCurrentUser();
 
-        if (user == null) throw new UnauthorizedAccessException("User not found.");
+        if (user == null) throw new NotAuthenticatedException("User not found.");
 
         // Set owner id
         filter.OwnerId = user.Id;
@@ -118,7 +115,7 @@ public class ItemFacade
 
         return items;
     }
-    
+
     /// <summary>
     /// Returns item with given id.
     /// </summary>
@@ -128,28 +125,11 @@ public class ItemFacade
     public async Task<Item> GetItem(int id)
     {
         var item = await _itemService.Get(id);
-        
+
         // Check if item exists
         if (item == null) throw new EntityNotFoundException($"Item with id {id} not found.");
-        
+
         // Return item
-        return item;
-    }
-    
-    /// <summary>
-    /// Returns item with given id if it belongs to the user.
-    /// </summary>
-    /// <param name="id">Id of the item</param>
-    /// <returns>The item.</returns>
-    /// <exception cref="ForbiddenAccessException">Throw if the user is not the owner</exception>
-    public async Task<Item> GetMyItem(int id)
-    {
-        var item = await GetItem(id);
-        
-        // Check if item belongs to the user
-        if(item.Owner.Id != (await _authenticateService.GetCurrentUser()).Id)
-            throw new ForbiddenAccessException("You are not authorized to perform this operation.");
-        
         return item;
     }
 }
