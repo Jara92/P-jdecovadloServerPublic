@@ -17,6 +17,7 @@ namespace PujcovadloServer.Business.Facades;
 
 public class ItemFacade
 {
+    // todo get rid of itemRepository
     private readonly IItemRepository _itemRepository;
     private readonly ItemService _itemService;
     private readonly ItemCategoryService _itemCategoryService;
@@ -26,7 +27,8 @@ public class ItemFacade
     private readonly IAuthorizationService _authorizationService;
 
     public ItemFacade(IItemRepository itemRepository, ItemService itemService, ItemCategoryService itemCategoryService,
-        ItemTagService itemTagService, IAuthenticateService authenticateService, IMapper mapper, IAuthorizationService authorizationService)
+        ItemTagService itemTagService, IAuthenticateService authenticateService, IMapper mapper,
+        IAuthorizationService authorizationService)
     {
         _itemRepository = itemRepository;
         _itemService = itemService;
@@ -38,34 +40,11 @@ public class ItemFacade
     }
 
     /// <summary>
-    /// Creates a new item using <see cref="ItemRequest"/>
+    /// Fill request data to the item.
     /// </summary>
-    /// <param name="request"></param>
-    public async Task<Item> CreateItem(ItemRequest request)
-    {
-        var user = await _authenticateService.GetCurrentUser();
-        if (user == null) throw new NotAuthenticatedException("User not found.");
-
-        // Map request to item
-        // Todo: must be done manually because of categories and tags
-        var item = _mapper.Map<Item>(request);
-
-        // Set initial status
-        item.Status = ItemStatus.Public;
-
-        // Set alias
-        item.Alias = UrlHelper.CreateUrlStub(item.Name);
-
-        // Set owner
-        item.Owner = user;
-
-        // Create the item  
-        await _itemService.Create(item);
-
-        return item;
-    }
-
-    public async Task UpdateItem(Item item, ItemRequest request)
+    /// <param name="item">The item.</param>
+    /// <param name="request">Item request data.</param>
+    private async Task FillItemRequest(Item item, ItemRequest request)
     {
         // Map request to item
         item.Name = request.Name;
@@ -80,14 +59,10 @@ public class ItemFacade
         // New categories
         var ids = request.Categories.Select(c => c.Id);
         var categories = await _itemCategoryService.GetByIds(ids);
-
+        
         // Update categories
         item.Categories.Clear();
         item.Categories.AddRange(categories);
-
-        // Item updated so we need to approve it
-        if (item.Status == ItemStatus.Denied)
-            item.Status = ItemStatus.Approving;
         
         // new tags
         var tags = await _itemTagService.GetOrCreate(request.Tags.Select(t => t.Name).ToList());
@@ -95,11 +70,44 @@ public class ItemFacade
         // Update tags
         item.Tags.Clear();
         item.Tags.AddRange(tags);
-        
+
         // Todo: update images
+    }
+
+    /// <summary>
+    /// Creates a new item using <see cref="ItemRequest"/>
+    /// </summary>
+    /// <param name="request"></param>
+    public async Task<Item> CreateItem(ItemRequest request)
+    {
+        var user = await _authenticateService.GetCurrentUser();
+        if (user == null) throw new NotAuthenticatedException("User not found.");
+
+        // Fill request data
+        Item item = new();
+        await FillItemRequest(item, request);
+
+        // Set initial status
+        item.Status = ItemStatus.Public;
+
+        // Set owner
+        item.Owner = user;
+
+        // Create the item  
+        await _itemService.Create(item);
+
+        return item;
+    }
+
+    public async Task UpdateItem(Item item, ItemRequest request)
+    {
+        await FillItemRequest(item, request);
+
+        // Item updated so we need to approve it
+        if (item.Status == ItemStatus.Denied)
+            item.Status = ItemStatus.Approving;
 
         // Update the item
-        // 
         await _itemService.Update(item);
     }
 
