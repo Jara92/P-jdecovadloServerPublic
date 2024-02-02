@@ -14,16 +14,12 @@ public class ItemAuthorizationHandler : BaseCrudAuthorizationHandler<OperationAu
     }
 
     protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
-        OperationAuthorizationRequirement requirement, Item loan)
+        OperationAuthorizationRequirement requirement, Item item)
     {
-        await base.HandleRequirementAsync(context, requirement, loan);
-
-        // TODO: remove important
-        context.Succeed(requirement);
-        return;
+        await base.HandleRequirementAsync(context, requirement, item);
         
         // Get current user 
-        var userId = _authenticateService.GetCurrentUserId();
+        var userId = _authenticateService.TryGetCurrentUserId();
 
         // TODO refactor spagety
         // Check each action
@@ -36,18 +32,18 @@ public class ItemAuthorizationHandler : BaseCrudAuthorizationHandler<OperationAu
                 break;
             case nameof(Operations.Read):
                 // Items is public
-                if (loan.Status == ItemStatus.Public)
+                if (item.Status == ItemStatus.Public)
                     context.Succeed(requirement);
 
                 // Or I am the owner
-                if (loan.Owner.Id == userId)
+                if (userId != null && item.Owner.Id == userId)
                     context.Succeed(requirement);
 
                 break;
             case nameof(Operations.Update):
             case nameof(Operations.Delete):
                 // I am the owner
-                if (loan.Owner.Id == userId)
+                if (userId != null && item.Owner.Id == userId)
                     context.Succeed(requirement);
                 break;
             default:
