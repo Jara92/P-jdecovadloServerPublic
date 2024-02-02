@@ -12,6 +12,7 @@ using PujcovadloServer.Data;
 using PujcovadloServer.Data.Repositories;
 using NSwag;
 using PujcovadloServer.Api.Filters;
+using PujcovadloServer.Api.Services;
 using PujcovadloServer.Authentication;
 using PujcovadloServer.AuthorizationHandlers;
 using PujcovadloServer.Business.Factories.State;
@@ -137,6 +138,10 @@ builder.Services.AddScoped<OwnerFacade>();
 
 // Filters
 builder.Services.AddScoped<ExceptionFilter>();
+
+// Hateoas generator
+builder.Services.AddScoped<ItemHateoasGenerator>();
+builder.Services.AddScoped<ImageHateoasGenerator>();
 
 // AutoMapper configuration
 var config = new MapperConfiguration(cfg =>
