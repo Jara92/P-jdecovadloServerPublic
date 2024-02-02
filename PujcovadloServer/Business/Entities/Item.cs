@@ -36,6 +36,8 @@ public class Item : BaseEntity
 
     public virtual ICollection<ItemCategory> Categories { get; } = new List<ItemCategory>();
     
+    public virtual ICollection<ItemTag> Tags { get; } = new List<ItemTag>();
+    
     public virtual ApplicationUser Owner { get; set; } = default!;
     
     [ReadOnly(true)]

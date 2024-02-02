@@ -17,6 +17,9 @@ public class MappingProfile : Profile
         
         CreateMap<ItemCategory, ItemCategoryResponse>();
         CreateMap<ItemCategoryRequest, ItemCategory>();
+        
+        CreateMap<ItemTag, ItemTagResponse>();
+        CreateMap<ItemTagRequest, ItemTag>();
 
         CreateMap<ApplicationUser, UserResponse>();
         

@@ -115,11 +115,13 @@ builder.Services.AddScoped<LoanStateFactory>();
 // Repositories
 builder.Services.AddScoped<IItemRepository, ItemRepository>();
 builder.Services.AddScoped<IItemCategoryRepository, ItemCategoryRepository>();
+builder.Services.AddScoped<IItemTagRepository, ItemTagRepository>();
 builder.Services.AddScoped<ILoanRepository, LoanRepository>();
 
 // Services
 builder.Services.AddScoped<ItemService>();
 builder.Services.AddScoped<ItemCategoryService>();
+builder.Services.AddScoped<ItemTagService>();
 builder.Services.AddScoped<LoanService>();
 
 // Facades

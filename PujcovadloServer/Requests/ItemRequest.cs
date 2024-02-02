@@ -19,5 +19,9 @@ public class ItemRequest: EntityRequest
     
     public float? PurchasePrice { get; set; }
     
+    [MaxLength(5)]
     public virtual ICollection<ItemCategoryRequest> Categories { get; set; } = new List<ItemCategoryRequest>();
+    
+    [MaxLength(10)]
+    public virtual ICollection<ItemTagRequest> Tags { get; set; } = new List<ItemTagRequest>();
 }

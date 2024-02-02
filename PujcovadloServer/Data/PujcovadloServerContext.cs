@@ -17,6 +17,8 @@ namespace PujcovadloServer.Data
         public DbSet<ItemCategory> ItemCategory { get; set; } = default!;
         public DbSet<Loan> Loan { get; set; } = default!;
        // public DbSet<User> User { get; set; } = default!;
+       
+       public DbSet<ItemTag> ItemTag { get; set; } = default!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -24,6 +26,11 @@ namespace PujcovadloServer.Data
             /*modelBuilder.Entity<Item>()
                 .HasMany<ItemCategory>(i => i.Categories)
                 .WithMany(c => c.Items);*/
+            
+            // Make tags name unique
+            modelBuilder.Entity<ItemTag>()
+                .HasIndex(u => u.Name)
+                .IsUnique();
             
             base.OnModelCreating(modelBuilder);
         }

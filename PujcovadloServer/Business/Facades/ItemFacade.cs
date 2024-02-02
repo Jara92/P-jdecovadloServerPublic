@@ -20,16 +20,18 @@ public class ItemFacade
     private readonly IItemRepository _itemRepository;
     private readonly ItemService _itemService;
     private readonly ItemCategoryService _itemCategoryService;
+    private readonly ItemTagService _itemTagService;
     private readonly IAuthenticateService _authenticateService;
     private readonly IMapper _mapper;
     private readonly IAuthorizationService _authorizationService;
 
     public ItemFacade(IItemRepository itemRepository, ItemService itemService, ItemCategoryService itemCategoryService,
-        IAuthenticateService authenticateService, IMapper mapper, IAuthorizationService authorizationService)
+        ItemTagService itemTagService, IAuthenticateService authenticateService, IMapper mapper, IAuthorizationService authorizationService)
     {
         _itemRepository = itemRepository;
         _itemService = itemService;
         _itemCategoryService = itemCategoryService;
+        _itemTagService = itemTagService;
         _authenticateService = authenticateService;
         _mapper = mapper;
         _authorizationService = authorizationService;
@@ -45,6 +47,7 @@ public class ItemFacade
         if (user == null) throw new NotAuthenticatedException("User not found.");
 
         // Map request to item
+        // Todo: must be done manually because of categories and tags
         var item = _mapper.Map<Item>(request);
 
         // Set initial status
@@ -85,7 +88,14 @@ public class ItemFacade
         // Item updated so we need to approve it
         if (item.Status == ItemStatus.Denied)
             item.Status = ItemStatus.Approving;
+        
+        // new tags
+        var tags = await _itemTagService.GetOrCreate(request.Tags.Select(t => t.Name).ToList());
 
+        // Update tags
+        item.Tags.Clear();
+        item.Tags.AddRange(tags);
+        
         // Todo: update images
 
         // Update the item

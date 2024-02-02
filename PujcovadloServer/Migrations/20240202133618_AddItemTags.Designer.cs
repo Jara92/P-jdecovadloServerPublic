@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PujcovadloServer.Data;
 
@@ -10,9 +11,11 @@ using PujcovadloServer.Data;
 namespace PujcovadloServer.Migrations
 {
     [DbContext(typeof(PujcovadloServerContext))]
-    partial class PujcovadloServerContextModelSnapshot : ModelSnapshot
+    [Migration("20240202133618_AddItemTags")]
+    partial class AddItemTags
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -34,21 +37,6 @@ namespace PujcovadloServer.Migrations
                     b.HasIndex("ItemsId");
 
                     b.ToTable("ItemItemCategory");
-                });
-
-            modelBuilder.Entity("ItemItemTag", b =>
-                {
-                    b.Property<int>("ItemsId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("TagsId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("ItemsId", "TagsId");
-
-                    b.HasIndex("TagsId");
-
-                    b.ToTable("ItemItemTag");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -363,12 +351,17 @@ namespace PujcovadloServer.Migrations
                     b.Property<bool>("IsApproved")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int?>("ItemId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(32)
                         .HasColumnType("VARCHAR");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ItemId");
 
                     b.HasIndex("Name")
                         .IsUnique();
@@ -442,21 +435,6 @@ namespace PujcovadloServer.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ItemItemTag", b =>
-                {
-                    b.HasOne("PujcovadloServer.Business.Entities.Item", null)
-                        .WithMany()
-                        .HasForeignKey("ItemsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("PujcovadloServer.Business.Entities.ItemTag", null)
-                        .WithMany()
-                        .HasForeignKey("TagsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -526,6 +504,13 @@ namespace PujcovadloServer.Migrations
                     b.Navigation("Parent");
                 });
 
+            modelBuilder.Entity("PujcovadloServer.Business.Entities.ItemTag", b =>
+                {
+                    b.HasOne("PujcovadloServer.Business.Entities.Item", null)
+                        .WithMany("Tags")
+                        .HasForeignKey("ItemId");
+                });
+
             modelBuilder.Entity("PujcovadloServer.Business.Entities.Loan", b =>
                 {
                     b.HasOne("PujcovadloServer.Business.Entities.Item", "Item")
@@ -541,6 +526,11 @@ namespace PujcovadloServer.Migrations
                     b.Navigation("Item");
 
                     b.Navigation("Tenant");
+                });
+
+            modelBuilder.Entity("PujcovadloServer.Business.Entities.Item", b =>
+                {
+                    b.Navigation("Tags");
                 });
 #pragma warning restore 612, 618
         }
