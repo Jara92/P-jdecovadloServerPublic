@@ -60,6 +60,15 @@ public class ItemController : ACrudController<Item>
         {
             item.Links.Add(new LinkResponse(
                 _urlHelper.GetUriByAction(HttpContext, nameof(this.Get), values: new { item.Id }), "SELF", "GET"));
+            
+            // TODO: add link to owner
+            
+            foreach(var image in item.Images)
+            {
+                image.Links.Add(new LinkResponse(
+                    _urlHelper.GetUriByAction(HttpContext, nameof(ItemImageController.GetImage), "ItemImage",
+                        values: new { id = item.Id, imageId = image.Id }), "SELF", "GET"));
+            }
         }
 
         // Hateos links
