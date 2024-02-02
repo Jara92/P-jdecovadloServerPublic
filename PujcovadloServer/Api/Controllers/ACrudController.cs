@@ -48,7 +48,7 @@ public abstract class ACrudController<T> : ControllerBase where T : BaseEntity
 
         return links;
     }
-
+    
     /// <summary>
     /// Checks if the user has permissions to perform the operation on the entity.
     /// </summary>
@@ -57,6 +57,20 @@ public abstract class ACrudController<T> : ControllerBase where T : BaseEntity
     /// <exception cref="ForbiddenAccessException">User does not have permission to perform the action.</exception>
     /// <exception cref="UnauthorizedAccessException">User is not authorized.</exception>
     protected async Task CheckPermissions(T entity, OperationAuthorizationRequirement requirement)
+    {
+        await CheckPermissions<T>(entity, requirement);
+    }
+
+    /// <summary>
+    /// Checks if the user has permissions to perform the operation on the entity of given type.
+    /// </summary>
+    /// <param name="entity">The entity.</param>
+    /// <param name="requirement">Required action</param>
+    /// <typeparam name="TE">Entity type to be checked.</typeparam>
+    /// <exception cref="ForbiddenAccessException">User does not have permission to perform the action.</exception>
+    /// <exception cref="UnauthorizedAccessException">User is not authorized.</exception>
+    protected async Task CheckPermissions<TE>(TE entity, OperationAuthorizationRequirement requirement)
+        where TE : BaseEntity
     {
         // Check requirement permissions
         var authorizationResult = await _authorizationService.AuthorizeAsync(User, entity, requirement);
