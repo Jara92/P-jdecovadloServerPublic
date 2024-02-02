@@ -19,6 +19,8 @@ namespace PujcovadloServer.Data
        // public DbSet<User> User { get; set; } = default!;
        
        public DbSet<ItemTag> ItemTag { get; set; } = default!;
+       
+       public DbSet<Image> Image { get; set; } = default!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

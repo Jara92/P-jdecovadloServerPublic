@@ -1,0 +1,18 @@
+using Microsoft.EntityFrameworkCore;
+using PujcovadloServer.Business.Entities;
+using PujcovadloServer.Business.Filters;
+using PujcovadloServer.Business.Interfaces;
+
+namespace PujcovadloServer.Data.Repositories;
+
+public class ImageRepository : ACrudRepository<Image, BaseFilter>, IImageRepository
+{
+    public ImageRepository(PujcovadloServerContext context) : base(context)
+    {
+    }
+
+    public async Task<IList<Image>> GetByIds(IEnumerable<int> ids)
+    {
+        return await _context.Image.Where(c => ids.Contains(c.Id)).ToListAsync();
+    }
+}

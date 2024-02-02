@@ -116,17 +116,20 @@ builder.Services.AddScoped<LoanStateFactory>();
 builder.Services.AddScoped<IItemRepository, ItemRepository>();
 builder.Services.AddScoped<IItemCategoryRepository, ItemCategoryRepository>();
 builder.Services.AddScoped<IItemTagRepository, ItemTagRepository>();
+builder.Services.AddScoped<IImageRepository, ImageRepository>();
 builder.Services.AddScoped<ILoanRepository, LoanRepository>();
 
 // Services
 builder.Services.AddScoped<ItemService>();
 builder.Services.AddScoped<ItemCategoryService>();
 builder.Services.AddScoped<ItemTagService>();
+builder.Services.AddScoped<ImageService>();
 builder.Services.AddScoped<LoanService>();
 
 // Facades
 builder.Services.AddScoped<ItemFacade>();
 builder.Services.AddScoped<ItemCategoryFacade>();
+builder.Services.AddScoped<ImageFacade>();
 builder.Services.AddScoped<LoanFacade>();
 builder.Services.AddScoped<TenantFacade>();
 builder.Services.AddScoped<OwnerFacade>();
@@ -148,7 +151,7 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-   // app.UseDeveloperExceptionPage();
+   //app.UseDeveloperExceptionPage();
     
     // Add OpenAPI 3.0 document serving middleware
     // Available at: http://localhost:<port>/swagger/v1/swagger.json

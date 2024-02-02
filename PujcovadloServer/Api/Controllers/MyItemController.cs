@@ -24,13 +24,15 @@ public class MyItemController : ACrudController<Item>
 {
     private readonly ItemService _itemService;
     private readonly ItemFacade _itemFacade;
+    private readonly ImageFacade _imageFacade;
     private readonly IMapper _mapper;
 
-    public MyItemController(ItemFacade itemFacade, ItemService itemService, LinkGenerator urlHelper, IMapper mapper,
-        IAuthorizationService authorizationService) : base(authorizationService, urlHelper)
+    public MyItemController(ItemFacade itemFacade, ImageFacade imageFacade, ItemService itemService,
+        LinkGenerator urlHelper, IMapper mapper, IAuthorizationService authorizationService) : base(authorizationService, urlHelper)
     {
         _itemService = itemService;
         _itemFacade = itemFacade;
+        _imageFacade = imageFacade;
         _mapper = mapper;
     }
 
@@ -52,10 +54,12 @@ public class MyItemController : ACrudController<Item>
                 _urlHelper.GetUriByAction(HttpContext, nameof(ItemController.Get), "Item", values: new { item.Id }),
                 "SELF", "GET"));
             item.Links.Add(new LinkResponse(
-                _urlHelper.GetUriByAction(HttpContext, nameof(MyItemController.Update), "MyItem", values: new { item.Id }),
+                _urlHelper.GetUriByAction(HttpContext, nameof(MyItemController.Update), "MyItem",
+                    values: new { item.Id }),
                 "UPDATE", "PUT"));
             item.Links.Add(new LinkResponse(
-                _urlHelper.GetUriByAction(HttpContext, nameof(MyItemController.Delete), "MyItem", values: new { item.Id }),
+                _urlHelper.GetUriByAction(HttpContext, nameof(MyItemController.Delete), "MyItem",
+                    values: new { item.Id }),
                 "DELETE", "DELETE"));
         }
 
@@ -81,7 +85,7 @@ public class MyItemController : ACrudController<Item>
     public async Task<ActionResult<ItemOwnerResponse>> Get(int id)
     {
         var item = await _itemFacade.GetItem(id);
-        
+
         // Can read all item's data only if the user is can update the item
         await CheckPermissions(item, ItemAuthorizationHandler.Operations.Update);
 
@@ -93,8 +97,8 @@ public class MyItemController : ACrudController<Item>
 
         return Ok(response);
     }
-    
-        /// <summary>
+
+    /// <summary>
     /// Create a new item.
     /// </summary>
     /// <param name="request">New Item</param>
@@ -108,7 +112,7 @@ public class MyItemController : ACrudController<Item>
     public async Task<ActionResult<ItemResponse>> Create([FromBody] ItemRequest request)
     {
         await CheckPermissions(_mapper.Map<Item>(request), ItemAuthorizationHandler.Operations.Create);
-        
+
         var newItem = await _itemFacade.CreateItem(request);
 
         var responseItem = _mapper.Map<ItemResponse>(newItem);
@@ -137,7 +141,7 @@ public class MyItemController : ACrudController<Item>
     public async Task<IActionResult> Update(int id, [FromBody] ItemRequest request)
     {
         var item = await _itemFacade.GetItem(id);
-        
+
         await CheckPermissions(item, ItemAuthorizationHandler.Operations.Update);
 
         // Update the item
@@ -162,9 +166,85 @@ public class MyItemController : ACrudController<Item>
         var item = await _itemFacade.GetItem(id);
 
         await CheckPermissions(item, ItemAuthorizationHandler.Operations.Delete);
-        
+
         await _itemFacade.DeleteItem(item);
 
         return NoContent();
+    }
+
+    [HttpGet("{id}/images")]
+    public async Task<IActionResult> GetImages(int id)
+    {
+        // get the item and check permissions
+        var item = await _itemFacade.GetItem(id);
+        await CheckPermissions(item, ItemAuthorizationHandler.Operations.Read);
+
+        // get the images and map them to response
+        var images = item.Images;
+        var responseImages = _mapper.Map<List<ImageResponse>>(images);
+
+        return Ok(responseImages);
+    }
+    
+    [HttpGet("{id}/images/{imageId}")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetImage(int id, int imageId)
+    {
+        // get the item and check permissions
+        var item = await _itemFacade.GetItem(id);
+        await CheckPermissions(item, ItemAuthorizationHandler.Operations.Read);
+
+        // get the image and return it
+        var image = await _imageFacade.GetImage(imageId);
+        
+        if (System.IO.File.Exists(image.Path))
+        {
+            // Get all bytes of the file and return the file with the specified file contents 
+            byte[] b = await System.IO.File.ReadAllBytesAsync(image.Path);
+            return File(b, "application/octet-stream", "soubor.png");
+        } 
+
+        else
+        {
+            // return error if file not found
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
+        
+        // TODO: TEST this
+        
+        // TODO: return the image file not the resource
+        //return Ok(_mapper.Map<ImageResponse>(image));
+    }
+
+    [HttpPost("{id}/images")]
+    public async Task<IActionResult> AddImage(int id, IFormFile file)
+    {
+        // get the item and check permissions
+        var item = await _itemFacade.GetItem(id);
+        await CheckPermissions(item, ItemAuthorizationHandler.Operations.Update);
+
+        // TODO: make path and max file size configurable
+        var filePath = Path.GetTempFileName();
+        // var filePath = Path.Combine(_config["StoredFilesPath"], Path.GetRandomFileName());
+
+        // Save the file as temporary file
+        using (var stream = System.IO.File.Create(filePath))
+        {
+            await file.CopyToAsync(stream);
+        }
+
+        var image = new Image()
+        {
+            Name = file.Name,
+            Path = filePath,
+            Item = item
+        };
+
+        // Save the image to the database
+        await _imageFacade.Create(image);
+        var imageResponse = _mapper.Map<ImageResponse>(image);
+        
+        return Created(_urlHelper.GetUriByAction(HttpContext, nameof(GetImage), "MyItem",
+            values: new { id = item.Id, imageId = image.Id }), imageResponse);
     }
 }

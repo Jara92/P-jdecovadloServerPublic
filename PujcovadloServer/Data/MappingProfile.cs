@@ -20,6 +20,8 @@ public class MappingProfile : Profile
         
         CreateMap<ItemTag, ItemTagResponse>();
         CreateMap<ItemTagRequest, ItemTag>();
+        
+        CreateMap<Image, ImageResponse>();
 
         CreateMap<ApplicationUser, UserResponse>();
         

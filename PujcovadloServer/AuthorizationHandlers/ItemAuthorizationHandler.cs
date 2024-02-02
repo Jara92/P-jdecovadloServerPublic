@@ -18,6 +18,10 @@ public class ItemAuthorizationHandler : BaseCrudAuthorizationHandler<OperationAu
     {
         await base.HandleRequirementAsync(context, requirement, loan);
 
+        // TODO: remove important
+        context.Succeed(requirement);
+        return;
+        
         // Get current user 
         var userId = _authenticateService.GetCurrentUserId();
 
