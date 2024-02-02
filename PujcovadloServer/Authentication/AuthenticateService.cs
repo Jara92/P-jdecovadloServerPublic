@@ -171,10 +171,20 @@ public class AuthenticateService : IAuthenticateService
     /// <inheritdoc cref="IAuthenticateService"/>
     public string GetCurrentUserId()
     {
+        // Get user id
+        var id = TryGetCurrentUserId();
+
+        // Return Id or throw and exception
+        return id ?? throw new NotAuthenticatedException("User is not authenticated.");
+    }
+    
+    /// <inheritdoc cref="IAuthenticateService"/>
+    public string? TryGetCurrentUserId()
+    {
         // get user id from claims
         var id = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.PrimarySid);
 
-        // Return Id ro throw and exception
-        return id ?? throw new NotAuthenticatedException("User is not authenticated.");
+        // Return Id or null
+        return id;
     }
 }

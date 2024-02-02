@@ -52,4 +52,10 @@ public interface IAuthenticateService
     /// <returns>Authenticated user id.</returns>
     /// <exception cref="NotAuthenticatedException">Thrown if user is not authenticated.</exception>
     public string GetCurrentUserId();
+    
+    /// <summary>
+    /// Returns ID of the current user or null if not authenticated.
+    /// </summary>
+    /// <returns>ID of current user or null.</returns>
+    public string? TryGetCurrentUserId();
 }
