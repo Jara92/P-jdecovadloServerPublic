@@ -20,6 +20,7 @@ public class ItemFacade
     // todo get rid of itemRepository
     private readonly IItemRepository _itemRepository;
     private readonly ItemService _itemService;
+    private readonly LoanService _loanService;
     private readonly ItemCategoryService _itemCategoryService;
     private readonly ItemTagService _itemTagService;
     private readonly IAuthenticateService _authenticateService;
@@ -27,12 +28,13 @@ public class ItemFacade
     private readonly IAuthorizationService _authorizationService;
     private readonly PujcovadloServerConfiguration _configuration;
 
-    public ItemFacade(IItemRepository itemRepository, ItemService itemService, ItemCategoryService itemCategoryService,
+    public ItemFacade(IItemRepository itemRepository, ItemService itemService, LoanService loanService, ItemCategoryService itemCategoryService,
         ItemTagService itemTagService, IAuthenticateService authenticateService, IMapper mapper,
         IAuthorizationService authorizationService, PujcovadloServerConfiguration configuration)
     {
         _itemRepository = itemRepository;
         _itemService = itemService;
+        _loanService = loanService;
         _itemCategoryService = itemCategoryService;
         _itemTagService = itemTagService;
         _authenticateService = authenticateService;
@@ -115,10 +117,20 @@ public class ItemFacade
 
     public async Task DeleteItem(Item item)
     {
-        // TODO: Check that the item can be deleted (no active rentals etc.)
+        if(!await CanDelete(item))
+            throw new InvalidOperationException("Item cannot be deleted because there are running loans.");
 
         // Delete the item
         await _itemService.Delete(item);
+    }
+    
+    public async Task<bool> CanDelete(Item item)
+    {
+        // Check if the item has any running loans
+        var runningLoans = await _loanService.GetRunningLoansCountByItem(item);
+        
+        // Return true if there are no running loans
+        return runningLoans == 0;
     }
 
     public async Task<PaginatedList<Item>> GetMyItems(ItemFilter filter)

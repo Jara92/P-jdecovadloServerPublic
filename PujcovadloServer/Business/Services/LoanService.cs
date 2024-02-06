@@ -36,4 +36,9 @@ public class LoanService : ACrudService<Loan, ILoanRepository, LoanFilter>
         filter.OwnerId = user.Id;
         return await _repository.GetAll(filter);
     }
+    
+    public async Task<int> GetRunningLoansCountByItem(Item item)
+    {
+        return await _repository.GetRunningLoansCountByItem(item);
+    }
 }
