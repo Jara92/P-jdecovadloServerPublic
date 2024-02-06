@@ -31,7 +31,6 @@ public class TenantFacade
     {
         // Get current user
         var user = await _authenticateService.GetCurrentUser();
-        if (user == null) throw new AuthenticationException();
 
         // Get loans where the user is the tenant
         var loans = await _loanService.GetLoansByTenant(user, filter);
@@ -43,7 +42,6 @@ public class TenantFacade
     {
         // Get current user
         var user = await _authenticateService.GetCurrentUser();
-        if (user == null) throw new AuthenticationException();
 
         // Get the loan
         var loan = await _loanService.Get(id);
