@@ -2,6 +2,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PujcovadloServer.Api.Filters;
+using PujcovadloServer.Api.Services;
 using PujcovadloServer.AuthorizationHandlers;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Facades;
@@ -17,13 +18,15 @@ public class ItemImageController : ACrudController<Image>
     private readonly ItemFacade _itemFacade;
     private readonly ImageFacade _imageFacade;
     private readonly IMapper _mapper;
+    private readonly FileUploadService _fileUploadService;
 
     public ItemImageController(ItemFacade itemFacade, ImageFacade imageFacade, IMapper mapper,
-        IAuthorizationService authorizationService, LinkGenerator urlHelper) : base(authorizationService, urlHelper)
+        IAuthorizationService authorizationService, LinkGenerator urlHelper, FileUploadService fileUploadService) : base(authorizationService, urlHelper)
     {
         _itemFacade = itemFacade;
         _imageFacade = imageFacade;
         _mapper = mapper;
+        _fileUploadService = fileUploadService;
     }
 
     /// <summary>
@@ -120,17 +123,11 @@ public class ItemImageController : ACrudController<Image>
     {
         // get the item and check permissions
         var item = await _itemFacade.GetItem(id);
+        
+        // Save the image to the file system
+        var filePath = await _fileUploadService.SaveUploadedImage(file);
 
-        // TODO: make path and max file size configurable
-        var filePath = Path.GetTempFileName();
-        // var filePath = Path.Combine(_config["StoredFilesPath"], Path.GetRandomFileName());
-
-        // Save the file as temporary file
-        using (var stream = System.IO.File.Create(filePath))
-        {
-            await file.CopyToAsync(stream);
-        }
-
+        // Create new image
         var image = new Image()
         {
             Name = file.FileName,
@@ -141,7 +138,9 @@ public class ItemImageController : ACrudController<Image>
         await CheckPermissions(image, ItemAuthorizationHandler.Operations.Create);
 
         // Save the image to the database
-        await _imageFacade.Create(image);
+        await _itemFacade.AddImage(item, image);
+        
+        // Map the image to response
         var imageResponse = _mapper.Map<ImageResponse>(image);
 
         return Created(_urlHelper.GetUriByAction(HttpContext, nameof(GetImage),

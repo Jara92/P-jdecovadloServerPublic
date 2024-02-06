@@ -25,10 +25,11 @@ public class ItemFacade
     private readonly IAuthenticateService _authenticateService;
     private readonly IMapper _mapper;
     private readonly IAuthorizationService _authorizationService;
+    private readonly PujcovadloServerConfiguration _configuration;
 
     public ItemFacade(IItemRepository itemRepository, ItemService itemService, ItemCategoryService itemCategoryService,
         ItemTagService itemTagService, IAuthenticateService authenticateService, IMapper mapper,
-        IAuthorizationService authorizationService)
+        IAuthorizationService authorizationService, PujcovadloServerConfiguration configuration)
     {
         _itemRepository = itemRepository;
         _itemService = itemService;
@@ -37,6 +38,7 @@ public class ItemFacade
         _authenticateService = authenticateService;
         _mapper = mapper;
         _authorizationService = authorizationService;
+        _configuration = configuration;
     }
 
     /// <summary>
@@ -149,5 +151,18 @@ public class ItemFacade
 
         // Return item
         return item;
+    }
+    
+    public async Task AddImage(Item item, Image image)
+    {
+        // Check that the item has not reached the maximum number of images
+        if (item.Images.Count >= _configuration.MaxImagesPerItem)
+            throw new ArgumentException("Max images per item exceeded.");
+        
+        // Add image to the item
+        item.Images.Add(image);
+
+        // Update the item
+        await _itemService.Update(item);
     }
 }

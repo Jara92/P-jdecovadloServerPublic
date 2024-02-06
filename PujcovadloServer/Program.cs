@@ -11,6 +11,7 @@ using PujcovadloServer.Business.Services;
 using PujcovadloServer.Data;
 using PujcovadloServer.Data.Repositories;
 using NSwag;
+using PujcovadloServer;
 using PujcovadloServer.Api.Filters;
 using PujcovadloServer.Api.Services;
 using PujcovadloServer.Authentication;
@@ -102,6 +103,9 @@ builder.Services.AddAuthorization(options =>
         .Build();
 });
 
+// Configuration
+builder.Services.AddScoped<PujcovadloServerConfiguration>();
+
 // Authentication service
 builder.Services.AddScoped<IAuthenticateService, AuthenticateService>();
 
@@ -142,6 +146,9 @@ builder.Services.AddScoped<ExceptionFilter>();
 // Hateoas generator
 builder.Services.AddScoped<ItemHateoasGenerator>();
 builder.Services.AddScoped<ImageHateoasGenerator>();
+
+// File upload service
+builder.Services.AddScoped<FileUploadService>();
 
 // AutoMapper configuration
 var config = new MapperConfiguration(cfg =>
