@@ -17,29 +17,24 @@ namespace PujcovadloServer.Business.Facades;
 
 public class ItemFacade
 {
-    // todo get rid of itemRepository
-    private readonly IItemRepository _itemRepository;
     private readonly ItemService _itemService;
     private readonly LoanService _loanService;
     private readonly ItemCategoryService _itemCategoryService;
     private readonly ItemTagService _itemTagService;
     private readonly IAuthenticateService _authenticateService;
     private readonly IMapper _mapper;
-    private readonly IAuthorizationService _authorizationService;
     private readonly PujcovadloServerConfiguration _configuration;
 
-    public ItemFacade(IItemRepository itemRepository, ItemService itemService, LoanService loanService, ItemCategoryService itemCategoryService,
+    public ItemFacade(ItemService itemService, LoanService loanService, ItemCategoryService itemCategoryService,
         ItemTagService itemTagService, IAuthenticateService authenticateService, IMapper mapper,
-        IAuthorizationService authorizationService, PujcovadloServerConfiguration configuration)
+        PujcovadloServerConfiguration configuration)
     {
-        _itemRepository = itemRepository;
         _itemService = itemService;
         _loanService = loanService;
         _itemCategoryService = itemCategoryService;
         _itemTagService = itemTagService;
         _authenticateService = authenticateService;
         _mapper = mapper;
-        _authorizationService = authorizationService;
         _configuration = configuration;
     }
 
