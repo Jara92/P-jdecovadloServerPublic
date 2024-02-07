@@ -166,6 +166,9 @@ public class ItemFacade
         if (item.Images.Count >= _configuration.MaxImagesPerItem)
             throw new ArgumentException("Max images per item exceeded.");
         
+        // Make item owner the owner of the image
+        image.Owner = item.Owner;
+        
         // Add image to the item
         item.Images.Add(image);
 

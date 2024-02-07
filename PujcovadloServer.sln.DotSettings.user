@@ -32,5 +32,6 @@
     &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.Business.Facades.TenantFacadeTest.UpdateMyLoan_UserIsNotTenant_ThrowsException&lt;/TestId&gt;
     &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.Business.Facades.TenantFacadeTest.UpdateMyLoan_UserIsTenantAndUpdatedStatus_UpdatesLoan&lt;/TestId&gt;
     &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.Business.Facades.TenantFacadeTest.UpdateMyLoan_UserIsTenantAndNotUpdatedStatus_UpdateLoan&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.Business.Facades.TenantFacadeTest.UpdateMyLoan_UserIsTenantButTriesToUpdateDisallowedFields_LoanUpdatedWithoutTheFields&lt;/TestId&gt;
   &lt;/TestAncestor&gt;
 &lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>
