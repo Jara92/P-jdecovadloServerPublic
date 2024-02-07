@@ -27,6 +27,9 @@ public class MappingProfile : Profile
         
         CreateMap<Loan, LoanResponse>();
         CreateMap<TenantLoanRequest, Loan>();
+        
+        CreateMap<PickupProtocol, PickupProtocolResponse>();
+        CreateMap<PickupProtocolRequest, PickupProtocol>();
 
         // CreateMap<ItemCategory, ItemCategoryDto>();
         //CreateMap<ItemCategoryDto, ItemCategory>();

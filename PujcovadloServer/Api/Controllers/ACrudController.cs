@@ -88,4 +88,18 @@ public abstract class ACrudController<T> : ControllerBase where T : BaseEntity
             throw new ForbiddenAccessException("You are not authorized to perform this operation.");
         }
     }
+
+    protected async Task<bool> CanPerformOperation(T entity, OperationAuthorizationRequirement requirement)
+    {
+        return await CanPerformOperation<T>(entity, requirement);
+    }
+    
+    protected async Task<bool> CanPerformOperation<TE>(TE entity, OperationAuthorizationRequirement requirement)
+        where TE : BaseEntity
+    {
+        // Check requirement permissions
+        var authorizationResult = await _authorizationService.AuthorizeAsync(User, entity, requirement);
+
+        return authorizationResult.Succeeded;
+    }
 }

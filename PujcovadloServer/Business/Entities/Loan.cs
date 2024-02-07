@@ -24,6 +24,10 @@ public class Loan : BaseEntity
     public virtual ApplicationUser Tenant { get; set; } = default!;
     
     public virtual Item Item { get; set; } = default!;
+
+    public int? PickupProtocolId { get; set; }
+    
+    public virtual PickupProtocol? PickupProtocol { get; set; }
     
     public DateTime CreatedAt { get; set; } = DateTime.Now;
     

@@ -24,6 +24,8 @@ public class Image : BaseEntity
     public virtual ApplicationUser Owner { get; set; } = default!;
 
     public virtual Item? Item { get; set; }
+    
+    public virtual PickupProtocol? PickupProtocol { get; set; }
 
     [ReadOnly(true)] public DateTime CreatedAt { get; set; } = DateTime.Now;
 }

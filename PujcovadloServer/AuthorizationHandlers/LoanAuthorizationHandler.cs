@@ -43,8 +43,36 @@ public class LoanAuthorizationHandler : BaseCrudAuthorizationHandler<OperationAu
                 if (loan.Tenant.Id == userId || loan.Item.Owner.Id == userId)
                     context.Succeed(requirement);
                 break;
+            case nameof(Operations.CreatePickupProtocol):
+                // Only the owner can create the protocol and the loan must be accepted
+                if (loan.Item.Owner.Id == userId
+                    && loan.Status == LoanStatus.Accepted
+                    && loan.PickupProtocol == null)
+                {
+                    context.Succeed(requirement);
+                }
+
+                break;
             default:
                 throw new UnsupportedOperationException($"Unspported operation {requirement.Name}");
         }
+    }
+
+    public static class Operations
+    {
+        public static OperationAuthorizationRequirement Create = new OperationAuthorizationRequirement
+            { Name = nameof(Create) };
+
+        public static OperationAuthorizationRequirement Read = new OperationAuthorizationRequirement
+            { Name = nameof(Read) };
+
+        public static OperationAuthorizationRequirement Update = new OperationAuthorizationRequirement
+            { Name = nameof(Update) };
+
+        public static OperationAuthorizationRequirement Delete = new OperationAuthorizationRequirement
+            { Name = nameof(Delete) };
+
+        public static OperationAuthorizationRequirement CreatePickupProtocol = new OperationAuthorizationRequirement
+            { Name = nameof(CreatePickupProtocol) };
     }
 }

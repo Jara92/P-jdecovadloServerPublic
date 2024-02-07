@@ -124,6 +124,7 @@ builder.Services.AddScoped<IItemCategoryRepository, ItemCategoryRepository>();
 builder.Services.AddScoped<IItemTagRepository, ItemTagRepository>();
 builder.Services.AddScoped<IImageRepository, ImageRepository>();
 builder.Services.AddScoped<ILoanRepository, LoanRepository>();
+builder.Services.AddScoped<IPickupProtocolRepository, PickupProtocolRepository>();
 
 // Services
 builder.Services.AddScoped<ItemService>();
@@ -131,6 +132,7 @@ builder.Services.AddScoped<ItemCategoryService>();
 builder.Services.AddScoped<ItemTagService>();
 builder.Services.AddScoped<ImageService>();
 builder.Services.AddScoped<LoanService>();
+builder.Services.AddScoped<PickupProtocolService>();
 
 // Facades
 builder.Services.AddScoped<ItemFacade>();

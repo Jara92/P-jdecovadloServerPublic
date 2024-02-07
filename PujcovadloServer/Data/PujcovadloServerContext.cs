@@ -21,6 +21,8 @@ namespace PujcovadloServer.Data
        public DbSet<ItemTag> ItemTag { get; set; } = default!;
        
        public DbSet<Image> Image { get; set; } = default!;
+       
+       public DbSet<PickupProtocol> PickupProtocol { get; set; } = default!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -33,6 +35,17 @@ namespace PujcovadloServer.Data
             modelBuilder.Entity<ItemTag>()
                 .HasIndex(u => u.Name)
                 .IsUnique();
+            
+            // Add Loan.PickupProtocolId foreign key
+            modelBuilder.Entity<Loan>()
+                .HasOne<PickupProtocol>(l => l.PickupProtocol)
+                .WithOne(p => p.Loan)
+                .HasForeignKey<Loan>(p => p.PickupProtocolId);
+
+            // Add Image.PickupProtocolId foreign key
+            modelBuilder.Entity<Image>()
+                .HasOne<PickupProtocol>(i => i.PickupProtocol)
+                .WithMany(p => p.Images);
             
             base.OnModelCreating(modelBuilder);
         }
