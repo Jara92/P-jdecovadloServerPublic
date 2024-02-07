@@ -15,4 +15,9 @@ public class ImageRepository : ACrudRepository<Image, BaseFilter>, IImageReposit
     {
         return await _context.Image.Where(c => ids.Contains(c.Id)).ToListAsync();
     }
+
+    public async Task<Image?> GetByPath(string name)
+    {
+        return await _context.Image.FirstOrDefaultAsync(c => c.Path == name);
+    }
 }

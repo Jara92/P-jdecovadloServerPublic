@@ -131,14 +131,15 @@ public class ItemImageController : ACrudController<Image>
         var image = new Image()
         {
             Name = file.FileName,
-            Path = filePath,
+            Extension = _fileUploadService.GetFileExtension(file),
+            MimeType = _fileUploadService.GetMimeType(file),
             Item = item
         };
         
         await CheckPermissions(image, ItemAuthorizationHandler.Operations.Create);
 
         // Save the image to the database
-        await _itemFacade.AddImage(item, image);
+        await _itemFacade.AddImage(item, image, filePath);
         
         // Map the image to response
         var imageResponse = _mapper.Map<ImageResponse>(image);

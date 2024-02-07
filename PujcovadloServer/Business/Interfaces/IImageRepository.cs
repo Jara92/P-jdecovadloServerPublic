@@ -6,4 +6,6 @@ namespace PujcovadloServer.Business.Interfaces;
 public interface IImageRepository : ICrudRepository<Image, BaseFilter>
 {
     public Task<IList<Image>> GetByIds(IEnumerable<int> ids);
+    
+    public Task<Image?> GetByPath(string name);
 }

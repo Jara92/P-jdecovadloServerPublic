@@ -12,4 +12,9 @@ public class ImageService(IImageRepository repository)
     {
         return await _repository.GetByIds(ids);
     }
+
+    public async Task<Image?> GetByPath(string name)
+    {
+        return await _repository.GetByPath(name);
+    }
 }

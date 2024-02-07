@@ -47,7 +47,7 @@ public class FileUploadService
     public async Task<string> SaveUploadedImage(IFormFile file)
     {
         // Build file path
-        string fileExtension = Path.GetExtension(file.FileName).ToLower();
+        string fileExtension = GetFileExtension(file);
         var filePath = BuildFilePath(file.FileName, fileExtension);
 
         // Check if the file is empty
@@ -71,12 +71,19 @@ public class FileUploadService
         return filePath;
     }
     
+    public string GetFileExtension(IFormFile file)
+    {
+        return Path.GetExtension(file.FileName).ToLower();
+    }
+    
+    public string GetMimeType(IFormFile file)
+    {
+        return file.ContentType;
+    }
+    
     protected string BuildFilePath(string fileName, string extension)
     {
         var filePath = Path.GetTempFileName();
-        
-        // TODO: Implement file storage
-        // var filePath = Path.Combine(_config["StoredFilesPath"], Path.GetRandomFileName()); 
 
         return filePath;
     }
@@ -108,7 +115,7 @@ public class FileUploadService
     protected async Task CheckFileSignature(IFormFile file)
     {
         // file extension
-        var extension = Path.GetExtension(file.FileName).ToLower();
+        var extension = this.GetFileExtension(file);
         
         // Check if the file signature is allowed
         if(!_fileSignatures.ContainsKey(extension)) throw new ArgumentException("File signature is not allowed.");

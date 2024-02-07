@@ -8,6 +8,11 @@ public class PujcovadloServerConfiguration
     {
         _configuration = configuration;
     }
+
+    /// <summary>
+    /// Default directory for images to be stored.
+    /// </summary>
+    public string ImagesPath => _configuration.GetValue<string>("Business:ImagesPath") ?? throw new Exception("ImagesPath is not defined in the configuration.");
     
     /// <summary>
     /// Maximum image size in bytes which is acceptable.

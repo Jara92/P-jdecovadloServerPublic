@@ -17,6 +17,7 @@ namespace PujcovadloServer.Business.Facades;
 
 public class ItemFacade
 {
+    private readonly ImageFacade _imageFacade;
     private readonly ItemService _itemService;
     private readonly LoanService _loanService;
     private readonly ItemCategoryService _itemCategoryService;
@@ -25,10 +26,11 @@ public class ItemFacade
     private readonly IMapper _mapper;
     private readonly PujcovadloServerConfiguration _configuration;
 
-    public ItemFacade(ItemService itemService, LoanService loanService, ItemCategoryService itemCategoryService,
+    public ItemFacade(ImageFacade imageFacade, ItemService itemService, LoanService loanService, ItemCategoryService itemCategoryService,
         ItemTagService itemTagService, IAuthenticateService authenticateService, IMapper mapper,
         PujcovadloServerConfiguration configuration)
     {
+        _imageFacade = imageFacade;
         _itemService = itemService;
         _loanService = loanService;
         _itemCategoryService = itemCategoryService;
@@ -160,19 +162,16 @@ public class ItemFacade
         return item;
     }
     
-    public async Task AddImage(Item item, Image image)
+    public async Task AddImage(Item item, Image image, string filePath)
     {
         // Check that the item has not reached the maximum number of images
         if (item.Images.Count >= _configuration.MaxImagesPerItem)
             throw new ArgumentException("Max images per item exceeded.");
         
-        // Make item owner the owner of the image
-        image.Owner = item.Owner;
-        
-        // Add image to the item
-        item.Images.Add(image);
+        // set images item
+        image.Item = item;
 
-        // Update the item
-        await _itemService.Update(item);
+        // Create using image facade
+        await _imageFacade.Create(image, filePath);
     }
 }
