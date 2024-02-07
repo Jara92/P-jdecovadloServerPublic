@@ -18,5 +18,19 @@
     &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.Business.Facades.TenantFasadeTest.GetMyLoan_LoanNotFound_ThrowsException&lt;/TestId&gt;
     &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.Business.Facades.TenantFasadeTest.GetMyLoan_UserIsNotTenant_ThrowsException&lt;/TestId&gt;
     &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.Business.Facades.TenantFasadeTest.GetMyLoan_UserIsTenant_ReturnsLoan&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.Business.Facades.TenantFacadeTest.CreateLoan_UnauthenticatedUser_ThrowsException&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.Business.Facades.TenantFacadeTest.GetMyLoan_UnauthenticatedUser_ThrowsException&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.Business.Facades.TenantFacadeTest.CreateLoan_ItemNotFound_ThrowsException&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.Business.Facades.TenantFacadeTest.CreateLoan_UserIsTenant_ReturnsLoan&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.Business.Facades.TenantFacadeTest.SetLoanDays_SameDateDifferentTime_ReturnsOneDay&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.Business.Facades.TenantFacadeTest.SetLoanDays_DifferentDates_ReturnsDays&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.Business.Facades.TenantFacadeTest.SetLoanDays_DifferentDatesDifferentTime_ReturnsDays&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.Business.Facades.TenantFacadeTest.SetLoanDays_DifferentDates_ReturnsDays2&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.Business.Facades.TenantFacadeTest.SetLoanExpectedPrice_ThreeDays_ReturnsPricePerDayTimesSeven&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.Business.Facades.TenantFacadeTest.SetLoanExpectedPrice_ZeroDays_ThrowsException&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.Business.Facades.TenantFacadeTest.UpdateMyLoan_UnauthenticatedUser_ThrowsException&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.Business.Facades.TenantFacadeTest.UpdateMyLoan_UserIsNotTenant_ThrowsException&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.Business.Facades.TenantFacadeTest.UpdateMyLoan_UserIsTenantAndUpdatedStatus_UpdatesLoan&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.Business.Facades.TenantFacadeTest.UpdateMyLoan_UserIsTenantAndNotUpdatedStatus_UpdateLoan&lt;/TestId&gt;
   &lt;/TestAncestor&gt;
 &lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>

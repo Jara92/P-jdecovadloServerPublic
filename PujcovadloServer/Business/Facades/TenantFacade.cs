@@ -60,13 +60,10 @@ public class TenantFacade
     {
         // Get current user
         var user = await _authenticateService.GetCurrentUser();
-        if (user == null) throw new AuthenticationException();
         
         // get the item
         var item = await _itemService.Get(request.Item.Id);
         if (item == null) throw new EntityNotFoundException($"Item with id {request.Item.Id} was not found.");
-        
-        // TODO: Check that the user has permission to create a loan for this item
 
         // Map request to loan
         var newLoan = _mapper.Map<Loan>(request);
@@ -82,14 +79,9 @@ public class TenantFacade
         newLoan.PricePerDay = item.PricePerDay;
         newLoan.RefundableDeposit = item.RefundableDeposit;
         
-        // Calculate the price - take dates only to get rid of time so we get pretty accurate days
-        var days = (newLoan.To.Date - newLoan.From.Date).TotalDays;
-        // Set days to one if To and From are the same
-        if (days < 1) days = 1;
-        
-        // Set the days and expected price
-        newLoan.Days = (int) Math.Ceiling(days);
-        newLoan.ExpectedPrice = newLoan.Days * newLoan.PricePerDay;
+        // Set the expected price and days
+        newLoan.Days = GetLoanSetLoanDays(newLoan);
+        newLoan.ExpectedPrice = GetLoanExpectedPrice(newLoan);
 
         // create the loan
         await _loanService.Create(newLoan);
@@ -97,11 +89,32 @@ public class TenantFacade
         return newLoan;
     }
 
+    public int GetLoanSetLoanDays(Loan loan)
+    {
+        // Calculate the price - take dates only to get rid of time so we get pretty accurate days
+        var days = (loan.To.Date - loan.From.Date).TotalDays;
+        // Set days to one if To and From are the same
+        if (days < 1) days = 1;
+        
+        // Set the days and expected price
+        return (int) Math.Ceiling(days);
+    }
+
+    public float GetLoanExpectedPrice(Loan loan)
+    {
+        // Check if the days are greater than 0
+        if(loan.Days <= 0) throw new ArgumentException("Days must be greater than 0.");
+        
+        return loan.Days * loan.PricePerDay;
+    }
+
     public async Task UpdateMyLoan(Loan loan, TenantLoanRequest request)
     {
         // Get current user
         var user = await _authenticateService.GetCurrentUser();
-        if (user == null) throw new AuthenticationException();
+        
+        // Check that the user is the tenant
+        if (loan.Tenant.Id != user.Id) throw new UnauthorizedAccessException("You are not the tenant of this loan.");
 
         // Check if the status has been changed
         if (request.Status != null && request.Status != loan.Status)

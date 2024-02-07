@@ -24,7 +24,7 @@ public class LoanService : ACrudService<Loan, ILoanRepository, LoanFilter>
         return await _repository.GetAll(filter);
     }
     
-    public ILoanState GetState(Loan loan)
+    public virtual ILoanState GetState(Loan loan)
     {
         return _loanStateFactory.GetState(loan.Status);
     }
