@@ -77,14 +77,29 @@ public class ImageFacade
         return newFileName;
     }
 
-    public async Task<Image> GetImage(Item item, int imageId)
+    public async Task<byte[]> GetImageBytes(Image image)
+    {
+        // Build absolute path to the image
+        var filePath = Path.Combine(_configuration.ImagesPath, image.Path);
+        
+        // Check if the file exists
+        if (File.Exists(filePath))
+        {
+            // Get all bytes of the file and return the file with the specified file contents 
+            return await File.ReadAllBytesAsync(filePath);
+        }
+        
+        throw new FileNotFoundException("Image not found.");
+    }
+
+    public async Task<Image> GetImage(int itemId, int imageId)
     {
         // Get image and check that it is not null
         var image = await _imageService.Get(imageId);
         if (image == null) throw new EntityNotFoundException();
 
         // Check that the image is associated with the item
-        if (image.Item?.Id != item.Id) throw new ArgumentException("Image is not associated with the item.");
+        if (image.Item?.Id != itemId) throw new ArgumentException("Image is not associated with the item.");
 
         return image;
     }
@@ -97,10 +112,15 @@ public class ImageFacade
         return image;
     }
 
-    public async Task DeleteImage(Item item, int imageId)
+    public async Task DeleteImage(int itemId, int imageId)
     {
-        var image = await GetImage(item, imageId);
+        var image = await GetImage(itemId, imageId);
 
+        await DeleteImage(image);
+    }
+
+    public async Task DeleteImage(Image image)
+    {
         await _imageService.Delete(image);
     }
 }

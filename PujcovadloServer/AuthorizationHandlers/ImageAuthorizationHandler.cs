@@ -36,8 +36,17 @@ public class ImageAuthorizationHandler : BaseCrudAuthorizationHandler<OperationA
                 }
                 break;
             case nameof(Operations.Read):
-                // Anyone can read categories
-                context.Succeed(requirement);
+                // Owner can read the image
+                if (userId != null && image.Owner.Id == userId)
+                {
+                    context.Succeed(requirement);
+                }
+                
+                // Image's item is public
+                if (image.Item != null && image.Item.Status == ItemStatus.Public)
+                {
+                    context.Succeed(requirement);
+                }
 
                 break;
             default:

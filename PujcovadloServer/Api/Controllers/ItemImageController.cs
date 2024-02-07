@@ -21,7 +21,8 @@ public class ItemImageController : ACrudController<Image>
     private readonly FileUploadService _fileUploadService;
 
     public ItemImageController(ItemFacade itemFacade, ImageFacade imageFacade, IMapper mapper,
-        IAuthorizationService authorizationService, LinkGenerator urlHelper, FileUploadService fileUploadService) : base(authorizationService, urlHelper)
+        IAuthorizationService authorizationService, LinkGenerator urlHelper,
+        FileUploadService fileUploadService) : base(authorizationService, urlHelper)
     {
         _itemFacade = itemFacade;
         _imageFacade = imageFacade;
@@ -54,18 +55,27 @@ public class ItemImageController : ACrudController<Image>
         // Hateos image links
         foreach (var image in responseImages)
         {
+            // Add link to the image
             image.Links.Add(new LinkResponse(
                 _urlHelper.GetUriByAction(HttpContext, nameof(GetImage), "ItemImage",
                     values: new { id, imageId = image.Id }), "SELF", "GET"));
+            
+            // Add link to the image data
+            image.Links.Add(new LinkResponse(
+                _urlHelper.GetUriByAction(HttpContext, nameof(ImageController.GetImage), "Image",
+                    values: new { filename = image.Path }), "DATA", "GET"));
+                
         }
-        
+
         // Create response with links
         var response = new ResponseList<ImageResponse>()
         {
             Data = responseImages,
             Links = new List<LinkResponse>
             {
-                new LinkResponse(_urlHelper.GetUriByAction(HttpContext, nameof(ItemController.Get), "Item", values: new { id }), "ITEM", "GET")
+                new LinkResponse(
+                    _urlHelper.GetUriByAction(HttpContext, nameof(ItemController.Get), "Item", values: new { id }),
+                    "ITEM", "GET")
             }
         };
 
@@ -86,25 +96,21 @@ public class ItemImageController : ACrudController<Image>
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [AllowAnonymous]
-    public async Task<IActionResult> GetImage(int id, int imageId)
+    public async Task<ActionResult<ImageResponse>> GetImage(int id, int imageId)
     {
-        // get the item and check permissions
-        var item = await _itemFacade.GetItem(id);
-
         // get the image and return it
-        var image = await _imageFacade.GetImage(item, imageId);
+        var image = await _imageFacade.GetImage(id, imageId);
         await CheckPermissions(image, ItemAuthorizationHandler.Operations.Read);
 
-        if (System.IO.File.Exists(image.Path))
-        {
-            // Get all bytes of the file and return the file with the specified file contents 
-            byte[] b = await System.IO.File.ReadAllBytesAsync(image.Path);
-            return File(b, "application/octet-stream", "soubor.png");
-        }
+        // Map the image to response
+        var imageResponse = _mapper.Map<ImageResponse>(image);
 
-        // return error if file not found
-        return StatusCode(StatusCodes.Status404NotFound);
+        // Hateos image links
+        imageResponse.Links.Add(new LinkResponse(
+            _urlHelper.GetUriByAction(HttpContext, nameof(ImageController.GetImage), "Image",
+                values: new { filename = image.Path }), "DATA", "GET"));
+
+        return Ok(imageResponse);
     }
 
     /// <summary>
@@ -123,7 +129,7 @@ public class ItemImageController : ACrudController<Image>
     {
         // get the item and check permissions
         var item = await _itemFacade.GetItem(id);
-        
+
         // Save the image to the file system
         var filePath = await _fileUploadService.SaveUploadedImage(file);
 
@@ -135,19 +141,19 @@ public class ItemImageController : ACrudController<Image>
             MimeType = _fileUploadService.GetMimeType(file),
             Item = item
         };
-        
+
         await CheckPermissions(image, ItemAuthorizationHandler.Operations.Create);
 
         // Save the image to the database
         await _itemFacade.AddImage(item, image, filePath);
-        
+
         // Map the image to response
         var imageResponse = _mapper.Map<ImageResponse>(image);
 
         return Created(_urlHelper.GetUriByAction(HttpContext, nameof(GetImage),
             values: new { id = item.Id, imageId = image.Id }), imageResponse);
     }
-    
+
     /// <summary>
     /// Deletes image by given id.
     /// </summary>
@@ -164,16 +170,13 @@ public class ItemImageController : ACrudController<Image>
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteImage(int id, int imageId)
     {
-        // get the item and check permissions
-        var item = await _itemFacade.GetItem(id);
-        
         // get the image
-        var image = await _imageFacade.GetImage(item, imageId);
+        var image = await _imageFacade.GetImage(id, imageId);
         await CheckPermissions(image, ItemAuthorizationHandler.Operations.Delete);
 
         // get the image and return it
-        await _imageFacade.DeleteImage(item, imageId);
-        
+        await _imageFacade.DeleteImage(id, imageId);
+
         return NoContent();
     }
 }
