@@ -16,6 +16,10 @@ public class Image : BaseEntity
     [Column(TypeName = "VARCHAR")]
     [StringLength(256, MinimumLength = 1)]
     public string Path { get; set; } = default!;
+    
+    public string Extension { get; set; } = default!;
+    
+    public string MimeType { get; set; } = default!;
 
     public virtual ApplicationUser Owner { get; set; } = default!;
 
