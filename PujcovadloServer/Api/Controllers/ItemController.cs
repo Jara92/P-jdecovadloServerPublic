@@ -21,20 +21,15 @@ namespace PujcovadloServer.Api.Controllers;
 public class ItemController : ACrudController<Item>
 {
     private readonly IMapper _mapper;
-    private readonly IItemRepository _itemsRepository;
     private readonly ItemService _itemService;
     private readonly ItemFacade _itemFacade;
-    private readonly ItemCategoryFacade _itemCategoryFacade;
     private readonly ItemResponseGenerator _itemResponseGenerator;
 
-    public ItemController(IItemRepository itemsRepository, ItemFacade itemFacade,
-        ItemCategoryFacade itemCategoryFacade, IMapper mapper,
-        ItemService itemService, LinkGenerator urlHelper, ItemResponseGenerator itemResponseGenerator,
-        AuthorizationService authorizationService) : base(authorizationService, urlHelper)
+    public ItemController(ItemFacade itemFacade, IMapper mapper, ItemService itemService, LinkGenerator urlHelper,
+        ItemResponseGenerator itemResponseGenerator, AuthorizationService authorizationService) : base(
+        authorizationService, urlHelper)
     {
-        _itemsRepository = itemsRepository;
         _itemFacade = itemFacade;
-        _itemCategoryFacade = itemCategoryFacade;
         _mapper = mapper;
         _itemService = itemService;
         _itemResponseGenerator = itemResponseGenerator;
@@ -76,7 +71,7 @@ public class ItemController : ACrudController<Item>
     {
         // Get the item and convert it to response
         var item = await _itemFacade.GetItem(id);
-        
+
         await _authorizationService.CheckPermissions(item, ItemAuthorizationHandler.Operations.Read);
 
         // get item response
@@ -84,8 +79,8 @@ public class ItemController : ACrudController<Item>
 
         return Ok(responseItem);
     }
-    
-        /// <summary>
+
+    /// <summary>
     /// Create a new item.
     /// </summary>
     /// <param name="request">New Item</param>
@@ -130,7 +125,7 @@ public class ItemController : ACrudController<Item>
     public async Task<IActionResult> Update(int id, [FromBody] ItemRequest request)
     {
         var item = await _itemFacade.GetItem(id);
-        
+
         await _authorizationService.CheckPermissions(item, ItemAuthorizationHandler.Operations.Update);
 
         // Update the item
@@ -174,10 +169,10 @@ public class ItemController : ACrudController<Item>
     public async Task<ActionResult<List<ItemCategoryResponse>>> GetCategories(int id)
     {
         // Get item
-        var item = await _itemsRepository.Get(id);
-        if (item == null) return NotFound($"Item with {id} not found.");
+        var item = await _itemFacade.GetItem(id);
 
         // Get categories
+        // TODO: user response generator instead.
         var categoriesResponse = _mapper.Map<List<ItemCategoryResponse>>(item.Categories);
 
         return Ok(categoriesResponse);
