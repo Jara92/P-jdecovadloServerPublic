@@ -30,7 +30,7 @@ public class ItemController : ACrudController<Item>
     public ItemController(IItemRepository itemsRepository, ItemFacade itemFacade,
         ItemCategoryFacade itemCategoryFacade, IMapper mapper,
         ItemService itemService, LinkGenerator urlHelper, ItemResponseGenerator itemResponseGenerator,
-        IAuthorizationService authorizationService) : base(authorizationService, urlHelper)
+        AuthorizationService authorizationService) : base(authorizationService, urlHelper)
     {
         _itemsRepository = itemsRepository;
         _itemFacade = itemFacade;
@@ -76,8 +76,8 @@ public class ItemController : ACrudController<Item>
     {
         // Get the item and convert it to response
         var item = await _itemFacade.GetItem(id);
-
-        await CheckPermissions(item, ItemAuthorizationHandler.Operations.Read);
+        
+        await _authorizationService.CheckPermissions(item, ItemAuthorizationHandler.Operations.Read);
 
         // get item response
         var responseItem = _itemResponseGenerator.GenerateItemDetailResponse(item);
@@ -98,7 +98,8 @@ public class ItemController : ACrudController<Item>
     [Authorize(Roles = UserRoles.Owner)]
     public async Task<ActionResult<ItemResponse>> Create([FromBody] ItemRequest request)
     {
-        await CheckPermissions(_mapper.Map<Item>(request), ItemAuthorizationHandler.Operations.Create);
+        await _authorizationService.CheckPermissions(_mapper.Map<Item>(request),
+            ItemAuthorizationHandler.Operations.Create);
 
         var newItem = await _itemFacade.CreateItem(request);
 
@@ -129,8 +130,8 @@ public class ItemController : ACrudController<Item>
     public async Task<IActionResult> Update(int id, [FromBody] ItemRequest request)
     {
         var item = await _itemFacade.GetItem(id);
-
-        await CheckPermissions(item, ItemAuthorizationHandler.Operations.Update);
+        
+        await _authorizationService.CheckPermissions(item, ItemAuthorizationHandler.Operations.Update);
 
         // Update the item
         await _itemFacade.UpdateItem(item, request);
@@ -153,7 +154,7 @@ public class ItemController : ACrudController<Item>
         // Get the item
         var item = await _itemFacade.GetItem(id);
 
-        await CheckPermissions(item, ItemAuthorizationHandler.Operations.Delete);
+        await _authorizationService.CheckPermissions(item, ItemAuthorizationHandler.Operations.Delete);
 
         await _itemFacade.DeleteItem(item);
 

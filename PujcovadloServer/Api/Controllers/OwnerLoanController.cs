@@ -22,7 +22,7 @@ public class OwnerLoanController : ACrudController<Loan>
     private readonly IMapper _mapper;
 
     public OwnerLoanController(OwnerFacade loanFacade, LinkGenerator urlHelper, IMapper mapper,
-        IAuthorizationService authorizationService) : base(authorizationService, urlHelper)
+        AuthorizationService authorizationService) : base(authorizationService, urlHelper)
     {
         _ownerFacade = loanFacade;
         _mapper = mapper;
@@ -72,7 +72,7 @@ public class OwnerLoanController : ACrudController<Loan>
     {
         var loan = await _ownerFacade.GetMyLoan(id);
 
-        await CheckPermissions(loan, LoanAuthorizationHandler.Operations.Read);
+        await _authorizationService.CheckPermissions(loan, LoanAuthorizationHandler.Operations.Read);
         
         var responseLoan = _mapper.Map<LoanResponse>(loan);
 
@@ -106,7 +106,7 @@ public class OwnerLoanController : ACrudController<Loan>
     {
         var loan = await _ownerFacade.GetMyLoan(id);
 
-        await CheckPermissions(loan, LoanAuthorizationHandler.Operations.Update);
+        await _authorizationService.CheckPermissions(loan, LoanAuthorizationHandler.Operations.Update);
         
         await _ownerFacade.UpdateMyLoan(loan, request);
 

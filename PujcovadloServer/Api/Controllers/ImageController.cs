@@ -14,7 +14,7 @@ public class ImageController : ACrudController<Image>
 {
     private readonly ImageFacade _imageFacade;
 
-    public ImageController(ImageFacade imageFacade, IAuthorizationService authorizationService, LinkGenerator urlHelper)
+    public ImageController(ImageFacade imageFacade, AuthorizationService authorizationService, LinkGenerator urlHelper)
         : base(authorizationService, urlHelper)
     {
         _imageFacade = imageFacade;
@@ -38,7 +38,7 @@ public class ImageController : ACrudController<Image>
         // Find the image by filename
         var image = await _imageFacade.GetImage(filename);
         
-        await CheckPermissions(image, ImageAuthorizationHandler.Operations.Read);
+        await _authorizationService.CheckPermissions(image, ImageAuthorizationHandler.Operations.Read);
 
         // Get the image bytes
         var imageBytes = await _imageFacade.GetImageBytes(image);

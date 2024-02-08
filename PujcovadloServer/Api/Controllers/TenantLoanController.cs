@@ -22,7 +22,7 @@ public class TenantLoanController : ACrudController<Loan>
     private readonly IMapper _mapper;
 
     public TenantLoanController(TenantFacade loanFacade, LinkGenerator urlHelper, IMapper mapper,
-        IAuthorizationService authorizationService) : base(authorizationService, urlHelper)
+        AuthorizationService authorizationService) : base(authorizationService, urlHelper)
     {
         _tenantFacade = loanFacade;
         _mapper = mapper;
@@ -72,7 +72,7 @@ public class TenantLoanController : ACrudController<Loan>
     {
         var loan = await _tenantFacade.GetMyLoan(id);
 
-        await CheckPermissions(loan, LoanAuthorizationHandler.Operations.Read);
+        await _authorizationService.CheckPermissions(loan, LoanAuthorizationHandler.Operations.Read);
         
         var responseLoan = _mapper.Map<LoanResponse>(loan);
 
@@ -101,7 +101,7 @@ public class TenantLoanController : ACrudController<Loan>
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<LoanResponse>> CreateLoan([FromBody] TenantLoanRequest request)
     {
-        await CheckPermissions(_mapper.Map<Loan>(request), LoanAuthorizationHandler.Operations.Create);
+        await _authorizationService.CheckPermissions(_mapper.Map<Loan>(request), LoanAuthorizationHandler.Operations.Create);
         
         var loan = await _tenantFacade.CreateLoan(request);
         var responseLoan = _mapper.Map<LoanResponse>(loan);
@@ -120,7 +120,7 @@ public class TenantLoanController : ACrudController<Loan>
     {
         var loan = await _tenantFacade.GetMyLoan(id);
 
-        await CheckPermissions(loan, LoanAuthorizationHandler.Operations.Update);
+        await _authorizationService.CheckPermissions(loan, LoanAuthorizationHandler.Operations.Update);
         
         await _tenantFacade.UpdateMyLoan(loan, request);
 

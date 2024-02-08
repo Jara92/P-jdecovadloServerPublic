@@ -22,7 +22,7 @@ public class PickupProtocolController : ACrudController<PickupProtocol>
     private readonly IMapper _mapper;
 
     public PickupProtocolController(LoanFacade loanFacade, OwnerFacade ownerFacade,
-        IAuthorizationService authorizationService,
+        AuthorizationService authorizationService,
         LinkGenerator urlHelper, IMapper mapper) : base(authorizationService, urlHelper)
     {
         _loanFacade = loanFacade;
@@ -50,7 +50,7 @@ public class PickupProtocolController : ACrudController<PickupProtocol>
     {
         // Get loan
         var loan = await _loanFacade.GetLoan(loanId);
-        await CheckPermissions<Loan>(loan, LoanAuthorizationHandler.Operations.CreatePickupProtocol);
+        await _authorizationService.CheckPermissions(loan, LoanAuthorizationHandler.Operations.CreatePickupProtocol);
 
         // Create protocol
         var protocol = await _ownerFacade.CreatePickupProtocol(loan, request);
@@ -78,11 +78,11 @@ public class PickupProtocolController : ACrudController<PickupProtocol>
     {
         // Get loan
         var loan = await _loanFacade.GetLoan(loanId);
-        await CheckPermissions<Loan>(loan, LoanAuthorizationHandler.Operations.Read);
+        await _authorizationService.CheckPermissions(loan, LoanAuthorizationHandler.Operations.Read);
 
         // Get protocol
         var protocol = _loanFacade.GetPickupProtocol(loan);
-        await CheckPermissions(protocol, PickupProtocolAuthorizationHandler.Operations.Read);
+        await _authorizationService.CheckPermissions(protocol, PickupProtocolAuthorizationHandler.Operations.Read);
 
         // build response
         var response = _mapper.Map<PickupProtocolResponse>(protocol);
@@ -94,7 +94,7 @@ public class PickupProtocolController : ACrudController<PickupProtocol>
             "LOAN", "GET"));*/
 
         // Add update link if user has permission
-        if (await CanPerformOperation(protocol, PickupProtocolAuthorizationHandler.Operations.Update))
+        if (await _authorizationService.CanPerformOperation(protocol, PickupProtocolAuthorizationHandler.Operations.Update))
         {
             response.Links.Add(new LinkResponse(
                 _urlHelper.GetUriByAction(HttpContext, nameof(UpdateProtocol), values: new { loanId }),
@@ -128,11 +128,11 @@ public class PickupProtocolController : ACrudController<PickupProtocol>
     {
         // Get loan
         var loan = await _loanFacade.GetLoan(loanId);
-        await CheckPermissions<Loan>(loan, LoanAuthorizationHandler.Operations.Read);
+        await _authorizationService.CheckPermissions(loan, LoanAuthorizationHandler.Operations.Read);
 
         // Get protocol
         var protocol = _loanFacade.GetPickupProtocol(loan);
-        await CheckPermissions(protocol, PickupProtocolAuthorizationHandler.Operations.Update);
+        await _authorizationService.CheckPermissions(protocol, PickupProtocolAuthorizationHandler.Operations.Update);
 
         // Update protocol
         await _ownerFacade.UpdatePickupProtocol(protocol, request);

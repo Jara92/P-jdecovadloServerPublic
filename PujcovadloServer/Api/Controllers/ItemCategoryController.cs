@@ -22,7 +22,7 @@ public class ItemCategoryController : ACrudController<ItemCategory>
     private readonly LinkGenerator _urlHelper;
 
     public ItemCategoryController(ItemCategoryFacade itemCategoryFacade, ItemCategoryService itemCategoryService,
-        IMapper mapper, LinkGenerator linkGenerator, IAuthorizationService authorizationService) : base(
+        IMapper mapper, LinkGenerator linkGenerator, AuthorizationService authorizationService) : base(
         authorizationService, linkGenerator)
     {
         _itemCategoryFacade = itemCategoryFacade;
@@ -89,7 +89,7 @@ public class ItemCategoryController : ACrudController<ItemCategory>
         // Get the category
         var category = await _itemCategoryFacade.Get(id);
 
-        await CheckPermissions(category, ItemCategoryAuthorizationHandler.Operations.Read);
+        await _authorizationService.CheckPermissions(category, ItemCategoryAuthorizationHandler.Operations.Read);
 
         // Map to response
         var categoryResponse = _mapper.Map<ItemCategoryResponse>(category);

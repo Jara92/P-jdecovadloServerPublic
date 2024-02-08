@@ -24,7 +24,7 @@ public class MyItemController : ACrudController<Item>
     private readonly IMapper _mapper;
 
     public MyItemController(ItemFacade itemFacade, ImageFacade imageFacade, ItemService itemService,
-        LinkGenerator urlHelper, IMapper mapper, IAuthorizationService authorizationService) : base(authorizationService, urlHelper)
+        LinkGenerator urlHelper, IMapper mapper, AuthorizationService authorizationService) : base(authorizationService, urlHelper)
     {
         _itemService = itemService;
         _itemFacade = itemFacade;
@@ -83,7 +83,7 @@ public class MyItemController : ACrudController<Item>
         var item = await _itemFacade.GetItem(id);
 
         // Can read all item's data only if the user is can update the item
-        await CheckPermissions(item, ItemAuthorizationHandler.Operations.Update);
+        await _authorizationService.CheckPermissions(item, ItemAuthorizationHandler.Operations.Update);
 
         var response = _mapper.Map<ItemOwnerResponse>(item);
 

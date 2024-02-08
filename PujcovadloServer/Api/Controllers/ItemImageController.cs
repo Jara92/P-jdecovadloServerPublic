@@ -21,7 +21,7 @@ public class ItemImageController : ACrudController<Image>
     private readonly FileUploadService _fileUploadService;
 
     public ItemImageController(ItemFacade itemFacade, ImageFacade imageFacade, IMapper mapper,
-        IAuthorizationService authorizationService, LinkGenerator urlHelper,
+        AuthorizationService authorizationService, LinkGenerator urlHelper,
         FileUploadService fileUploadService) : base(authorizationService, urlHelper)
     {
         _itemFacade = itemFacade;
@@ -46,7 +46,7 @@ public class ItemImageController : ACrudController<Image>
         var item = await _itemFacade.GetItem(id);
 
         // Check permission for the item.
-        await CheckPermissions<Item>(item, ItemAuthorizationHandler.Operations.Read);
+        await _authorizationService.CheckPermissions(item, ItemAuthorizationHandler.Operations.Read);
 
         // get the images and map them to response
         var images = item.Images;
@@ -100,7 +100,7 @@ public class ItemImageController : ACrudController<Image>
     {
         // get the image and return it
         var image = await _imageFacade.GetImage(id, imageId);
-        await CheckPermissions(image, ItemAuthorizationHandler.Operations.Read);
+        await _authorizationService.CheckPermissions(image, ItemAuthorizationHandler.Operations.Read);
 
         // Map the image to response
         var imageResponse = _mapper.Map<ImageResponse>(image);
@@ -142,7 +142,7 @@ public class ItemImageController : ACrudController<Image>
             Item = item
         };
 
-        await CheckPermissions(image, ItemAuthorizationHandler.Operations.Create);
+        await _authorizationService.CheckPermissions(image, ItemAuthorizationHandler.Operations.Create);
 
         // Save the image to the database
         await _itemFacade.AddImage(item, image, filePath);
@@ -172,7 +172,7 @@ public class ItemImageController : ACrudController<Image>
     {
         // get the image
         var image = await _imageFacade.GetImage(id, imageId);
-        await CheckPermissions(image, ItemAuthorizationHandler.Operations.Delete);
+        await _authorizationService.CheckPermissions(image, ItemAuthorizationHandler.Operations.Delete);
 
         // get the image and return it
         await _imageFacade.DeleteImage(id, imageId);

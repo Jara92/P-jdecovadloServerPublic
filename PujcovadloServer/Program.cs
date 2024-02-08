@@ -151,6 +151,9 @@ builder.Services.AddScoped<ItemResponseGenerator>();
 // File upload service
 builder.Services.AddScoped<FileUploadService>();
 
+// Custom authorization service
+builder.Services.AddScoped<AuthorizationService>();
+
 // AutoMapper configuration
 var config = new MapperConfiguration(cfg =>
 {
