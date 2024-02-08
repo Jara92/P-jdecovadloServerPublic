@@ -56,7 +56,7 @@ public class ItemController : ACrudController<Item>
         var items = await _itemService.GetAll(filter);
 
         // get response list
-        var response = _itemResponseGenerator.GenerateResponseList(items, filter, nameof(Get), "Item");
+        var response = await _itemResponseGenerator.GenerateResponseList(items, filter, nameof(Get), "Item");
 
 
         return Ok(response);
@@ -80,7 +80,7 @@ public class ItemController : ACrudController<Item>
         await _authorizationService.CheckPermissions(item, ItemAuthorizationHandler.Operations.Read);
 
         // get item response
-        var responseItem = _itemResponseGenerator.GenerateItemDetailResponse(item);
+        var responseItem = await _itemResponseGenerator.GenerateItemDetailResponse(item);
 
         return Ok(responseItem);
     }
@@ -104,7 +104,7 @@ public class ItemController : ACrudController<Item>
         var newItem = await _itemFacade.CreateItem(request);
 
         // generate detailed reponse for the owner
-        var responseItem = _itemResponseGenerator.GenerateItemOwnerResponse(newItem);
+        var responseItem = await _itemResponseGenerator.GenerateItemOwnerResponse(newItem);
 
         // generate response with location header
         return CreatedAtAction(_urlHelper.GetUriByAction(HttpContext, nameof(Get), values: newItem.Id), responseItem);

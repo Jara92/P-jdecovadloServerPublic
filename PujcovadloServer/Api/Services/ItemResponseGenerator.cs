@@ -1,5 +1,6 @@
 using AutoMapper;
 using PujcovadloServer.Api.Controllers;
+using PujcovadloServer.AuthorizationHandlers;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Filters;
 using PujcovadloServer.Lib;
@@ -15,8 +16,9 @@ public class ItemResponseGenerator : ABaseResponseGenerator
 {
     private readonly IMapper _mapper;
 
-    public ItemResponseGenerator(IMapper mapper, LinkGenerator urlHelper, IHttpContextAccessor httpContextAccessor) :
-        base(httpContextAccessor, urlHelper)
+    public ItemResponseGenerator(IMapper mapper, LinkGenerator urlHelper, IHttpContextAccessor httpContextAccessor,
+        AuthorizationService authorizationService) :
+        base(httpContextAccessor, urlHelper, authorizationService)
     {
         _mapper = mapper;
     }
@@ -25,15 +27,34 @@ public class ItemResponseGenerator : ABaseResponseGenerator
     /// generates ItemResponse for single item.
     /// </summary>
     /// <param name="item">Item to be converted to a response</param>
+    /// <param name="owner">Is the response meant for the owner? </param>
     /// <returns>ItemResponse which represents the Item.</returns>
-    private ItemResponse GenerateSingleItemResponse(Item item)
+    private async Task<ItemResponse> GenerateSingleItemResponse(Item item, bool owner = false)
     {
         var response = _mapper.Map<ItemResponse>(item);
 
-        // Link to item detail
-        response.Links.Add(new LinkResponse(
-            _urlHelper.GetUriByAction(_httpContext, nameof(ItemController.Get), "Item", values: new { item.Id }),
-            "SELF", "GET"));
+        // Link to item detail - it is different for the owner.
+        if (owner)
+        {
+            response.Links.Add(new LinkResponse(
+                _urlHelper.GetUriByAction(_httpContext, nameof(MyItemController.Get), "MyItem",
+                    values: new { item.Id }), "SELF", "GET"));
+        }
+        else
+        {
+            response.Links.Add(new LinkResponse(
+                _urlHelper.GetUriByAction(_httpContext, nameof(ItemController.Get), "Item", values: new { item.Id }),
+                "SELF", "GET"));
+        }
+
+
+        // item delete action if has permission
+        if (await _authorizationService.CanPerformOperation(item, ItemAuthorizationHandler.Operations.Delete))
+        {
+            response.Links.Add(new LinkResponse(
+                _urlHelper.GetUriByAction(_httpContext, nameof(ItemController.Delete), "Item",
+                    values: new { item.Id }), "DELETE", "DELETE"));
+        }
 
         // TODO: add link to owner
 
@@ -70,16 +91,17 @@ public class ItemResponseGenerator : ABaseResponseGenerator
     /// <param name="filter">Filter used for retrieving the items.</param>
     /// <param name="action">Action to used for retrieving the items.</param>
     /// <param name="controller">Controller used for retrieving the items.</param>
+    /// <param name="owner">Is the response meant for the owner? </param>
     /// <returns></returns>
-    public ResponseList<ItemResponse> GenerateResponseList(PaginatedList<Item> items, ItemFilter filter, string action,
-        string controller)
+    public async Task<ResponseList<ItemResponse>> GenerateResponseList(PaginatedList<Item> items, ItemFilter filter,
+        string action, string controller, bool owner = false)
     {
         // Create empty list
         var responseItems = new List<ItemResponse>();
 
         foreach (var item in items)
         {
-            responseItems.Add(GenerateSingleItemResponse(item));
+            responseItems.Add(await GenerateSingleItemResponse(item, owner));
         }
 
         // Init links with pagination links
@@ -100,7 +122,7 @@ public class ItemResponseGenerator : ABaseResponseGenerator
     /// </summary>
     /// <param name="item">Item to be converted to a response.</param>
     /// <returns>ItemDetailResponse which represents the item</returns>
-    public ItemDetailResponse GenerateItemDetailResponse(Item item)
+    public async Task<ItemDetailResponse> GenerateItemDetailResponse(Item item)
     {
         var response = _mapper.Map<ItemDetailResponse>(item);
 
@@ -119,7 +141,7 @@ public class ItemResponseGenerator : ABaseResponseGenerator
     /// </summary>
     /// <param name="item">Item to be converted to a response</param>
     /// <returns>ItemOwnerResponse</returns>
-    public ItemOwnerResponse GenerateItemOwnerResponse(Item item)
+    public async Task<ItemOwnerResponse> GenerateItemOwnerResponse(Item item)
     {
         var response = _mapper.Map<ItemOwnerResponse>(item);
 
@@ -129,6 +151,22 @@ public class ItemResponseGenerator : ABaseResponseGenerator
         // Add links for owner
         response.Links.Add(new LinkResponse(
             _urlHelper.GetUriByAction(_httpContext, nameof(MyItemController.Index), "MyItem"), "LIST", "GET"));
+
+        // item update action if has permission
+        if (await _authorizationService.CanPerformOperation(item, ItemAuthorizationHandler.Operations.Update))
+        {
+            response.Links.Add(new LinkResponse(
+                _urlHelper.GetUriByAction(_httpContext, nameof(ItemController.Update), "Item",
+                    values: new { item.Id }), "UPDATE", "PUT"));
+        }
+
+        // item delete action if has permission
+        if (await _authorizationService.CanPerformOperation(item, ItemAuthorizationHandler.Operations.Delete))
+        {
+            response.Links.Add(new LinkResponse(
+                _urlHelper.GetUriByAction(_httpContext, nameof(ItemController.Delete), "Item",
+                    values: new { item.Id }), "DELETE", "DELETE"));
+        }
 
         return response;
     }

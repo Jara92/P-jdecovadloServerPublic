@@ -2,6 +2,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PujcovadloServer.Api.Filters;
+using PujcovadloServer.Api.Services;
 using PujcovadloServer.AuthorizationHandlers;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Enums;
@@ -21,14 +22,16 @@ public class MyItemController : ACrudController<Item>
     private readonly ItemService _itemService;
     private readonly ItemFacade _itemFacade;
     private readonly ImageFacade _imageFacade;
+    private readonly ItemResponseGenerator _itemResponseGenerator;
     private readonly IMapper _mapper;
 
-    public MyItemController(ItemFacade itemFacade, ImageFacade imageFacade, ItemService itemService,
+    public MyItemController(ItemFacade itemFacade, ImageFacade imageFacade, ItemService itemService, ItemResponseGenerator itemResponseGenerator,
         LinkGenerator urlHelper, IMapper mapper, AuthorizationService authorizationService) : base(authorizationService, urlHelper)
     {
         _itemService = itemService;
         _itemFacade = itemFacade;
         _imageFacade = imageFacade;
+        _itemResponseGenerator = itemResponseGenerator;
         _mapper = mapper;
     }
 
@@ -41,33 +44,9 @@ public class MyItemController : ACrudController<Item>
         var items = await _itemFacade.GetMyItems(filter);
 
         // Map items to response
-        var responseItems = _mapper.Map<List<ItemResponse>>(items);
-
-        // Hateos item links
-        foreach (var item in responseItems)
-        {
-            item.Links.Add(new LinkResponse(
-                _urlHelper.GetUriByAction(HttpContext, nameof(MyItemController.Get), "MyItem", 
-                    values: new { item.Id }), "SELF", "GET"));
-            item.Links.Add(new LinkResponse(
-                _urlHelper.GetUriByAction(HttpContext, nameof(ItemController.Update), "Item",
-                    values: new { item.Id }),
-                "UPDATE", "PUT"));
-            item.Links.Add(new LinkResponse(
-                _urlHelper.GetUriByAction(HttpContext, nameof(ItemController.Delete), "Item",
-                    values: new { item.Id }),
-                "DELETE", "DELETE"));
-        }
-
-        // Generate pagination links
-        var links = GeneratePaginationLinks(items, filter, nameof(Index));
-
-        // Return response
-        return Ok(new ResponseList<ItemResponse>
-        {
-            Data = responseItems,
-            Links = links
-        });
+        var response = await _itemResponseGenerator.GenerateResponseList(items, filter, nameof(MyItemController.Index), "MyItem", true);
+        
+        return Ok(response);
     }
 
     /// <summary>
@@ -85,11 +64,7 @@ public class MyItemController : ACrudController<Item>
         // Can read all item's data only if the user is can update the item
         await _authorizationService.CheckPermissions(item, ItemAuthorizationHandler.Operations.Update);
 
-        var response = _mapper.Map<ItemOwnerResponse>(item);
-
-        response.Links.Add(new LinkResponse(
-            _urlHelper.GetUriByAction(HttpContext, nameof(MyItemController.Get), "MyItem", values: new { response.Id }),
-            "SELF", "GET"));
+        var response = await _itemResponseGenerator.GenerateItemOwnerResponse(item);
 
         return Ok(response);
     }

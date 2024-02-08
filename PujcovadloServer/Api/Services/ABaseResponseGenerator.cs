@@ -1,3 +1,4 @@
+using PujcovadloServer.AuthorizationHandlers;
 using PujcovadloServer.Business.Filters;
 using PujcovadloServer.Lib;
 using PujcovadloServer.Responses;
@@ -8,12 +9,14 @@ public abstract class ABaseResponseGenerator
 {
     protected readonly LinkGenerator _urlHelper;
     protected readonly IHttpContextAccessor _httpContextAccessor;
+    protected readonly AuthorizationService _authorizationService;
     protected HttpContext _httpContext;
     
-    public ABaseResponseGenerator(IHttpContextAccessor httpContextAccessor, LinkGenerator urlHelper)
+    public ABaseResponseGenerator(IHttpContextAccessor httpContextAccessor, LinkGenerator urlHelper, AuthorizationService authorizationService)
     {
         _urlHelper = urlHelper;
         _httpContextAccessor = httpContextAccessor;
+        _authorizationService = authorizationService;
 
         _httpContext = _httpContextAccessor.HttpContext;
     }
