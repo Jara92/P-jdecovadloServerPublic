@@ -15,13 +15,13 @@ namespace PujcovadloServer.Api.Controllers;
 [Route("api/loans/{loanId}/pickup-protocol")]
 [Authorize(Roles = UserRoles.Owner)]
 [ServiceFilter(typeof(ExceptionFilter))]
-public class PickupProtocolControllers : ACrudController<PickupProtocol>
+public class PickupProtocolController : ACrudController<PickupProtocol>
 {
     private readonly LoanFacade _loanFacade;
     private readonly OwnerFacade _ownerFacade;
     private readonly IMapper _mapper;
 
-    public PickupProtocolControllers(LoanFacade loanFacade, OwnerFacade ownerFacade,
+    public PickupProtocolController(LoanFacade loanFacade, OwnerFacade ownerFacade,
         IAuthorizationService authorizationService,
         LinkGenerator urlHelper, IMapper mapper) : base(authorizationService, urlHelper)
     {
