@@ -145,9 +145,8 @@ builder.Services.AddScoped<OwnerFacade>();
 // Filters
 builder.Services.AddScoped<ExceptionFilter>();
 
-// Hateoas generator
-builder.Services.AddScoped<ItemHateoasGenerator>();
-builder.Services.AddScoped<ImageHateoasGenerator>();
+// Response generator
+builder.Services.AddScoped<ItemResponseGenerator>();
 
 // File upload service
 builder.Services.AddScoped<FileUploadService>();

@@ -2,6 +2,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PujcovadloServer.Api.Filters;
+using PujcovadloServer.Api.Services;
 using PujcovadloServer.AuthorizationHandlers;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Enums;
@@ -24,10 +25,11 @@ public class ItemController : ACrudController<Item>
     private readonly ItemService _itemService;
     private readonly ItemFacade _itemFacade;
     private readonly ItemCategoryFacade _itemCategoryFacade;
+    private readonly ItemResponseGenerator _itemResponseGenerator;
 
     public ItemController(IItemRepository itemsRepository, ItemFacade itemFacade,
         ItemCategoryFacade itemCategoryFacade, IMapper mapper,
-        ItemService itemService, LinkGenerator urlHelper,
+        ItemService itemService, LinkGenerator urlHelper, ItemResponseGenerator itemResponseGenerator,
         IAuthorizationService authorizationService) : base(authorizationService, urlHelper)
     {
         _itemsRepository = itemsRepository;
@@ -35,6 +37,7 @@ public class ItemController : ACrudController<Item>
         _itemCategoryFacade = itemCategoryFacade;
         _mapper = mapper;
         _itemService = itemService;
+        _itemResponseGenerator = itemResponseGenerator;
     }
 
     /// <summary>
@@ -52,34 +55,8 @@ public class ItemController : ACrudController<Item>
         // Get items
         var items = await _itemService.GetAll(filter);
 
-        // Map items to response
-        var responseItems = _mapper.Map<List<ItemResponse>>(items);
-
-        // Hateos item links
-        foreach (var item in responseItems)
-        {
-            item.Links.Add(new LinkResponse(
-                _urlHelper.GetUriByAction(HttpContext, nameof(this.Get), values: new { item.Id }), "SELF", "GET"));
-            
-            // TODO: add link to owner
-            
-            foreach(var image in item.Images)
-            {
-                image.Links.Add(new LinkResponse(
-                    _urlHelper.GetUriByAction(HttpContext, nameof(ItemImageController.GetImage), "ItemImage",
-                        values: new { id = item.Id, imageId = image.Id }), "SELF", "GET"));
-            }
-        }
-
-        // Hateos links
-        var links = GeneratePaginationLinks(items, filter, nameof(Index));
-
-        // Build response
-        var response = new ResponseList<ItemResponse>
-        {
-            Data = responseItems,
-            Links = links
-        };
+        // get response list
+        var response = _itemResponseGenerator.GenerateResponseList(items, filter, nameof(Get), "Item");
 
 
         return Ok(response);
@@ -101,12 +78,9 @@ public class ItemController : ACrudController<Item>
         var item = await _itemFacade.GetItem(id);
 
         await CheckPermissions(item, ItemAuthorizationHandler.Operations.Read);
-        
-        var responseItem = _mapper.Map<ItemDetailResponse>(item);
 
-        // Hateos links
-        responseItem.Links.Add(new LinkResponse(
-            _urlHelper.GetUriByAction(HttpContext, nameof(this.Index)), "LIST", "GET"));
+        // get item response
+        var responseItem = _itemResponseGenerator.GenerateItemDetailResponse(item);
 
         return Ok(responseItem);
     }
@@ -128,7 +102,8 @@ public class ItemController : ACrudController<Item>
 
         var newItem = await _itemFacade.CreateItem(request);
 
-        var responseItem = _mapper.Map<ItemResponse>(newItem);
+        // generate detailed reponse for the owner
+        var responseItem = _itemResponseGenerator.GenerateItemOwnerResponse(newItem);
 
         // generate response with location header
         return CreatedAtAction(_urlHelper.GetUriByAction(HttpContext, nameof(Get), values: newItem.Id), responseItem);
@@ -140,12 +115,12 @@ public class ItemController : ACrudController<Item>
     /// <param name="id">Item's id.</param>
     /// <param name="request">Updated item.</param>
     /// <returns></returns>
-    /// <response code="200">If the item was updated successfully.</response>
+    /// <response code="204">If the item was updated successfully.</response>
     /// <response code="400">If the item data is invalid.</response>
     /// <response code="404">If the item was not found.</response>
     /// <response code="409">If the item was updated in the meantime.</response>
     [HttpPut("{id}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
@@ -160,7 +135,7 @@ public class ItemController : ACrudController<Item>
         // Update the item
         await _itemFacade.UpdateItem(item, request);
 
-        return Ok();
+        return NoContent();
     }
 
     /// <summary>
