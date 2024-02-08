@@ -31,12 +31,4 @@ public class LoanFacade
 
         return protocol;
     }
-    
-    public async Task UpdatePickupProtocol(PickupProtocol protocol, PickupProtocolRequest request)
-    {
-        protocol.Description = request.Description;
-        protocol.AcceptedRefundableDeposit = request.AcceptedRefundableDeposit;
-        
-        await _pickupProtocolService.Update(protocol);
-    }
 }

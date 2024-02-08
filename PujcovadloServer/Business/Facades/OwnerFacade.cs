@@ -15,14 +15,16 @@ public class OwnerFacade
 {
     private readonly LoanService _loanService;
     private readonly ItemService _itemService;
+    private readonly PickupProtocolService _pickupProtocolService;
     private readonly IAuthenticateService _authenticateService;
     private readonly IMapper _mapper;
 
-    public OwnerFacade(LoanService loanService, ItemService itemService, IAuthenticateService authenticateService,
-        IMapper mapper)
+    public OwnerFacade(LoanService loanService, ItemService itemService, PickupProtocolService pickupProtocolService,
+        IAuthenticateService authenticateService, IMapper mapper)
     {
         _loanService = loanService;
         _itemService = itemService;
+        _pickupProtocolService = pickupProtocolService;
         _authenticateService = authenticateService;
         _mapper = mapper;
     }
@@ -74,5 +76,40 @@ public class OwnerFacade
         */
 
         await _loanService.Update(loan);
+    }
+
+    /// <summary>
+    /// Creates a pickup protocol for the loan.
+    /// </summary>
+    /// <param name="loan">Protocols loan.</param>
+    /// <param name="request">Protocol request data.</param>
+    /// <returns>Returns newly created pickup protocol</returns>
+    /// <exception cref="ActionNotAllowedException">Thrown if pickup protocol is not allowed to be created.</exception>
+    public async Task<PickupProtocol> CreatePickupProtocol(Loan loan, PickupProtocolRequest request)
+    {
+        // Check if the loan is in the correct status
+        if (loan.Status != LoanStatus.PreparedForPickup)
+            throw new ActionNotAllowedException("Cannot create pickup protocol for loan in status " + loan.Status);
+        
+        // Check if the protocol already exists
+        if(loan.PickupProtocol != null)
+            throw new ActionNotAllowedException("Pickup protocol already exists.");
+
+        // Create protocol
+        var protocol = _mapper.Map<PickupProtocol>(request);
+        protocol.Loan = loan;
+
+        // Save protocol
+        await _pickupProtocolService.Create(protocol);
+
+        return protocol;
+    }
+    
+    public async Task UpdatePickupProtocol(PickupProtocol protocol, PickupProtocolRequest request)
+    {
+        protocol.Description = request.Description;
+        protocol.AcceptedRefundableDeposit = request.AcceptedRefundableDeposit;
+        
+        await _pickupProtocolService.Update(protocol);
     }
 }
