@@ -13,8 +13,10 @@ public class PreparedForPickupLoanState : ALoanState
             // Tenant can cancel, deny or pickup the loan (active)
             case LoanStatus.Cancelled:
             case LoanStatus.PickupDenied:
-            case LoanStatus.Active:
                 loan.Status = newStatus;
+                break;
+            case LoanStatus.Active:
+                MakeLoanActive(loan);
                 break;
             default:
                 throw new ActionNotAllowedException(
@@ -35,5 +37,22 @@ public class PreparedForPickupLoanState : ALoanState
                 throw new ActionNotAllowedException(
                     $"Cannot change loan status from {loan.Status} to {newStatus} as an owner.");
         }
+    }
+
+    /// <summary>
+    /// Realizes transition from PreparedForPickup status to Active status.
+    /// </summary>
+    /// <param name="loan">Loan to be updated.</param>
+    /// <exception cref="ActionNotAllowedException">Thrown when there is no pickup protocol.</exception>
+    private void MakeLoanActive(Entities.Loan loan)
+    {
+        loan.Status = LoanStatus.Active;
+
+        // Check if pickup protocol exists (it should exist)
+        if (loan.PickupProtocol == null)
+            throw new ActionNotAllowedException("Cannot change loan status to active without pickup protocol.");
+
+        // Confirm pickup protocol
+        loan.PickupProtocol.ConfirmedAt = DateTime.Now;
     }
 }
