@@ -33,5 +33,28 @@
     &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.Business.Facades.TenantFacadeTest.UpdateMyLoan_UserIsTenantAndUpdatedStatus_UpdatesLoan&lt;/TestId&gt;
     &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.Business.Facades.TenantFacadeTest.UpdateMyLoan_UserIsTenantAndNotUpdatedStatus_UpdateLoan&lt;/TestId&gt;
     &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.Business.Facades.TenantFacadeTest.UpdateMyLoan_UserIsTenantButTriesToUpdateDisallowedFields_LoanUpdatedWithoutTheFields&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.AuthorizationHandlers.ItemCategoryAuthorizationHandlerTest.Read_UnauthenticatedUser_ShouldSuccess&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.AuthorizationHandlers.ItemCategoryAuthorizationHandlerTest.ReadCategory_AuthenticatedUser_ShouldSuccess&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.AuthorizationHandlers.ItemCategoryAuthorizationHandlerTest.CreateCategory_UnauthenticatedUser_ShouldFail&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.AuthorizationHandlers.ItemCategoryAuthorizationHandlerTest.CreateCategory_AuthenticatedUser_ShouldFail&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.AuthorizationHandlers.ItemCategoryAuthorizationHandlerTest.CreateCategory_IsAdmin_ShoulSuccess&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.AuthorizationHandlers.ItemCategoryAuthorizationHandlerTest.DoAnything_IsAdmin_ShouldSuccess&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.AuthorizationHandlers.ItemCategoryAuthorizationHandlerTest&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.AuthorizationHandlers.ItemAuthorizationHandlerTest.DoCrud_IsAdmin_ShouldSuccess&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.AuthorizationHandlers.ItemAuthorizationHandlerTest.ReadItem_UnauthenticatedUser_ShouldSuccess&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.AuthorizationHandlers.ItemAuthorizationHandlerTest.ReadItem_UnauthenticatedUserNonPublicItem_ShouldFail&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.AuthorizationHandlers.ItemAuthorizationHandlerTest.ReadItem_AuthenticatedUserPublicItem_ShouldSuccess&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.AuthorizationHandlers.ItemAuthorizationHandlerTest.ReadItem_AuthenticatedUserNonPublicItem_ShouldFail&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.AuthorizationHandlers.ItemAuthorizationHandlerTest.ReadItem_UserIsOwnerItemIsNotDeleted_ShouldSuccess&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.AuthorizationHandlers.ItemAuthorizationHandlerTest.ReadItem_UserIsOwnerItemIsDeleted_ShouldFail&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.AuthorizationHandlers.ItemAuthorizationHandlerTest.CreateItem_UnauthenticatedUser_ShouldFail&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.AuthorizationHandlers.ItemAuthorizationHandlerTest.CreateItem_AuthenticatedUser_ShouldFail&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.AuthorizationHandlers.ItemAuthorizationHandlerTest.CreateItem_UserIsOwner_ShouldSuccess&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.AuthorizationHandlers.ItemAuthorizationHandlerTest.UpdateItem_UserIsOwner_ShouldSuccess&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.AuthorizationHandlers.ItemAuthorizationHandlerTest.UpdateItem_UserIsOwnerButItemIsDeleted_ShouldFail&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.AuthorizationHandlers.ItemAuthorizationHandlerTest.DeleteItem_UnauthenticatedUser_ShouldFail&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.AuthorizationHandlers.ItemAuthorizationHandlerTest.DeleteItem_AuthenticatedUser_ShouldFail&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.AuthorizationHandlers.ItemAuthorizationHandlerTest.DeleteItem_UserIsOwner_ShouldSuccess&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::E84FE4E7-B30A-46E4-AD58-B9D5D7C994D9::net8.0::Tests.AuthorizationHandlers.ItemAuthorizationHandlerTest.DeleteItem_UserIsOwnerButItemIsDeleted_ShouldFail&lt;/TestId&gt;
   &lt;/TestAncestor&gt;
 &lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>

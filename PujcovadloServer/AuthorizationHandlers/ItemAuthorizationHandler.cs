@@ -36,14 +36,14 @@ public class ItemAuthorizationHandler : BaseCrudAuthorizationHandler<OperationAu
                     context.Succeed(requirement);
 
                 // Or I am the owner
-                if (userId != null && item.Owner.Id == userId)
+                if (userId != null && item.Owner.Id == userId && item.Status != ItemStatus.Deleted)
                     context.Succeed(requirement);
 
                 break;
             case nameof(Operations.Update):
             case nameof(Operations.Delete):
-                // I am the owner
-                if (userId != null && item.Owner.Id == userId)
+                // I am the owner and the item is not deleted
+                if (userId != null && item.Owner.Id == userId && item.Status != ItemStatus.Deleted)
                     context.Succeed(requirement);
                 break;
             default:
