@@ -1,3 +1,4 @@
+using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Enums;
 using PujcovadloServer.Business.Exceptions;
 
@@ -28,6 +29,7 @@ public class PrepareForPickupLoanStateTest : ALoanStateTest
         foreach (var status in allowed)
         {
             _loan.Status = _status;
+            _loan.PickupProtocol = new PickupProtocol { Id = 1 };
 
             // Act
             _state.HandleTenant(_loan, status);
