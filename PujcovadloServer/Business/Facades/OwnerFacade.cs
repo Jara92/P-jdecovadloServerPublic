@@ -31,7 +31,6 @@ public class OwnerFacade
     {
         // Get current user
         var user = await _authenticateService.GetCurrentUser();
-        if (user == null) throw new AuthenticationException();
 
         // Get loans where the user is the tenant
         var loans = await _loanService.GetLoansByOwner(user, filter);
@@ -42,8 +41,7 @@ public class OwnerFacade
     public async Task<Loan> GetMyLoan(int id)
     {
         // Get current user
-        var user = await _authenticateService.GetCurrentUser();
-        if (user == null) throw new AuthenticationException();
+        var userId = _authenticateService.GetCurrentUserId();
 
         // Get the loan
         var loan = await _loanService.Get(id);
@@ -52,17 +50,13 @@ public class OwnerFacade
         if (loan == null) throw new EntityNotFoundException();
 
         // Check that the user is the tenant
-        if (loan.Item.Owner.Id != user.Id) throw new UnauthorizedAccessException("You are not the owner of this loan.");
+        if (loan.Item.Owner.Id != userId) throw new UnauthorizedAccessException("You are not the owner of this loan.");
 
         return loan;
     }
 
-    public async Task UpdateMyLoan(Loan loan, TenantLoanRequest request)
+    public async Task UpdateMyLoan(Loan loan, OwnerLoanRequest request)
     {
-        // Get current user
-        var user = await _authenticateService.GetCurrentUser();
-        if (user == null) throw new AuthenticationException();
-
         // Check if the status has been changed
         if (request.Status != null && request.Status != loan.Status)
         {

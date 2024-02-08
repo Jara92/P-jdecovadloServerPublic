@@ -102,7 +102,7 @@ public class OwnerLoanController : ACrudController<Loan>
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ValidateIdFilter]
-    public async Task<ActionResult<LoanResponse>> UpdateLoan(int id, [FromBody] TenantLoanRequest request)
+    public async Task<ActionResult<LoanResponse>> UpdateLoan(int id, [FromBody] OwnerLoanRequest request)
     {
         var loan = await _ownerFacade.GetMyLoan(id);
 
