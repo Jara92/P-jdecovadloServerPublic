@@ -51,7 +51,7 @@ public class ItemController : ACrudController<Item>
         var items = await _itemService.GetAll(filter);
 
         // get response list
-        var response = await _itemResponseGenerator.GenerateResponseList(items, filter, nameof(Get), "Item");
+        var response = await _itemResponseGenerator.GenerateResponseList(items, filter, nameof(Index), "Item");
 
 
         return Ok(response);

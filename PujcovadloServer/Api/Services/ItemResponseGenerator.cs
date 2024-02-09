@@ -60,18 +60,23 @@ public class ItemResponseGenerator : ABaseResponseGenerator
 
         foreach (var image in response.Images)
         {
-            // LInk to image detail
-            image.Links.Add(new LinkResponse(
-                _urlHelper.GetUriByAction(_httpContext, nameof(ItemImageController.GetImage), "ItemImage",
-                    values: new { id = item.Id, imageId = image.Id }), "SELF", "GET"));
-
-            // Link to image data
-            image.Links.Add(new LinkResponse(
-                _urlHelper.GetUriByAction(_httpContext, nameof(ImageController.GetImage), "Image",
-                    values: new { fileName = image.Path }), "DATA", "GET"));
+            AddImageLinks(item, image);
         }
 
         return response;
+    }
+    
+    private void AddImageLinks(Item item, ImageResponse image)
+    {
+        // LInk to image detail
+        image.Links.Add(new LinkResponse(
+            _urlHelper.GetUriByAction(_httpContext, nameof(ItemImageController.GetImage), "ItemImage",
+                values: new { id = item.Id, imageId = image.Id }), "SELF", "GET"));
+
+        // Link to image data
+        image.Links.Add(new LinkResponse(
+            _urlHelper.GetUriByAction(_httpContext, nameof(ImageController.GetImage), "Image",
+                values: new { fileName = image.Path }), "DATA", "GET"));
     }
 
     /// <summary>
@@ -81,7 +86,11 @@ public class ItemResponseGenerator : ABaseResponseGenerator
     /// <param name="response">Response for the links to be added.</param>
     private void AddItemDetailLinks(Item item, ItemDetailResponse response)
     {
-        // todo: Add common links
+        // Add image links
+        foreach(var image in response.Images)
+        {
+            AddImageLinks(item, image);
+        }
     }
 
     /// <summary>

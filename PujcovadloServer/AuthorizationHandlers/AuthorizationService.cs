@@ -9,10 +9,10 @@ namespace PujcovadloServer.AuthorizationHandlers;
 
 public class AuthorizationService
 {
-    private readonly HttpContextAccessor _httpContextAccessor;
+    private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IAuthorizationService _authorizationService;
     
-    public AuthorizationService(HttpContextAccessor httpContextAccessor, IAuthorizationService authorizationService)
+    public AuthorizationService(IHttpContextAccessor httpContextAccessor, IAuthorizationService authorizationService)
     {
         _httpContextAccessor = httpContextAccessor;
         _authorizationService = authorizationService;
