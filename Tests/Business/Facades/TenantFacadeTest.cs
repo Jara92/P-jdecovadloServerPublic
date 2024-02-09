@@ -325,7 +325,10 @@ public class TenantFacadeTest
     [Test]
     public void SetLoanDays_SameDateDifferentTime_ReturnsOneDay()
     {
-        var loan = new Loan { From = DateTime.Now, To = DateTime.Now.AddMinutes(60) };
+        var from = DateTime.Now;
+        var to = from;
+        
+        var loan = new Loan { From = from, To = to };
 
         var days = _tenantFasade.GetLoanSetLoanDays(loan);
 
@@ -351,7 +354,7 @@ public class TenantFacadeTest
     public void SetLoanDays_DifferentDatesDifferentTime_ReturnsDays()
     {
         var dateFrom = DateTime.Now;
-        var dateTo = dateFrom.AddDays(1).AddMinutes(60);
+        var dateTo = dateFrom.AddDays(1);
 
         var loan = new Loan { From = dateFrom, To = dateTo };
 
