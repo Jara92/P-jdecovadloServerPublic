@@ -1,5 +1,5 @@
-using System.Security.Authentication;
 using AutoMapper;
+using PujcovadloServer.AuthorizationHandlers.Exceptions;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Enums;
 using PujcovadloServer.Business.Exceptions;
@@ -52,7 +52,7 @@ public class OwnerFacade
         if (loan == null) throw new EntityNotFoundException();
 
         // Check that the user is the tenant
-        if (loan.Item.Owner.Id != userId) throw new UnauthorizedAccessException("You are not the owner of this loan.");
+        if (loan.Item.Owner.Id != userId) throw new ForbiddenAccessException("You are not the owner of this loan.");
 
         return loan;
     }
@@ -64,7 +64,7 @@ public class OwnerFacade
         {
             // get current state
             var state = _loanService.GetState(loan);
-            
+
             // handle the request
             state.HandleOwner(loan, request.Status.Value);
         }
@@ -90,9 +90,9 @@ public class OwnerFacade
         // Check if the loan is in the correct status
         if (loan.Status != LoanStatus.PreparedForPickup)
             throw new ActionNotAllowedException("Cannot create pickup protocol for loan in status " + loan.Status);
-        
+
         // Check if the protocol already exists
-        if(loan.PickupProtocol != null)
+        if (loan.PickupProtocol != null)
             throw new ActionNotAllowedException("Pickup protocol already exists.");
 
         // Create protocol
@@ -104,12 +104,12 @@ public class OwnerFacade
 
         return protocol;
     }
-    
+
     public async Task UpdatePickupProtocol(PickupProtocol protocol, PickupProtocolRequest request)
     {
         protocol.Description = request.Description;
         protocol.AcceptedRefundableDeposit = request.AcceptedRefundableDeposit;
-        
+
         await _pickupProtocolService.Update(protocol);
     }
 }

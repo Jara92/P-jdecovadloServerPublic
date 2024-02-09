@@ -11,7 +11,7 @@ public class AuthorizationService
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IAuthorizationService _authorizationService;
-    
+
     public AuthorizationService(IHttpContextAccessor httpContextAccessor, IAuthorizationService authorizationService)
     {
         _httpContextAccessor = httpContextAccessor;
@@ -25,14 +25,14 @@ public class AuthorizationService
     /// <param name="requirement">Required action</param>
     /// <typeparam name="TE">Entity type to be checked.</typeparam>
     /// <exception cref="ForbiddenAccessException">User does not have permission to perform the action.</exception>
-    /// <exception cref="UnauthorizedAccessException">User is not authorized.</exception>
+    /// <exception cref="NotAuthenticatedException">User is not authenticated.</exception>
     public async Task CheckPermissions<TE>(TE entity, OperationAuthorizationRequirement requirement)
         where TE : BaseEntity
     {
         // get User ClaimsPrincipal and check if it is not null
         var user = _httpContextAccessor.HttpContext?.User;
         if (user == null) throw new NotAuthenticatedException();
-        
+
         // Check requirement permissions
         var authorizationResult = await _authorizationService.AuthorizeAsync(user, entity, requirement);
 
@@ -41,7 +41,7 @@ public class AuthorizationService
         {
             var identity = user.Identity;
 
-            // Throw UnauthorizedAccessException if not authenticated
+            // Throw NotAuthenticatedException if not authenticated
             if (identity == null || !identity.IsAuthenticated)
                 throw new NotAuthenticatedException();
 
@@ -49,14 +49,14 @@ public class AuthorizationService
             throw new ForbiddenAccessException("You are not authorized to perform this operation.");
         }
     }
-    
+
     public async Task<bool> CanPerformOperation<TE>(TE entity, OperationAuthorizationRequirement requirement)
         where TE : BaseEntity
     {
         // get User ClaimsPrincipal and check if it is not null
         var user = _httpContextAccessor.HttpContext?.User;
         if (user == null) throw new NotAuthenticatedException();
-        
+
         // Check requirement permissions
         var authorizationResult = await _authorizationService.AuthorizeAsync(user, entity, requirement);
 

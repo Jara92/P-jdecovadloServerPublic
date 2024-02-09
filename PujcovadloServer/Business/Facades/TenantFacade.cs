@@ -1,5 +1,5 @@
-using System.Security.Authentication;
 using AutoMapper;
+using PujcovadloServer.AuthorizationHandlers.Exceptions;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Enums;
 using PujcovadloServer.Business.Exceptions;
@@ -50,7 +50,7 @@ public class TenantFacade
         if (loan == null) throw new EntityNotFoundException();
 
         // Check that the user is the tenant
-        if (loan.Tenant.Id != user.Id) throw new UnauthorizedAccessException("You are not the tenant of this loan.");
+        if (loan.Tenant.Id != user.Id) throw new ForbiddenAccessException("You are not the tenant of this loan.");
 
         return loan;
     }
@@ -60,11 +60,11 @@ public class TenantFacade
     {
         // Get current user
         var user = await _authenticateService.GetCurrentUser();
-        
+
         // get the item
         var item = await _itemService.Get(request.Item.Id);
         if (item == null) throw new EntityNotFoundException($"Item with id {request.Item.Id} was not found.");
-        
+
         // TODO: Check if the owner is not the tenant
 
         // Map request to loan
@@ -75,12 +75,12 @@ public class TenantFacade
 
         // Set the tenant as the current user
         newLoan.Tenant = user;
-        
+
         // Set the item
         newLoan.Item = item;
         newLoan.PricePerDay = item.PricePerDay;
         newLoan.RefundableDeposit = item.RefundableDeposit;
-        
+
         // Set the expected price and days
         newLoan.Days = GetLoanSetLoanDays(newLoan);
         newLoan.ExpectedPrice = GetLoanExpectedPrice(newLoan);
@@ -97,16 +97,16 @@ public class TenantFacade
         var days = (loan.To.Date - loan.From.Date).TotalDays;
         // Set days to one if To and From are the same
         if (days < 1) days = 1;
-        
+
         // Set the days and expected price
-        return (int) Math.Ceiling(days);
+        return (int)Math.Ceiling(days);
     }
 
     public float GetLoanExpectedPrice(Loan loan)
     {
         // Check if the days are greater than 0
-        if(loan.Days <= 0) throw new ArgumentException("Days must be greater than 0.");
-        
+        if (loan.Days <= 0) throw new ArgumentException("Days must be greater than 0.");
+
         return loan.Days * loan.PricePerDay;
     }
 
@@ -114,16 +114,16 @@ public class TenantFacade
     {
         // Get current user
         var user = await _authenticateService.GetCurrentUser();
-        
+
         // Check that the user is the tenant
-        if (loan.Tenant.Id != user.Id) throw new UnauthorizedAccessException("You are not the tenant of this loan.");
+        if (loan.Tenant.Id != user.Id) throw new ForbiddenAccessException("You are not the tenant of this loan.");
 
         // Check if the status has been changed
         if (request.Status != null && request.Status != loan.Status)
         {
             // get current state
             var state = _loanService.GetState(loan);
-            
+
             // handle the request
             state.HandleTenant(loan, request.Status.Value);
         }

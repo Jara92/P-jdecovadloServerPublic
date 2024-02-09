@@ -1,33 +1,47 @@
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
 using PujcovadloServer.Authentication.Exceptions;
 using PujcovadloServer.AuthorizationHandlers.Exceptions;
 using PujcovadloServer.Business.Exceptions;
+using PujcovadloServer.Responses;
 
 namespace PujcovadloServer.Api.Filters;
 
-public class ExceptionFilter : IExceptionFilter
+public class ExceptionFilter : ExceptionFilterAttribute
 {
-    public void OnException(ExceptionContext context)
+    public override void OnException(ExceptionContext context)
     {
+        base.OnException(context);
+
         if (context.Exception is ForbiddenAccessException)
         {
-            context.Result = new ForbidResult();
+            var details = new ExceptionResponse
+            {
+                Title = "Forbidden",
+                Status = StatusCodes.Status403Forbidden,
+                Errors = new List<string> { context.Exception.Message }
+            };
+
+            context.Result = new ObjectResult(details)
+            {
+                StatusCode = StatusCodes.Status403Forbidden
+            };
         }
         else if (context.Exception is NotAuthenticatedException)
         {
             context.Result = new ChallengeResult();
         }
-        // Todo: get rid of this
-        else if (context.Exception is UnauthorizedAccessException)
-        {
-            context.Result = new UnauthorizedResult();
-        }
         else if (context.Exception is EntityNotFoundException)
         {
-            context.Result = new NotFoundResult();
+            var details = new ExceptionResponse
+            {
+                Title = "Not Found",
+                Status = StatusCodes.Status404NotFound,
+                Errors = new List<string> { context.Exception.Message }
+            };
+
+            context.Result = new NotFoundObjectResult(details);
         }
         else if (context.Exception is DbUpdateConcurrencyException)
         {
@@ -39,7 +53,14 @@ public class ExceptionFilter : IExceptionFilter
         }
         else if (context.Exception is ActionNotAllowedException)
         {
-            context.Result = new BadRequestResult();
+            var details = new ExceptionResponse
+            {
+                Title = "Unprocessable Entity",
+                Status = StatusCodes.Status422UnprocessableEntity,
+                Errors = new List<string> { context.Exception.Message }
+            };
+
+            context.Result = new UnprocessableEntityObjectResult(details);
         }
     }
 }

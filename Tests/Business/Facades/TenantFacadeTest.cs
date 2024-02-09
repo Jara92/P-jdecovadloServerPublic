@@ -1,15 +1,13 @@
 using AutoMapper;
-using PujcovadloServer.Business.Factories.State;
-using PujcovadloServer.Business.Interfaces;
-using PujcovadloServer.Business.Services;
-using PujcovadloServer.Data.Repositories;
 using Moq;
 using PujcovadloServer.Authentication;
 using PujcovadloServer.Authentication.Exceptions;
+using PujcovadloServer.AuthorizationHandlers.Exceptions;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Enums;
 using PujcovadloServer.Business.Exceptions;
 using PujcovadloServer.Business.Filters;
+using PujcovadloServer.Business.Services;
 using PujcovadloServer.Business.Services.Interfaces;
 using PujcovadloServer.Business.States.Loan;
 using PujcovadloServer.Lib;
@@ -144,8 +142,8 @@ public class TenantFacadeTest
         // Loan service will return the loan
         _loanService.Setup(o => o.Get(loanId, true)).ReturnsAsync(loan);
 
-        // Must throw UnauthorizedAccessException because the user is not the tenant
-        Assert.ThrowsAsync<UnauthorizedAccessException>(async () => await _tenantFasade.GetMyLoan(loanId));
+        // Must throw ForbiddenAccessException because the user is not the tenant
+        Assert.ThrowsAsync<ForbiddenAccessException>(async () => await _tenantFasade.GetMyLoan(loanId));
 
         // Verify that GetCurrentUser was called
         _authenticateService.Verify(o => o.GetCurrentUser(), Times.Once);
@@ -327,7 +325,7 @@ public class TenantFacadeTest
     {
         var from = DateTime.Now;
         var to = from;
-        
+
         var loan = new Loan { From = from, To = to };
 
         var days = _tenantFasade.GetLoanSetLoanDays(loan);
@@ -454,8 +452,8 @@ public class TenantFacadeTest
         // Authentication service will return the user
         _authenticateService.Setup(o => o.GetCurrentUser()).ReturnsAsync(_user);
 
-        // Must throw UnauthorizedAccessException because the user is not the tenant
-        Assert.ThrowsAsync<UnauthorizedAccessException>(async () =>
+        // Must throw ForbiddenAccessException because the user is not the tenant
+        Assert.ThrowsAsync<ForbiddenAccessException>(async () =>
             await _tenantFasade.UpdateMyLoan(loan, new TenantLoanRequest()));
 
         // Verify that GetCurrentUser was called
