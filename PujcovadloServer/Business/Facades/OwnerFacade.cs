@@ -99,7 +99,16 @@ public class OwnerFacade
         var protocol = _mapper.Map<PickupProtocol>(request);
         protocol.Loan = loan;
 
-        // Save protocol
+        // Check if loan status
+        if (loan.Status == LoanStatus.Accepted)
+            throw new OperationNotAllowedException("Loan must be in status " + LoanStatus.Accepted +
+                                                   " to create pickup protocol.");
+
+        // Check that the protocol does not exist
+        if (loan.PickupProtocol != null)
+            throw new OperationNotAllowedException("Pickup protocol already exists.");
+
+        // Create the protocol
         await _pickupProtocolService.Create(protocol);
 
         return protocol;

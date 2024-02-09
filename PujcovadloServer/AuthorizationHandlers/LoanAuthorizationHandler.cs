@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
-using Namotion.Reflection;
 using PujcovadloServer.AuthorizationHandlers.Exceptions;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Enums;
@@ -44,10 +43,8 @@ public class LoanAuthorizationHandler : BaseCrudAuthorizationHandler<OperationAu
                     context.Succeed(requirement);
                 break;
             case nameof(Operations.CreatePickupProtocol):
-                // Only the owner can create the protocol and the loan must be accepted
-                if (loan.Item.Owner.Id == userId
-                    && loan.Status == LoanStatus.Accepted
-                    && loan.PickupProtocol == null)
+                // Only the owner can create the protocol
+                if (loan.Item.Owner.Id == userId)
                 {
                     context.Succeed(requirement);
                 }
@@ -56,13 +53,13 @@ public class LoanAuthorizationHandler : BaseCrudAuthorizationHandler<OperationAu
             case nameof(Operations.IsOwner):
                 // I am the owner
                 // TODO: check options for reusing the this requirement inside other requirements
-                if(loan.Item.Owner.Id == userId)
+                if (loan.Item.Owner.Id == userId)
                     context.Succeed(requirement);
                 break;
             case nameof(Operations.IsTenant):
                 // I am the tenant
                 // TODO: check options for reusing the this requirement inside other requirements
-                if(loan.Tenant.Id == userId)
+                if (loan.Tenant.Id == userId)
                     context.Succeed(requirement);
                 break;
             default:
@@ -86,13 +83,13 @@ public class LoanAuthorizationHandler : BaseCrudAuthorizationHandler<OperationAu
 
         public static OperationAuthorizationRequirement CreatePickupProtocol = new OperationAuthorizationRequirement
             { Name = nameof(CreatePickupProtocol) };
-        
+
         /*public static OperationAuthorizationRequirement CreateReturnProtocol = new OperationAuthorizationRequirement
             { Name = nameof(CreateReturnProtocol) };*/
-        
+
         public static OperationAuthorizationRequirement IsOwner = new OperationAuthorizationRequirement
             { Name = nameof(IsOwner) };
-        
+
         public static OperationAuthorizationRequirement IsTenant = new OperationAuthorizationRequirement
             { Name = nameof(IsTenant) };
     }
