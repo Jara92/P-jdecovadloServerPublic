@@ -2,6 +2,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PujcovadloServer.Api.Filters;
+using PujcovadloServer.Api.Services;
 using PujcovadloServer.AuthorizationHandlers;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Enums;
@@ -19,12 +20,15 @@ namespace PujcovadloServer.Api.Controllers;
 public class TenantLoanController : ACrudController<Loan>
 {
     private readonly TenantFacade _tenantFacade;
+    private readonly LoanResponseGenerator _responseGenerator;
     private readonly IMapper _mapper;
 
-    public TenantLoanController(TenantFacade loanFacade, LinkGenerator urlHelper, IMapper mapper,
+    public TenantLoanController(TenantFacade loanFacade, LoanResponseGenerator responseGenerator,
+        LinkGenerator urlHelper, IMapper mapper,
         AuthorizationService authorizationService) : base(authorizationService, urlHelper)
     {
         _tenantFacade = loanFacade;
+        _responseGenerator = responseGenerator;
         _mapper = mapper;
     }
 
@@ -35,33 +39,10 @@ public class TenantLoanController : ACrudController<Loan>
     {
         var loans = await _tenantFacade.GetMyLoans(filter);
 
-        var responseLoans = _mapper.Map<List<LoanResponse>>(loans);
+        // generate response list
+        var response = await _responseGenerator.GenerateResponseList(loans, filter, nameof(GetLoans), "TenantLoan");
 
-        // HATEOS links
-        foreach (var loan in responseLoans)
-        {
-            loan.Links.Add(new LinkResponse(
-                _urlHelper.GetUriByAction(HttpContext, nameof(GetLoan), values: new { loan.Id }),
-                "SELF", "GET"));
-
-            loan.Links.Add(new LinkResponse(
-                _urlHelper.GetUriByAction(HttpContext, nameof(UpdateLoan), values: new { loan.Id }),
-                "UPDATE", "PUT"));
-
-            // TODO: uncomment when user controller is ready
-            /*loan.Links.Add(new LinkResponse(
-                _urlHelper.GetUriByAction(HttpContext, nameof(Get), "User", values: new { loan.Id }),
-                "OWNER", "GET"));*/
-        }
-
-        // Generate pagination links
-        var links = GeneratePaginationLinks(loans, filter, nameof(GetLoans));
-
-        return Ok(new ResponseList<LoanResponse>
-        {
-            Data = responseLoans,
-            Links = links
-        });
+        return Ok(response);
     }
 
     [HttpGet("{id}")]
@@ -73,27 +54,11 @@ public class TenantLoanController : ACrudController<Loan>
         var loan = await _tenantFacade.GetMyLoan(id);
 
         await _authorizationService.CheckPermissions(loan, LoanAuthorizationHandler.Operations.Read);
-        
-        var responseLoan = _mapper.Map<LoanResponse>(loan);
 
-        // HATEOS links
-        responseLoan.Links.Add(new LinkResponse(
-            _urlHelper.GetUriByAction(HttpContext, nameof(GetLoans)), "LIST", "GET"));
+        // Generate response
+        var response = await _responseGenerator.GenerateLoanDetailResponse(loan);
 
-        // TODO: uncomment when user controller is ready
-        /*responseLoan.Links.Add(new LinkResponse(
-            _urlHelper.GetUriByAction(HttpContext, nameof(Get), "User", loan.Tenant.Id), "TENANT", "GET"));
-
-        responseLoan.Links.Add(new LinkResponse(
-           _urlHelper.GetUriByAction(HttpContext, nameof(Get), "User", loan.Item.Owner.Id), "OWNER", "GET"));
-        */
-
-        responseLoan.Links.Add(new LinkResponse(
-            _urlHelper.GetUriByAction(HttpContext, nameof(ItemController.Get), "Item",
-                values: new { loan.Item.Id }),
-            "ITEM", "GET"));
-
-        return Ok(responseLoan);
+        return Ok(response);
     }
 
     [HttpPost]
@@ -101,13 +66,16 @@ public class TenantLoanController : ACrudController<Loan>
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<LoanResponse>> CreateLoan([FromBody] TenantLoanRequest request)
     {
-        await _authorizationService.CheckPermissions(_mapper.Map<Loan>(request), LoanAuthorizationHandler.Operations.Create);
-        
+        await _authorizationService.CheckPermissions(_mapper.Map<Loan>(request),
+            LoanAuthorizationHandler.Operations.Create);
+
         var loan = await _tenantFacade.CreateLoan(request);
-        var responseLoan = _mapper.Map<LoanResponse>(loan);
+        
+        // Generate response
+        var response = await _responseGenerator.GenerateLoanDetailResponse(loan);
 
         // Created response with location header
-        return CreatedAtAction(_urlHelper.GetUriByAction(HttpContext, nameof(GetLoan), values: loan.Id), responseLoan);
+        return CreatedAtAction(_urlHelper.GetUriByAction(HttpContext, nameof(GetLoan), values: loan.Id), response);
     }
 
     [HttpPut("{id}")]
@@ -121,7 +89,7 @@ public class TenantLoanController : ACrudController<Loan>
         var loan = await _tenantFacade.GetMyLoan(id);
 
         await _authorizationService.CheckPermissions(loan, LoanAuthorizationHandler.Operations.Update);
-        
+
         await _tenantFacade.UpdateMyLoan(loan, request);
 
         return Ok();

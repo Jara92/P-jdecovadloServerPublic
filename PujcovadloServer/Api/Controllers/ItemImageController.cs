@@ -17,15 +17,17 @@ public class ItemImageController : ACrudController<Image>
 {
     private readonly ItemFacade _itemFacade;
     private readonly ImageFacade _imageFacade;
+    private readonly ImageResponseGenerator _responseGenerator;
     private readonly IMapper _mapper;
     private readonly FileUploadService _fileUploadService;
 
-    public ItemImageController(ItemFacade itemFacade, ImageFacade imageFacade, IMapper mapper,
+    public ItemImageController(ItemFacade itemFacade, ImageFacade imageFacade, ImageResponseGenerator responseGenerator, IMapper mapper,
         AuthorizationService authorizationService, LinkGenerator urlHelper,
         FileUploadService fileUploadService) : base(authorizationService, urlHelper)
     {
         _itemFacade = itemFacade;
         _imageFacade = imageFacade;
+        _responseGenerator = responseGenerator;
         _mapper = mapper;
         _fileUploadService = fileUploadService;
     }
@@ -50,34 +52,9 @@ public class ItemImageController : ACrudController<Image>
 
         // get the images and map them to response
         var images = item.Images;
-        var responseImages = _mapper.Map<List<ImageResponse>>(images);
-
-        // Hateos image links
-        foreach (var image in responseImages)
-        {
-            // Add link to the image
-            image.Links.Add(new LinkResponse(
-                _urlHelper.GetUriByAction(HttpContext, nameof(GetImage), "ItemImage",
-                    values: new { id, imageId = image.Id }), "SELF", "GET"));
-            
-            // Add link to the image data
-            image.Links.Add(new LinkResponse(
-                _urlHelper.GetUriByAction(HttpContext, nameof(ImageController.GetImage), "Image",
-                    values: new { filename = image.Path }), "DATA", "GET"));
-                
-        }
-
-        // Create response with links
-        var response = new ResponseList<ImageResponse>()
-        {
-            Data = responseImages,
-            Links = new List<LinkResponse>
-            {
-                new LinkResponse(
-                    _urlHelper.GetUriByAction(HttpContext, nameof(ItemController.Get), "Item", values: new { id }),
-                    "ITEM", "GET")
-            }
-        };
+        
+        // generate response 
+        var response = await _responseGenerator.GenerateResponseList(images);
 
         return Ok(response);
     }
@@ -102,15 +79,10 @@ public class ItemImageController : ACrudController<Image>
         var image = await _imageFacade.GetImage(id, imageId);
         await _authorizationService.CheckPermissions(image, ItemAuthorizationHandler.Operations.Read);
 
-        // Map the image to response
-        var imageResponse = _mapper.Map<ImageResponse>(image);
+        // Generate response
+        var response = await _responseGenerator.GenerateImageDetailResponse(image);
 
-        // Hateos image links
-        imageResponse.Links.Add(new LinkResponse(
-            _urlHelper.GetUriByAction(HttpContext, nameof(ImageController.GetImage), "Image",
-                values: new { filename = image.Path }), "DATA", "GET"));
-
-        return Ok(imageResponse);
+        return Ok(response);
     }
 
     /// <summary>
@@ -148,10 +120,10 @@ public class ItemImageController : ACrudController<Image>
         await _itemFacade.AddImage(item, image, filePath);
 
         // Map the image to response
-        var imageResponse = _mapper.Map<ImageResponse>(image);
+        var response = await _responseGenerator.GenerateImageDetailResponse(image);
 
         return Created(_urlHelper.GetUriByAction(HttpContext, nameof(GetImage),
-            values: new { id = item.Id, imageId = image.Id }), imageResponse);
+            values: new { id = item.Id, imageId = image.Id }), response);
     }
 
     /// <summary>

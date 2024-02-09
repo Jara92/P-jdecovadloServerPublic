@@ -147,6 +147,10 @@ builder.Services.AddScoped<ExceptionFilter>();
 
 // Response generator
 builder.Services.AddScoped<ItemResponseGenerator>();
+builder.Services.AddScoped<ItemCategoryResponseGenerator>();
+builder.Services.AddScoped<LoanResponseGenerator>();
+builder.Services.AddScoped<ImageResponseGenerator>();
+builder.Services.AddScoped<PickupProtocolResponseGenerator>();
 
 // File upload service
 builder.Services.AddScoped<FileUploadService>();

@@ -53,6 +53,18 @@ public class LoanAuthorizationHandler : BaseCrudAuthorizationHandler<OperationAu
                 }
 
                 break;
+            case nameof(Operations.IsOwner):
+                // I am the owner
+                // TODO: check options for reusing the this requirement inside other requirements
+                if(loan.Item.Owner.Id == userId)
+                    context.Succeed(requirement);
+                break;
+            case nameof(Operations.IsTenant):
+                // I am the tenant
+                // TODO: check options for reusing the this requirement inside other requirements
+                if(loan.Tenant.Id == userId)
+                    context.Succeed(requirement);
+                break;
             default:
                 throw new UnsupportedOperationException($"Unspported operation {requirement.Name}");
         }
@@ -74,5 +86,14 @@ public class LoanAuthorizationHandler : BaseCrudAuthorizationHandler<OperationAu
 
         public static OperationAuthorizationRequirement CreatePickupProtocol = new OperationAuthorizationRequirement
             { Name = nameof(CreatePickupProtocol) };
+        
+        /*public static OperationAuthorizationRequirement CreateReturnProtocol = new OperationAuthorizationRequirement
+            { Name = nameof(CreateReturnProtocol) };*/
+        
+        public static OperationAuthorizationRequirement IsOwner = new OperationAuthorizationRequirement
+            { Name = nameof(IsOwner) };
+        
+        public static OperationAuthorizationRequirement IsTenant = new OperationAuthorizationRequirement
+            { Name = nameof(IsTenant) };
     }
 }

@@ -64,6 +64,8 @@ public class TenantFacade
         // get the item
         var item = await _itemService.Get(request.Item.Id);
         if (item == null) throw new EntityNotFoundException($"Item with id {request.Item.Id} was not found.");
+        
+        // TODO: Check if the owner is not the tenant
 
         // Map request to loan
         var newLoan = _mapper.Map<Loan>(request);

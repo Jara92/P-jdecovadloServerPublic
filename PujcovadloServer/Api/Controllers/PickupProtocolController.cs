@@ -2,6 +2,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PujcovadloServer.Api.Filters;
+using PujcovadloServer.Api.Services;
 using PujcovadloServer.AuthorizationHandlers;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Enums;
@@ -19,14 +20,16 @@ public class PickupProtocolController : ACrudController<PickupProtocol>
 {
     private readonly LoanFacade _loanFacade;
     private readonly OwnerFacade _ownerFacade;
+    private readonly PickupProtocolResponseGenerator _responseGenerator;
     private readonly IMapper _mapper;
 
-    public PickupProtocolController(LoanFacade loanFacade, OwnerFacade ownerFacade,
+    public PickupProtocolController(LoanFacade loanFacade, OwnerFacade ownerFacade, PickupProtocolResponseGenerator responseGenerator,
         AuthorizationService authorizationService,
         LinkGenerator urlHelper, IMapper mapper) : base(authorizationService, urlHelper)
     {
         _loanFacade = loanFacade;
         _ownerFacade = ownerFacade;
+        _responseGenerator = responseGenerator;
         _mapper = mapper;
     }
 
@@ -56,7 +59,7 @@ public class PickupProtocolController : ACrudController<PickupProtocol>
         var protocol = await _ownerFacade.CreatePickupProtocol(loan, request);
 
         // build response
-        var response = _mapper.Map<PickupProtocolResponse>(protocol);
+        var response = await _responseGenerator.GeneratePickupProtocolDetailResponse(protocol);
 
         // HATEOS links
         return CreatedAtAction(_urlHelper.GetUriByAction(HttpContext, nameof(GetProtocol), values: protocol.Id), response);
@@ -85,25 +88,7 @@ public class PickupProtocolController : ACrudController<PickupProtocol>
         await _authorizationService.CheckPermissions(protocol, PickupProtocolAuthorizationHandler.Operations.Read);
 
         // build response
-        var response = _mapper.Map<PickupProtocolResponse>(protocol);
-
-        // HATEOS links
-        // TODO: add loan link later. the problem is that we have two loan controllers for owner and tenant and we need to distinguish them
-        /*response.Links.Add(new LinkResponse(
-            _urlHelper.GetUriByAction(HttpContext, nameof(), values: new { loan.Id }),
-            "LOAN", "GET"));*/
-
-        // Add update link if user has permission
-        if (await _authorizationService.CanPerformOperation(protocol, PickupProtocolAuthorizationHandler.Operations.Update))
-        {
-            response.Links.Add(new LinkResponse(
-                _urlHelper.GetUriByAction(HttpContext, nameof(UpdateProtocol), values: new { loanId }),
-                "UPDATE", "PUT"));
-            
-            // todo: add images link
-            
-            // todo: add link for creating a new image
-        }
+        var response = await _responseGenerator.GeneratePickupProtocolDetailResponse(protocol);
 
         return Ok(response);
     }

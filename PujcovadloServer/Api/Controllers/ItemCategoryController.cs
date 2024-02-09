@@ -2,6 +2,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PujcovadloServer.Api.Filters;
+using PujcovadloServer.Api.Services;
 using PujcovadloServer.AuthorizationHandlers;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Facades;
@@ -18,15 +19,17 @@ public class ItemCategoryController : ACrudController<ItemCategory>
 {
     private readonly ItemCategoryFacade _itemCategoryFacade;
     private readonly ItemCategoryService _itemCategoryService;
+    private readonly ItemCategoryResponseGenerator _categoryResponseGenerator;
     private readonly IMapper _mapper;
     private readonly LinkGenerator _urlHelper;
 
     public ItemCategoryController(ItemCategoryFacade itemCategoryFacade, ItemCategoryService itemCategoryService,
-        IMapper mapper, LinkGenerator linkGenerator, AuthorizationService authorizationService) : base(
-        authorizationService, linkGenerator)
+        ItemCategoryResponseGenerator categoryResponseGenerator, IMapper mapper, LinkGenerator linkGenerator,
+        AuthorizationService authorizationService) : base(authorizationService, linkGenerator)
     {
         _itemCategoryFacade = itemCategoryFacade;
         _itemCategoryService = itemCategoryService;
+        _categoryResponseGenerator = categoryResponseGenerator;
         _mapper = mapper;
         _urlHelper = linkGenerator;
     }
@@ -47,28 +50,9 @@ public class ItemCategoryController : ACrudController<ItemCategory>
         // get categories by filter
         var categories = await _itemCategoryService.GetAll(filter);
 
-        // Convert to response items
-        var categoriesResponse = _mapper.Map<List<ItemCategoryResponse>>(categories);
-
-        // Hateos item links
-        foreach (var category in categoriesResponse)
-        {
-            category.Links.Add(new LinkResponse(
-                _urlHelper.GetUriByAction(HttpContext, nameof(this.Get), values: new { category.Id }), "SELF", "GET"));
-
-            category.Links.Add(new LinkResponse(
-                _urlHelper.GetUriByAction(HttpContext, nameof(ItemController.Index), "Item",
-                    values: new { CategoryId = category.Id }), "ITEMS", "GET"));
-        }
-
-        var links = GeneratePaginationLinks(categories, filter, nameof(Index));
-
-        // Create response list
-        var response = new ResponseList<ItemCategoryResponse>
-        {
-            Data = categoriesResponse,
-            Links = links
-        };
+        // Generate response
+        var response =
+            await _categoryResponseGenerator.GenerateResponseList(categories, filter, nameof(Index), "ItemCategory");
 
         return Ok(response);
     }
@@ -91,13 +75,8 @@ public class ItemCategoryController : ACrudController<ItemCategory>
 
         await _authorizationService.CheckPermissions(category, ItemCategoryAuthorizationHandler.Operations.Read);
 
-        // Map to response
-        var categoryResponse = _mapper.Map<ItemCategoryResponse>(category);
-
-        // Link to items
-        categoryResponse.Links.Add(new LinkResponse(
-            _urlHelper.GetUriByAction(HttpContext, nameof(ItemController.Index), "Item",
-                values: new { CategoryId = category.Id }), "ITEMS", "GET"));
+        // Generate response
+        var categoryResponse = await _categoryResponseGenerator.GenerateItemCategoryDetailResponse(category);
 
         return Ok(categoryResponse);
     }
