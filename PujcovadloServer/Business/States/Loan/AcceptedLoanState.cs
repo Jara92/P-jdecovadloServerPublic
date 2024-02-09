@@ -28,7 +28,16 @@ public class AcceptedLoanState : ALoanState
             // Can cancel, activate or prepare for pickup
             case LoanStatus.Cancelled:
             case LoanStatus.Active:
+                // Update the status
+                loan.Status = newStatus;
+                break;
             case LoanStatus.PreparedForPickup:
+                // Pickup protocol is required for changing the status to PreparedForPickup
+                if (loan.PickupProtocol == null)
+                    throw new ActionNotAllowedException(
+                        $"Cannot change loan status from {loan.Status} to {newStatus} as an owner without a pickup protocol.");
+
+                // Update the status
                 loan.Status = newStatus;
                 break;
             default:

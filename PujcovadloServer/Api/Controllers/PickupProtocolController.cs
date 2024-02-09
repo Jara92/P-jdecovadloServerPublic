@@ -102,8 +102,11 @@ public class PickupProtocolController : ACrudController<PickupProtocol>
                 LoanAuthorizationHandler.Operations.CreatePickupProtocol);
             var protocol = await _ownerFacade.CreatePickupProtocol(loan, request);
 
+            // generate response
+            var response = await _responseGenerator.GeneratePickupProtocolDetailResponse(protocol);
+
             return CreatedAtAction(_urlHelper.GetUriByAction(HttpContext, nameof(GetProtocol), values: protocol.Id),
-                protocol);
+                response);
         }
     }
 }

@@ -88,8 +88,9 @@ public class OwnerFacade
     public async Task<PickupProtocol> CreatePickupProtocol(Loan loan, PickupProtocolRequest request)
     {
         // Check if the loan is in the correct status
-        if (loan.Status != LoanStatus.PreparedForPickup)
-            throw new ActionNotAllowedException("Cannot create pickup protocol for loan in status " + loan.Status);
+        if (loan.Status != LoanStatus.Accepted)
+            throw new OperationNotAllowedException("Loan must be in status " + LoanStatus.Accepted +
+                                                   " to create pickup protocol.");
 
         // Check if the protocol already exists
         if (loan.PickupProtocol != null)
@@ -99,23 +100,32 @@ public class OwnerFacade
         var protocol = _mapper.Map<PickupProtocol>(request);
         protocol.Loan = loan;
 
-        // Check if loan status
-        if (loan.Status == LoanStatus.Accepted)
-            throw new OperationNotAllowedException("Loan must be in status " + LoanStatus.Accepted +
-                                                   " to create pickup protocol.");
-
-        // Check that the protocol does not exist
-        if (loan.PickupProtocol != null)
-            throw new OperationNotAllowedException("Pickup protocol already exists.");
-
         // Create the protocol
         await _pickupProtocolService.Create(protocol);
+
+        // Try to change the status of the loan
+        var state = _loanService.GetState(loan);
+        state.HandleOwner(loan, LoanStatus.PreparedForPickup);
+
+        // Update the loan
+        await _loanService.Update(loan);
 
         return protocol;
     }
 
+    /// <summary>
+    /// Updated PickupProtocol.
+    /// </summary>
+    /// <param name="protocol">Pickup protocol to update.</param>
+    /// <param name="request">New data</param>
+    /// <exception cref="ActionNotAllowedException">Thrown if the action cannot be performed.</exception>
     public async Task UpdatePickupProtocol(PickupProtocol protocol, PickupProtocolRequest request)
     {
+        // Check if the protocol can be updated
+        if (protocol.Loan.Status != LoanStatus.PickupDenied)
+            throw new ActionNotAllowedException("Pickup protocol can be updated only if the loan pickup is denied.");
+
+        // Update protocol data
         protocol.Description = request.Description;
         protocol.AcceptedRefundableDeposit = request.AcceptedRefundableDeposit;
 

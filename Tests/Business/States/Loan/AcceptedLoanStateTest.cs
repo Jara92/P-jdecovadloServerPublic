@@ -1,3 +1,4 @@
+using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Enums;
 using PujcovadloServer.Business.Exceptions;
 
@@ -21,7 +22,7 @@ public class AcceptedLoanStateTest : ALoanStateTest
             _status,
             LoanStatus.Cancelled
         };
-        
+
         // Check all allowed statuses
         foreach (var status in allowed)
         {
@@ -68,8 +69,7 @@ public class AcceptedLoanStateTest : ALoanStateTest
         {
             _status,
             LoanStatus.Cancelled,
-            LoanStatus.Active,
-            LoanStatus.PreparedForPickup
+            LoanStatus.Active
         };
 
         // Check all allowed statuses
@@ -83,6 +83,29 @@ public class AcceptedLoanStateTest : ALoanStateTest
             // Should be able to change the status
             Assert.That(_loan.Status, Is.EqualTo(status));
         }
+    }
+
+    [Test]
+    public void HandleOwner_ToPreparedForPickupButPickupProtocolIsNotSet_ThrowsException()
+    {
+        // Arrange pickup protocol is not set
+        _loan.PickupProtocol = null;
+
+        // Act & Assert
+        Assert.Throws<ActionNotAllowedException>(() => _state.HandleOwner(_loan, LoanStatus.PreparedForPickup));
+    }
+
+    [Test]
+    public void HandleOwner_ToPreparedForPickupButPickupProtocolIsSet_ChangesStatus()
+    {
+        // Arrange pickup protocol is set
+        _loan.PickupProtocol = new PickupProtocol() { Loan = _loan };
+
+        // Act
+        _state.HandleOwner(_loan, LoanStatus.PreparedForPickup);
+
+        // Assert
+        Assert.That(_loan.Status, Is.EqualTo(LoanStatus.PreparedForPickup));
     }
 
     [Test]
