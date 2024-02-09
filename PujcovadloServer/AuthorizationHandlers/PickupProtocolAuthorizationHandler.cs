@@ -10,11 +10,8 @@ namespace PujcovadloServer.AuthorizationHandlers;
 public class
     PickupProtocolAuthorizationHandler : BaseCrudAuthorizationHandler<OperationAuthorizationRequirement, PickupProtocol>
 {
-    private readonly IAuthorizationService _authorizationService;
-    
-    public PickupProtocolAuthorizationHandler(IAuthenticateService authenticateService, IAuthorizationService authorizationService) : base(authenticateService)
+    public PickupProtocolAuthorizationHandler(IAuthenticateService authenticateService) : base(authenticateService)
     {
-        _authorizationService = authorizationService;
     }
 
     protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
@@ -30,14 +27,12 @@ public class
         switch (requirement.Name)
         {
             case nameof(Operations.Create):
-                // Delegate the problem to LoanAuthorizationHandler
-                var result = await _authorizationService.AuthorizeAsync(context.User, protocol.Loan, LoanAuthorizationHandler.Operations.CreatePickupProtocol);
-                
-                if (result.Succeeded)
+                // todo: find a way how to delete this requirement to other AuthorizationHandler
+                if (protocol.Loan.Item.Owner.Id == userId)
                 {
                     context.Succeed(requirement);
                 }
-                
+
                 break;
             case nameof(Operations.Read):
                 // User is the tenant or the owner

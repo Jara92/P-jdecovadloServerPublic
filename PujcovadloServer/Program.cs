@@ -5,19 +5,19 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using PujcovadloServer.Business.Facades;
-using PujcovadloServer.Business.Interfaces;
-using PujcovadloServer.Business.Services;
-using PujcovadloServer.Data;
-using PujcovadloServer.Data.Repositories;
 using NSwag;
 using PujcovadloServer;
 using PujcovadloServer.Api.Filters;
 using PujcovadloServer.Api.Services;
 using PujcovadloServer.Authentication;
 using PujcovadloServer.AuthorizationHandlers;
+using PujcovadloServer.Business.Facades;
 using PujcovadloServer.Business.Factories.State;
+using PujcovadloServer.Business.Interfaces;
+using PujcovadloServer.Business.Services;
 using PujcovadloServer.Business.Services.Interfaces;
+using PujcovadloServer.Data;
+using PujcovadloServer.Data.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,7 +26,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddOpenApiDocument(options => {
+builder.Services.AddOpenApiDocument(options =>
+{
     options.PostProcess = document =>
     {
         document.Info = new OpenApiInfo
@@ -61,8 +62,8 @@ if (builder.Environment.IsDevelopment())
 // Production environment
 else
 {
-   /* builder.Services.AddDbContext<PujcovadloServerContext>(options =>
-        options.UseSqlServer(builder.Configuration.GetConnectionString("ProductionMvcMovieContext")));*/
+    /* builder.Services.AddDbContext<PujcovadloServerContext>(options =>
+         options.UseSqlServer(builder.Configuration.GetConnectionString("ProductionMvcMovieContext")));*/
 }
 
 // For Identity
@@ -114,6 +115,7 @@ builder.Services.AddScoped<IAuthorizationHandler, ItemAuthorizationHandler>();
 builder.Services.AddScoped<IAuthorizationHandler, ImageAuthorizationHandler>();
 builder.Services.AddScoped<IAuthorizationHandler, ItemCategoryAuthorizationHandler>();
 builder.Services.AddScoped<IAuthorizationHandler, LoanAuthorizationHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, PickupProtocolAuthorizationHandler>();
 
 //Factories
 builder.Services.AddScoped<LoanStateFactory>();
@@ -172,12 +174,12 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-   //app.UseDeveloperExceptionPage();
-    
+    //app.UseDeveloperExceptionPage();
+
     // Add OpenAPI 3.0 document serving middleware
     // Available at: http://localhost:<port>/swagger/v1/swagger.json
     app.UseOpenApi();
-    
+
     app.UseSwagger();
     app.UseSwaggerUI();
 }
@@ -198,5 +200,7 @@ app.Run();
 
 namespace PujcovadloServer
 {
-    public partial class Program {}
+    public partial class Program
+    {
+    }
 }
