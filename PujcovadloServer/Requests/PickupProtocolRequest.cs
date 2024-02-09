@@ -7,5 +7,4 @@ public class PickupProtocolRequest
     public float? AcceptedRefundableDeposit { get; set; } = null!;
     
     // TODO: add common LoanRequest properties
-    public virtual TenantLoanRequest Loan { get; set; } = default!;
 }
