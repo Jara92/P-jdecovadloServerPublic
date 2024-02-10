@@ -1,7 +1,6 @@
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Exceptions;
 using PujcovadloServer.Business.Services;
-using PujcovadloServer.Requests;
 
 namespace PujcovadloServer.Business.Facades;
 
@@ -27,7 +26,7 @@ public class LoanFacade
     public PickupProtocol GetPickupProtocol(Loan loan)
     {
         var protocol = loan.PickupProtocol;
-        if (protocol == null) throw new EntityNotFoundException("Protocol not found");
+        if (protocol == null) throw new EntityNotFoundException("Pickup protocol not found");
 
         return protocol;
     }

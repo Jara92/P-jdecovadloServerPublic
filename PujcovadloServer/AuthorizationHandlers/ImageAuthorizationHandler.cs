@@ -17,7 +17,7 @@ public class ImageAuthorizationHandler : BaseCrudAuthorizationHandler<OperationA
         OperationAuthorizationRequirement requirement, Image image)
     {
         await base.HandleRequirementAsync(context, requirement, image);
-        
+
         var userId = _authenticateService.TryGetCurrentUserId();
 
         // Check each action
@@ -25,8 +25,14 @@ public class ImageAuthorizationHandler : BaseCrudAuthorizationHandler<OperationA
         {
             case nameof(Operations.Create):
                 // Only owners of the item can create a new Image
-                if(userId != null && image.Item != null && image.Item.Owner.Id == userId)
+                if (userId != null && image.Item != null && image.Item.Owner.Id == userId)
                     context.Succeed(requirement);
+
+                // Only owners of the loan item can create a new Image
+                // TODO: add test
+                if (userId != null && image.PickupProtocol != null && image.PickupProtocol.Loan.Item.Owner.Id == userId)
+                    context.Succeed(requirement);
+
                 break;
             case nameof(Operations.Update):
             case nameof(Operations.Delete):
@@ -34,6 +40,7 @@ public class ImageAuthorizationHandler : BaseCrudAuthorizationHandler<OperationA
                 {
                     context.Succeed(requirement);
                 }
+
                 break;
             case nameof(Operations.Read):
                 // Owner can read the image
@@ -41,7 +48,7 @@ public class ImageAuthorizationHandler : BaseCrudAuthorizationHandler<OperationA
                 {
                     context.Succeed(requirement);
                 }
-                
+
                 // Image's item is public
                 if (image.Item != null && image.Item.Status == ItemStatus.Public)
                 {

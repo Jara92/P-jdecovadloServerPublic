@@ -2,8 +2,6 @@ using AutoMapper;
 using PujcovadloServer.Api.Controllers;
 using PujcovadloServer.AuthorizationHandlers;
 using PujcovadloServer.Business.Entities;
-using PujcovadloServer.Business.Filters;
-using PujcovadloServer.Lib;
 using PujcovadloServer.Responses;
 
 namespace PujcovadloServer.Api.Services;
@@ -69,6 +67,14 @@ public class ImageResponseGenerator : ABaseResponseGenerator
             response.Links.Add(new LinkResponse(
                 _urlHelper.GetUriByAction(_httpContext, nameof(ItemController.Get), "Item",
                     values: new { image.Item.Id }), "ITEM", "GET"));
+        }
+
+        // Pickup protocol
+        if (image.PickupProtocol != null)
+        {
+            response.Links.Add(new LinkResponse(
+                _urlHelper.GetUriByAction(_httpContext, nameof(PickupProtocolController.GetProtocol), "PickupProtocol",
+                    values: new { loanId = image.PickupProtocol.Loan.Id }), "PICKUP_PROTOCOL", "GET"));
         }
     }
 

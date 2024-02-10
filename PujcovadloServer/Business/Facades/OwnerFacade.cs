@@ -13,20 +13,25 @@ namespace PujcovadloServer.Business.Facades;
 
 public class OwnerFacade
 {
+    private readonly ImageFacade _imageFacade;
     private readonly LoanService _loanService;
     private readonly ItemService _itemService;
     private readonly PickupProtocolService _pickupProtocolService;
     private readonly IAuthenticateService _authenticateService;
     private readonly IMapper _mapper;
+    private readonly PujcovadloServerConfiguration _configuration;
 
-    public OwnerFacade(LoanService loanService, ItemService itemService, PickupProtocolService pickupProtocolService,
-        IAuthenticateService authenticateService, IMapper mapper)
+    public OwnerFacade(ImageFacade imageFacade, LoanService loanService, ItemService itemService,
+        PickupProtocolService pickupProtocolService,
+        IAuthenticateService authenticateService, IMapper mapper, PujcovadloServerConfiguration configuration)
     {
+        _imageFacade = imageFacade;
         _loanService = loanService;
         _itemService = itemService;
         _pickupProtocolService = pickupProtocolService;
         _authenticateService = authenticateService;
         _mapper = mapper;
+        _configuration = configuration;
     }
 
     public async Task<PaginatedList<Loan>> GetMyLoans(LoanFilter filter)
@@ -104,6 +109,7 @@ public class OwnerFacade
         await _pickupProtocolService.Create(protocol);
 
         // Try to change the status of the loan
+        // TODO: REMOVE BCAUSE THE USER WOULD NOT BE ABLE TO ADD IMAGES
         var state = _loanService.GetState(loan);
         state.HandleOwner(loan, LoanStatus.PreparedForPickup);
 
@@ -130,5 +136,23 @@ public class OwnerFacade
         protocol.AcceptedRefundableDeposit = request.AcceptedRefundableDeposit;
 
         await _pickupProtocolService.Update(protocol);
+    }
+
+    public async Task AddPickupProtocolImage(PickupProtocol pickupProtocol, Image image, string filePath)
+    {
+        // Check that the item has not reached the maximum number of images
+        if (pickupProtocol.Images.Count >= _configuration.MaxImagesPerPickupProtocol)
+            throw new ArgumentException("Max images per pickupProtocol exceeded.");
+
+        // Check loan status
+        if (pickupProtocol.Loan.Status != LoanStatus.Accepted && pickupProtocol.Loan.Status != LoanStatus.PickupDenied)
+            throw new ActionNotAllowedException(
+                "Images can be added only if the loan is accepted or pickup is denied.");
+
+        // set images pickupProtocol
+        image.PickupProtocol = pickupProtocol;
+
+        // Create using image facade
+        await _imageFacade.Create(image, filePath);
     }
 }
