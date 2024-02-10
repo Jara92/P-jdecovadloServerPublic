@@ -37,8 +37,8 @@ public class ImageResponseGenerator : ABaseResponseGenerator
         if (image.Item != null)
         {
             response.Links.Add(new LinkResponse(
-                _urlHelper.GetUriByAction(_httpContext, nameof(ItemImageController.GetImage), "ItemImage",
-                    values: new { image.Item.Id, imageId = image.Id }), "SELF", "GET"));
+                _urlHelper.GetUriByAction(_httpContext, nameof(ImageController.GetImage), "Image",
+                    values: new { id = image.Id }), "SELF", "GET"));
         }
 
         AddCommonLinks(response, image);
@@ -55,8 +55,13 @@ public class ImageResponseGenerator : ABaseResponseGenerator
     {
         // Add link to the image data
         response.Links.Add(new LinkResponse(
-            _urlHelper.GetUriByAction(_httpContext, nameof(ImageController.GetImage), "Image",
+            _urlHelper.GetUriByAction(_httpContext, nameof(ImageDataController.GetImage), "ImageData",
                 values: new { filename = image.Path }), "DATA", "GET"));
+
+        // Add delete link
+        response.Links.Add(new LinkResponse(
+            _urlHelper.GetUriByAction(_httpContext, nameof(ImageController.DeleteImage), "Image",
+                values: new { id = image.Id }), "DELETE", "DELETE"));
 
         // Image item
         if (image.Item != null)
@@ -104,5 +109,11 @@ public class ImageResponseGenerator : ABaseResponseGenerator
         AddCommonLinks(response, loan);
 
         return response;
+    }
+
+    public string? GetLink(Image image)
+    {
+        return _urlHelper.GetUriByAction(_httpContext, nameof(ImageController.GetImage), "Image",
+            values: new { id = image.Id });
     }
 }

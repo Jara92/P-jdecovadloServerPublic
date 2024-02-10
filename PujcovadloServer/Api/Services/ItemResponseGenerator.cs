@@ -65,17 +65,17 @@ public class ItemResponseGenerator : ABaseResponseGenerator
 
         return response;
     }
-    
+
     private void AddImageLinks(Item item, ImageResponse image)
     {
         // LInk to image detail
         image.Links.Add(new LinkResponse(
-            _urlHelper.GetUriByAction(_httpContext, nameof(ItemImageController.GetImage), "ItemImage",
-                values: new { id = item.Id, imageId = image.Id }), "SELF", "GET"));
+            _urlHelper.GetUriByAction(_httpContext, nameof(ImageController.GetImage), "Image",
+                values: new { id = image.Id }), "SELF", "GET"));
 
         // Link to image data
         image.Links.Add(new LinkResponse(
-            _urlHelper.GetUriByAction(_httpContext, nameof(ImageController.GetImage), "Image",
+            _urlHelper.GetUriByAction(_httpContext, nameof(ImageDataController.GetImage), "ImageData",
                 values: new { fileName = image.Path }), "DATA", "GET"));
     }
 
@@ -87,7 +87,7 @@ public class ItemResponseGenerator : ABaseResponseGenerator
     private void AddItemDetailLinks(Item item, ItemDetailResponse response)
     {
         // Add image links
-        foreach(var image in response.Images)
+        foreach (var image in response.Images)
         {
             AddImageLinks(item, image);
         }

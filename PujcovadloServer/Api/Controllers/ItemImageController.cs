@@ -6,7 +6,6 @@ using PujcovadloServer.Api.Services;
 using PujcovadloServer.AuthorizationHandlers;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Facades;
-using PujcovadloServer.Responses;
 
 namespace PujcovadloServer.Api.Controllers;
 
@@ -21,7 +20,8 @@ public class ItemImageController : ACrudController<Image>
     private readonly IMapper _mapper;
     private readonly FileUploadService _fileUploadService;
 
-    public ItemImageController(ItemFacade itemFacade, ImageFacade imageFacade, ImageResponseGenerator responseGenerator, IMapper mapper,
+    public ItemImageController(ItemFacade itemFacade, ImageFacade imageFacade, ImageResponseGenerator responseGenerator,
+        IMapper mapper,
         AuthorizationService authorizationService, LinkGenerator urlHelper,
         FileUploadService fileUploadService) : base(authorizationService, urlHelper)
     {
@@ -52,35 +52,9 @@ public class ItemImageController : ACrudController<Image>
 
         // get the images and map them to response
         var images = item.Images;
-        
+
         // generate response 
         var response = await _responseGenerator.GenerateResponseList(images);
-
-        return Ok(response);
-    }
-
-    /// <summary>
-    /// Returns image by given id.
-    /// </summary>
-    /// <param name="id">Item id.</param>
-    /// <param name="imageId">Image id.</param>
-    /// <returns>Returns image file.</returns>
-    /// <response code="200">Returns image file.</response>
-    /// <response code="400">If the request is not valid.</response>
-    /// <response code="403">If the user is not authorized to read the image.</response>
-    /// <response code="404">If the image was not found.</response>
-    [HttpGet("{id}/images/{imageId}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<ImageResponse>> GetImage(int id, int imageId)
-    {
-        // get the image and return it
-        var image = await _imageFacade.GetImage(id, imageId);
-        await _authorizationService.CheckPermissions(image, ItemAuthorizationHandler.Operations.Read);
-
-        // Generate response
-        var response = await _responseGenerator.GenerateImageDetailResponse(image);
 
         return Ok(response);
     }
@@ -122,33 +96,6 @@ public class ItemImageController : ACrudController<Image>
         // Map the image to response
         var response = await _responseGenerator.GenerateImageDetailResponse(image);
 
-        return Created(_urlHelper.GetUriByAction(HttpContext, nameof(GetImage),
-            values: new { id = item.Id, imageId = image.Id }), response);
-    }
-
-    /// <summary>
-    /// Deletes image by given id.
-    /// </summary>
-    /// <param name="id">item id</param>
-    /// <param name="imageId">Image id.</param>
-    /// <returns></returns>
-    /// <response code="204">If the image was deleted successfully.</response>
-    /// <response code="400">If the request is not valid.</response>
-    /// <response code="403">If the user is not authorized to delete the image.</response>
-    /// <response code="404">If the image was not found.</response>
-    [HttpDelete("{id}/images/{imageId}")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DeleteImage(int id, int imageId)
-    {
-        // get the image
-        var image = await _imageFacade.GetImage(id, imageId);
-        await _authorizationService.CheckPermissions(image, ItemAuthorizationHandler.Operations.Delete);
-
-        // get the image and return it
-        await _imageFacade.DeleteImage(id, imageId);
-
-        return NoContent();
+        return Created(_responseGenerator.GetLink(image), response);
     }
 }

@@ -1,9 +1,10 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PujcovadloServer.Api.Filters;
+using PujcovadloServer.Api.Services;
 using PujcovadloServer.AuthorizationHandlers;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Facades;
+using PujcovadloServer.Responses;
 
 namespace PujcovadloServer.Api.Controllers;
 
@@ -13,37 +14,63 @@ namespace PujcovadloServer.Api.Controllers;
 public class ImageController : ACrudController<Image>
 {
     private readonly ImageFacade _imageFacade;
+    private readonly ImageResponseGenerator _responseGenerator;
 
-    public ImageController(ImageFacade imageFacade, AuthorizationService authorizationService, LinkGenerator urlHelper)
+    public ImageController(ImageFacade imageFacade, ImageResponseGenerator responseGenerator,
+        AuthorizationService authorizationService, LinkGenerator urlHelper)
         : base(authorizationService, urlHelper)
     {
         _imageFacade = imageFacade;
+        _responseGenerator = responseGenerator;
     }
 
     /// <summary>
-    /// Returns image bytes by filename.
+    /// Returns image by given id.
     /// </summary>
-    /// <param name="filename">Image filname</param>
-    /// <returns>Image's binary data.</returns>
-    /// <response code="200">Returns image's binary data.</response>
-    /// <response code="403">If user is not authorized to view the image.</response>
-    /// <response code="404">If image was not found.</response>
-    [HttpGet("{filename}")]
+    /// <param name="id">Image id.</param>
+    /// <returns>Returns image file.</returns>
+    /// <response code="200">Returns image file.</response>
+    /// <response code="400">If the request is not valid.</response>
+    /// <response code="403">If the user is not authorized to read the image.</response>
+    /// <response code="404">If the image was not found.</response>
+    [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [AllowAnonymous]
-    public async Task<IActionResult> GetImage(string filename)
+    public async Task<ActionResult<ImageResponse>> GetImage(int id)
     {
-        // Find the image by filename
-        var image = await _imageFacade.GetImage(filename);
-        
-        await _authorizationService.CheckPermissions(image, ImageAuthorizationHandler.Operations.Read);
+        // get the image and return it
+        var image = await _imageFacade.GetImage(id);
+        await _authorizationService.CheckPermissions(image, ItemAuthorizationHandler.Operations.Read);
 
-        // Get the image bytes
-        var imageBytes = await _imageFacade.GetImageBytes(image);
+        // Generate response
+        var response = await _responseGenerator.GenerateImageDetailResponse(image);
 
-        // Return the image data as a file
-        return File(imageBytes, "application/octet-stream", image.Name);
+        return Ok(response);
+    }
+
+    /// <summary>
+    /// Deletes image by given id.
+    /// </summary>
+    /// <param name="id">Image id</param>
+    /// <returns></returns>
+    /// <response code="204">If the image was deleted successfully.</response>
+    /// <response code="400">If the request is not valid.</response>
+    /// <response code="403">If the user is not authorized to delete the image.</response>
+    /// <response code="404">If the image was not found.</response>
+    [HttpDelete("{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteImage(int id)
+    {
+        // get the image
+        var image = await _imageFacade.GetImage(id);
+        await _authorizationService.CheckPermissions(image, ItemAuthorizationHandler.Operations.Delete);
+
+        // get the image and return it
+        await _imageFacade.DeleteImage(image);
+
+        return NoContent();
     }
 }

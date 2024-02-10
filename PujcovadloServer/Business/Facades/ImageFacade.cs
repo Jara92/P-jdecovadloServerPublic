@@ -1,17 +1,8 @@
 using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
-using NuGet.Packaging;
-using PujcovadloServer.Authentication.Exceptions;
 using PujcovadloServer.Business.Entities;
-using PujcovadloServer.Business.Enums;
 using PujcovadloServer.Business.Exceptions;
-using PujcovadloServer.Business.Filters;
-using PujcovadloServer.Business.Interfaces;
 using PujcovadloServer.Business.Services;
 using PujcovadloServer.Business.Services.Interfaces;
-using PujcovadloServer.Helpers;
-using PujcovadloServer.Lib;
-using PujcovadloServer.Requests;
 
 namespace PujcovadloServer.Business.Facades;
 
@@ -81,22 +72,29 @@ public class ImageFacade
     {
         // Build absolute path to the image
         var filePath = Path.Combine(_configuration.ImagesPath, image.Path);
-        
+
         // Check if the file exists
         if (File.Exists(filePath))
         {
             // Get all bytes of the file and return the file with the specified file contents 
             return await File.ReadAllBytesAsync(filePath);
         }
-        
+
         throw new FileNotFoundException("Image not found.");
     }
 
-    public async Task<Image> GetImage(int itemId, int imageId)
+    public async Task<Image> GetImage(int imageId)
     {
         // Get image and check that it is not null
         var image = await _imageService.Get(imageId);
         if (image == null) throw new EntityNotFoundException();
+
+        return image;
+    }
+
+    public async Task<Image> GetImage(int itemId, int imageId)
+    {
+        var image = await GetImage(imageId);
 
         // Check that the image is associated with the item
         if (image.Item?.Id != itemId) throw new ArgumentException("Image is not associated with the item.");
@@ -107,8 +105,8 @@ public class ImageFacade
     public async Task<Image> GetImage(string name)
     {
         var image = await _imageService.GetByPath(name);
-        if(image == null) throw new EntityNotFoundException("Image not found.");
-        
+        if (image == null) throw new EntityNotFoundException("Image not found.");
+
         return image;
     }
 
