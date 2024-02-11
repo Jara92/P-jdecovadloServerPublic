@@ -55,6 +55,17 @@ public class TenantFacade
         return loan;
     }
 
+    private void PreCreateCheck(Loan loan)
+    {
+        // Check if the item is public
+        if (loan.Item.Status != ItemStatus.Public)
+            throw new OperationNotAllowedException("You can't borrow an item that is not public.");
+
+        // Check if the tenant is the owner
+        if (loan.Item.Owner == loan.Tenant)
+            throw new OperationNotAllowedException("You can't borrow your own item.");
+    }
+
 
     public async Task<Loan> CreateLoan(TenantLoanRequest request)
     {
@@ -64,8 +75,6 @@ public class TenantFacade
         // get the item
         var item = await _itemService.Get(request.Item.Id);
         if (item == null) throw new EntityNotFoundException($"Item with id {request.Item.Id} was not found.");
-
-        // TODO: Check if the owner is not the tenant
 
         // Map request to loan
         var newLoan = _mapper.Map<Loan>(request);
@@ -84,6 +93,8 @@ public class TenantFacade
         // Set the expected price and days
         newLoan.Days = GetLoanSetLoanDays(newLoan);
         newLoan.ExpectedPrice = GetLoanExpectedPrice(newLoan);
+
+        PreCreateCheck(newLoan);
 
         // create the loan
         await _loanService.Create(newLoan);

@@ -19,7 +19,11 @@ public class LoanAuthorizationHandler : BaseCrudAuthorizationHandler<OperationAu
         await base.HandleRequirementAsync(context, requirement, loan);
 
         // Get current user id
-        var userId = _authenticateService.GetCurrentUserId();
+        var userId = _authenticateService.TryGetCurrentUserId();
+
+        // If the user is not authenticated, return
+        if (userId == null)
+            return;
 
         // TODO refactor spagety
         // Check each action
@@ -37,10 +41,12 @@ public class LoanAuthorizationHandler : BaseCrudAuthorizationHandler<OperationAu
 
                 break;
             case nameof(Operations.Update):
-            case nameof(Operations.Delete):
-                // I am the owner
+                // User is the tenant or the owner
                 if (loan.Tenant.Id == userId || loan.Item.Owner.Id == userId)
                     context.Succeed(requirement);
+                break;
+            case nameof(Operations.Delete):
+                // Noone can do this
                 break;
             case nameof(Operations.CreatePickupProtocol):
                 // Only the owner can create the protocol
