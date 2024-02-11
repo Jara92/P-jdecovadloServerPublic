@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
 using PujcovadloServer.AuthorizationHandlers.Exceptions;
 using PujcovadloServer.Business.Entities;
-using PujcovadloServer.Business.Enums;
 using PujcovadloServer.Business.Services.Interfaces;
 
 namespace PujcovadloServer.AuthorizationHandlers;
@@ -41,7 +40,7 @@ public class
                 break;
             case nameof(Operations.Update):
                 // Only the owner can update the protocol but the loan pickup must be denied
-                if (protocol.Loan.Item.Owner.Id == userId && protocol.Loan.Status == LoanStatus.PickupDenied)
+                if (protocol.Loan.Item.Owner.Id == userId)
                     context.Succeed(requirement);
 
                 break;
