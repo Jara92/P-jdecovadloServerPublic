@@ -9,12 +9,12 @@ public abstract class ALoanState : ILoanState
     {
         // Nothing to be done here
         if (loan.Status == newStatus) return;
-        
+
         HandleTenantImplementation(loan, newStatus);
     }
 
     /// <inheritdoc cref="ILoanState"/>
-    public void HandleOwner(Entities.Loan loan, LoanStatus newStatus)
+    public virtual void HandleOwner(Entities.Loan loan, LoanStatus newStatus)
     {
         // Nothing to be done here
         if (loan.Status == newStatus) return;
@@ -22,6 +22,6 @@ public abstract class ALoanState : ILoanState
     }
 
     protected abstract void HandleTenantImplementation(Entities.Loan loan, LoanStatus newStatus);
-    
+
     protected abstract void HandleOwnerImplementation(Entities.Loan loan, LoanStatus newStatus);
 }

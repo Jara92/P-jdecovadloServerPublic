@@ -47,6 +47,7 @@ public class OwnerFacade
 
     public async Task<Loan> GetMyLoan(int id)
     {
+        // TODO: Move this method to the LoanFacade
         // Get current user
         var userId = _authenticateService.GetCurrentUserId();
 
@@ -65,7 +66,7 @@ public class OwnerFacade
     public async Task UpdateMyLoan(Loan loan, OwnerLoanRequest request)
     {
         // Check if the status has been changed
-        if (request.Status != null && request.Status != loan.Status)
+        if (request.Status != null)
         {
             // get current state
             var state = _loanService.GetState(loan);

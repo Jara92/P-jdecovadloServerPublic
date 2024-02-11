@@ -40,6 +40,7 @@ public class TenantFacade
 
     public async Task<Loan> GetMyLoan(int id)
     {
+        // TODO: Move this method to the LoanFacade
         // Get current user
         var user = await _authenticateService.GetCurrentUser();
 
@@ -130,7 +131,7 @@ public class TenantFacade
         if (loan.Tenant.Id != user.Id) throw new ForbiddenAccessException("You are not the tenant of this loan.");
 
         // Check if the status has been changed
-        if (request.Status != null && request.Status != loan.Status)
+        if (request.Status != null)
         {
             // get current state
             var state = _loanService.GetState(loan);
