@@ -109,14 +109,6 @@ public class OwnerFacade
         // Create the protocol
         await _pickupProtocolService.Create(protocol);
 
-        // Try to change the status of the loan
-        // TODO: REMOVE BCAUSE THE USER WOULD NOT BE ABLE TO ADD IMAGES
-        var state = _loanService.GetState(loan);
-        state.HandleOwner(loan, LoanStatus.PreparedForPickup);
-
-        // Update the loan
-        await _loanService.Update(loan);
-
         return protocol;
     }
 
