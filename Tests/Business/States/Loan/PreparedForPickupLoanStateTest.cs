@@ -21,10 +21,9 @@ public class PrepareForPickupLoanStateTest : ALoanStateTest
         {
             _status,
             LoanStatus.Cancelled,
-            LoanStatus.Active,
             LoanStatus.PickupDenied
         };
-        
+
         // Check all allowed statuses
         foreach (var status in allowed)
         {
@@ -37,6 +36,34 @@ public class PrepareForPickupLoanStateTest : ALoanStateTest
             // Should be able to change the status
             Assert.That(_loan.Status, Is.EqualTo(status));
         }
+    }
+
+    [Test]
+    public void HandleTenant_TransitionToActiveButPickupProtocolIsNotSet_Fails()
+    {
+        // Arrange
+        _loan.PickupProtocol = null;
+
+        // Act - OperationNotAllowedException is thrown
+        Assert.Throws<ActionNotAllowedException>(() => _state.HandleTenant(_loan, LoanStatus.Active));
+        // Make sure the status is not changed
+        Assert.That(_loan.Status, Is.EqualTo(_status));
+        // Make sure the protocol is not set
+        Assert.That(_loan.PickupProtocol, Is.Null);
+    }
+
+    [Test]
+    public void HandleTenant_TransitionToActivePickupProtocolSet_StatusUpdates()
+    {
+        _loan.PickupProtocol = new PickupProtocol { Id = 1 };
+
+        // act
+        _state.HandleTenant(_loan, LoanStatus.Active);
+
+        // Status is updated to active
+        Assert.That(_loan.Status, Is.EqualTo(LoanStatus.Active));
+        // Protocol is confirmed
+        Assert.That(_loan.PickupProtocol.ConfirmedAt, Is.Not.Null);
     }
 
     [Test]

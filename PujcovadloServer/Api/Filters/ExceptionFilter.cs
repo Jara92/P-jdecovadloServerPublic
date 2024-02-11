@@ -51,7 +51,8 @@ public class ExceptionFilter : ExceptionFilterAttribute
         {
             context.Result = new BadRequestResult();
         }
-        else if (context.Exception is ActionNotAllowedException)
+        // TODO: Make ActionNotAllowedException and OperationNotAllowedException one exception
+        else if (context.Exception is ActionNotAllowedException || context.Exception is OperationNotAllowedException)
         {
             var details = new ExceptionResponse
             {

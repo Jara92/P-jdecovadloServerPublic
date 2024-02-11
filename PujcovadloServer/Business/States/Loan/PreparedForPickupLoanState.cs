@@ -46,11 +46,12 @@ public class PreparedForPickupLoanState : ALoanState
     /// <exception cref="ActionNotAllowedException">Thrown when there is no pickup protocol.</exception>
     private void MakeLoanActive(Entities.Loan loan)
     {
-        loan.Status = LoanStatus.Active;
-
         // Check if pickup protocol exists (it should exist)
         if (loan.PickupProtocol == null)
             throw new ActionNotAllowedException("Cannot change loan status to active without pickup protocol.");
+
+        // Update the status of the loan
+        loan.Status = LoanStatus.Active;
 
         // Confirm pickup protocol
         loan.PickupProtocol.ConfirmedAt = DateTime.Now;
