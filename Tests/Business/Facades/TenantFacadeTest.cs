@@ -305,16 +305,138 @@ public class TenantFacadeTest
         Assert.That(result.TenantNote, Is.EqualTo(expectedLoan.TenantNote));
     }
 
+    [Test]
+    public async Task CreateLoan_UserIsTenantAndItemsOwner_ThrowsException()
+    {
+        var dateFrom = DateTime.Now;
+        var dateTo = dateFrom.AddDays(1);
+
+        // Simulate the request
+        var request = new TenantLoanRequest()
+        {
+            Item = new ItemRequest { Id = 1 },
+            From = dateFrom,
+            To = dateTo,
+            TenantNote = "Note"
+        };
+
+        // Expected item 
+        var item = new Item
+        {
+            Id = request.Id,
+            PricePerDay = 100,
+            RefundableDeposit = 2000,
+            Owner = _user
+        };
+
+        var mappedLoan = new Loan()
+        {
+            From = dateFrom,
+            To = dateTo,
+            TenantNote = request.TenantNote
+        };
+
+        // Expected loan
+        var expectedLoan = new Loan
+        {
+            From = dateFrom,
+            To = dateTo,
+            Tenant = _user,
+            Item = item,
+            PricePerDay = item.PricePerDay,
+            RefundableDeposit = item.RefundableDeposit,
+            Days = 1,
+            ExpectedPrice = 1 * item.PricePerDay,
+            TenantNote = request.TenantNote
+        };
+
+        // Authentication service will return the user
+        _authenticateService.Setup(o => o.GetCurrentUser()).ReturnsAsync(_user);
+
+        // Item service will return the item
+        _itemService.Setup(o => o.Get(request.Item.Id, true)).ReturnsAsync(item);
+
+        // Mapper will map the request to loan
+        _mapper.Setup(o => o.Map<Loan>(request)).Returns(mappedLoan);
+
+        // Loan service will return the loan
+        _loanService.Setup(o => o.Create(expectedLoan)).Returns(Task.CompletedTask);
+
+        // Must throw OperationNotAllowedException because the user is the owner of the item
+        Assert.ThrowsAsync<OperationNotAllowedException>(async () => await _tenantFasade.CreateLoan(request));
+    }
+
+    [Test]
+    public async Task CreateLoan_UserIsTenantButItemIsNotPublic_ThrowsException()
+    {
+        var dateFrom = DateTime.Now;
+        var dateTo = dateFrom.AddDays(1);
+
+        // Simulate the request
+        var request = new TenantLoanRequest()
+        {
+            Item = new ItemRequest { Id = 1 },
+            From = dateFrom,
+            To = dateTo,
+            TenantNote = "Note"
+        };
+
+        // Expected item 
+        var item = new Item
+        {
+            Id = request.Id,
+            PricePerDay = 100,
+            RefundableDeposit = 2000,
+            Status = ItemStatus.Approving
+        };
+
+        var mappedLoan = new Loan()
+        {
+            From = dateFrom,
+            To = dateTo,
+            TenantNote = request.TenantNote
+        };
+
+        // Expected loan
+        var expectedLoan = new Loan
+        {
+            From = dateFrom,
+            To = dateTo,
+            Tenant = _user,
+            Item = item,
+            PricePerDay = item.PricePerDay,
+            RefundableDeposit = item.RefundableDeposit,
+            Days = 1,
+            ExpectedPrice = 1 * item.PricePerDay,
+            TenantNote = request.TenantNote
+        };
+
+        // Authentication service will return the user
+        _authenticateService.Setup(o => o.GetCurrentUser()).ReturnsAsync(_user);
+
+        // Item service will return the item
+        _itemService.Setup(o => o.Get(request.Item.Id, true)).ReturnsAsync(item);
+
+        // Mapper will map the request to loan
+        _mapper.Setup(o => o.Map<Loan>(request)).Returns(mappedLoan);
+
+        // Loan service will return the loan
+        _loanService.Setup(o => o.Create(expectedLoan)).Returns(Task.CompletedTask);
+
+        // Must throw OperationNotAllowedException because the user is the owner of the item
+        Assert.ThrowsAsync<OperationNotAllowedException>(async () => await _tenantFasade.CreateLoan(request));
+    }
+
     #endregion
 
-    #region GetLoanSetLoanDays
+    #region GetLoanDays
 
     [Test]
     public void SetLoanDays_SameDate_ReturnsOneDay()
     {
         var loan = new Loan { From = DateTime.Now, To = DateTime.Now };
 
-        var days = _tenantFasade.GetLoanSetLoanDays(loan);
+        var days = _tenantFasade.GetLoanDays(loan);
 
         // Should be one day even if From and To are the same
         Assert.That(days, Is.EqualTo(1));
@@ -328,7 +450,7 @@ public class TenantFacadeTest
 
         var loan = new Loan { From = from, To = to };
 
-        var days = _tenantFasade.GetLoanSetLoanDays(loan);
+        var days = _tenantFasade.GetLoanDays(loan);
 
         // Should be one day
         Assert.That(days, Is.EqualTo(1));
@@ -342,7 +464,7 @@ public class TenantFacadeTest
 
         var loan = new Loan { From = dateFrom, To = dateTo };
 
-        var days = _tenantFasade.GetLoanSetLoanDays(loan);
+        var days = _tenantFasade.GetLoanDays(loan);
 
         // Should be one day
         Assert.That(days, Is.EqualTo(1));
@@ -356,7 +478,7 @@ public class TenantFacadeTest
 
         var loan = new Loan { From = dateFrom, To = dateTo };
 
-        var days = _tenantFasade.GetLoanSetLoanDays(loan);
+        var days = _tenantFasade.GetLoanDays(loan);
 
         // Should be one day because time is not considered
         Assert.That(days, Is.EqualTo(1));
@@ -370,7 +492,7 @@ public class TenantFacadeTest
 
         var loan = new Loan { From = dateFrom, To = dateTo };
 
-        var days = _tenantFasade.GetLoanSetLoanDays(loan);
+        var days = _tenantFasade.GetLoanDays(loan);
 
         // Should be two days because time is not considered
         Assert.That(days, Is.EqualTo(7));

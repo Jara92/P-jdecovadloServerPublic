@@ -91,7 +91,7 @@ public class TenantFacade
         newLoan.RefundableDeposit = item.RefundableDeposit;
 
         // Set the expected price and days
-        newLoan.Days = GetLoanSetLoanDays(newLoan);
+        newLoan.Days = GetLoanDays(newLoan);
         newLoan.ExpectedPrice = GetLoanExpectedPrice(newLoan);
 
         PreCreateCheck(newLoan);
@@ -102,7 +102,7 @@ public class TenantFacade
         return newLoan;
     }
 
-    public int GetLoanSetLoanDays(Loan loan)
+    public int GetLoanDays(Loan loan)
     {
         // Calculate the price - take dates only to get rid of time so we get pretty accurate days
         var days = (loan.To.Date - loan.From.Date).TotalDays;
