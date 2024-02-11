@@ -586,7 +586,7 @@ public class TenantFacadeTest
     }
 
     [Test]
-    public void UpdateMyLoan_UserIsTenantAndNotUpdatedStatus_UpdateLoan()
+    public async Task UpdateMyLoan_UserIsTenantAndNotUpdatedStatus_UpdateLoan()
     {
         var loan = new Loan { Tenant = _user, Status = LoanStatus.Inquired };
 
@@ -605,13 +605,13 @@ public class TenantFacadeTest
         _loanService.Setup(o => o.GetState(loan)).Returns(mockState.Object);
 
         // Act
-        var result = _tenantFasade.UpdateMyLoan(loan, request);
+        await _tenantFasade.UpdateMyLoan(loan, request);
 
         // Verify that GetCurrentUser was called
         _authenticateService.Verify(o => o.GetCurrentUser(), Times.Once);
 
-        // Check that the state change by tenant was NOT called because the status is the same
-        mockState.Verify(o => o.HandleTenant(loan, newStatus), Times.Never);
+        // Check that the state change by tenant was called even if the status was not changed
+        mockState.Verify(o => o.HandleTenant(loan, newStatus), Times.Once);
 
         // Check that the state change by owner was NOT called
         mockState.Verify(o => o.HandleOwner(loan, newStatus), Times.Never);
@@ -621,7 +621,7 @@ public class TenantFacadeTest
     }
 
     [Test]
-    public void UpdateMyLoan_UserIsTenantAndUpdatedStatus_UpdatesLoan()
+    public async Task UpdateMyLoan_UserIsTenantAndUpdatedStatus_UpdatesLoan()
     {
         var loan = new Loan { Tenant = _user, Status = LoanStatus.Inquired };
 
@@ -641,7 +641,7 @@ public class TenantFacadeTest
         _loanService.Setup(o => o.GetState(loan)).Returns(mockState.Object);
 
         // Act
-        var result = _tenantFasade.UpdateMyLoan(loan, request);
+        await _tenantFasade.UpdateMyLoan(loan, request);
 
         // Verify that GetCurrentUser was called
         _authenticateService.Verify(o => o.GetCurrentUser(), Times.Once);
@@ -651,6 +651,41 @@ public class TenantFacadeTest
 
         // Check that the state change by owner was NOT called
         mockState.Verify(o => o.HandleOwner(loan, newStatus), Times.Never);
+
+        // Verify that update was called
+        _loanService.Verify(l => l.Update(loan), Times.Once);
+    }
+
+    [Test]
+    public async Task UpdateMyLoan_UserIsTenantAndUpdatedStatusIsNull_UpdatesLoan()
+    {
+        var loan = new Loan { Tenant = _user, Status = LoanStatus.Inquired };
+
+        var request = new TenantLoanRequest { };
+
+        // Mock the state so we can verify that the state change was called
+        var mockState = new Mock<ILoanState>();
+
+        // Authentication service will return the user
+        _authenticateService.Setup(o => o.GetCurrentUser()).ReturnsAsync(_user);
+
+        // Loan service will return the loan
+        _loanService.Setup(o => o.Update(loan)).Returns(Task.CompletedTask);
+
+        // Returns the state
+        _loanService.Setup(o => o.GetState(loan)).Returns(mockState.Object);
+
+        // Act
+        await _tenantFasade.UpdateMyLoan(loan, request);
+
+        // Verify that GetCurrentUser was called
+        _authenticateService.Verify(o => o.GetCurrentUser(), Times.Once);
+
+        // Check that the state change by tenant was NOT called
+        mockState.Verify(o => o.HandleTenant(loan, It.IsAny<LoanStatus>()), Times.Never);
+
+        // Check that the state change by owner was NOT called
+        mockState.Verify(o => o.HandleOwner(loan, It.IsAny<LoanStatus>()), Times.Never);
 
         // Verify that update was called
         _loanService.Verify(l => l.Update(loan), Times.Once);

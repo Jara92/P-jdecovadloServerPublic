@@ -5,7 +5,7 @@ namespace PujcovadloServer.Business.States.Loan;
 public abstract class ALoanState : ILoanState
 {
     /// <inheritdoc cref="ILoanState"/>
-    public void HandleTenant(Entities.Loan loan, LoanStatus newStatus)
+    public virtual void HandleTenant(Entities.Loan loan, LoanStatus newStatus)
     {
         // Nothing to be done here
         if (loan.Status == newStatus) return;

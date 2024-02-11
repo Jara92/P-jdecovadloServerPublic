@@ -82,6 +82,9 @@ public class OwnerFacadeTest
         // Make sure that state was called
         stateMock.Verify(x => x.HandleOwner(_loan, request.Status.Value), Times.Once);
 
+        // Make sure that status change by tenant was not called
+        stateMock.Verify(x => x.HandleTenant(_loan, request.Status.Value), Times.Never);
+
         // Make sure that update method was called
         _loanService.Verify(x => x.Update(_loan), Times.Once);
     }
@@ -103,6 +106,9 @@ public class OwnerFacadeTest
         // Make sure that state was not called
         stateMock.Verify(x => x.HandleOwner(_loan, request.Status.Value), Times.Once);
 
+        // Make sure that status change by tenant was not called
+        stateMock.Verify(x => x.HandleTenant(_loan, request.Status.Value), Times.Never);
+
         // Make sure that update method was not called
         _loanService.Verify(x => x.Update(_loan), Times.Once);
     }
@@ -118,8 +124,11 @@ public class OwnerFacadeTest
         // Run the operation
         await _ownerFasade.UpdateMyLoan(_loan, request);
 
-        // Make sure that state was NOT called
+        // Make sure that state change was NOT called
         stateMock.Verify(x => x.HandleOwner(_loan, It.IsAny<LoanStatus>()), Times.Never);
+
+        // Make sure that state change by tenant was NOT called
+        stateMock.Verify(x => x.HandleTenant(_loan, It.IsAny<LoanStatus>()), Times.Never);
 
         // Make sure that update method was called
         _loanService.Verify(x => x.Update(_loan), Times.Once);
