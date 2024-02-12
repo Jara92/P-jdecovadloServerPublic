@@ -1,21 +1,28 @@
 using Microsoft.AspNetCore.Mvc;
+using PujcovadloServer.Api.Filters;
 using PujcovadloServer.Api.Services;
 using PujcovadloServer.AuthorizationHandlers;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Facades;
+using PujcovadloServer.Requests;
 using PujcovadloServer.Responses;
 
 namespace PujcovadloServer.Api.Controllers;
 
+[ApiController]
+[Route("api/loans")]
+[ServiceFilter(typeof(ExceptionFilter))]
 public class LoanController : ACrudController<Loan>
 {
     private readonly LoanFacade _loanFacade;
+    private readonly TenantFacade _tenantFacade;
     private readonly LoanResponseGenerator _responseGenerator;
 
-    public LoanController(LoanFacade loanFacade, LoanResponseGenerator responseGenerator,
+    public LoanController(LoanFacade loanFacade, TenantFacade tenantFacade, LoanResponseGenerator responseGenerator,
         AuthorizationService authorizationService, LinkGenerator urlHelper) : base(authorizationService, urlHelper)
     {
         _loanFacade = loanFacade;
+        _tenantFacade = tenantFacade;
         _responseGenerator = responseGenerator;
     }
 
@@ -33,5 +40,22 @@ public class LoanController : ACrudController<Loan>
         var response = await _responseGenerator.GenerateLoanDetailResponse(loan);
 
         return Ok(response);
+    }
+
+    [HttpPost]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<LoanResponse>> CreateLoan([FromBody] TenantLoanRequest request)
+    {
+        await _authorizationService.CheckPermissions(new Loan(),
+            LoanAuthorizationHandler.Operations.Create);
+
+        var loan = await _tenantFacade.CreateLoan(request);
+
+        // Generate response
+        var response = await _responseGenerator.GenerateLoanDetailResponse(loan);
+
+        // Created response with location header
+        return CreatedAtAction(_responseGenerator.GetLink(loan), response);
     }
 }

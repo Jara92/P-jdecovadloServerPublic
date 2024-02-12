@@ -48,23 +48,6 @@ public class TenantLoanController : ACrudController<Loan>
         return Ok(response);
     }
 
-    [HttpPost]
-    [ProducesResponseType(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<LoanResponse>> CreateLoan([FromBody] TenantLoanRequest request)
-    {
-        await _authorizationService.CheckPermissions(_mapper.Map<Loan>(request),
-            LoanAuthorizationHandler.Operations.Create);
-
-        var loan = await _tenantFacade.CreateLoan(request);
-
-        // Generate response
-        var response = await _responseGenerator.GenerateLoanDetailResponse(loan);
-
-        // Created response with location header
-        return CreatedAtAction(_responseGenerator.GetLink(loan), response);
-    }
-
     [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
