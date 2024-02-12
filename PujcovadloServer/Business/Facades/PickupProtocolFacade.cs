@@ -24,6 +24,20 @@ public class PickupProtocolFacade
     }
 
     /// <summary>
+    /// Returns pickup protocol for the loan.
+    /// </summary>
+    /// <param name="loan">The loan.</param>
+    /// <returns>Pickup protocol of the loan</returns>
+    /// <exception cref="EntityNotFoundException">Thrown when the loan has no pickup protocol.</exception>
+    public PickupProtocol GetPickupProtocol(Loan loan)
+    {
+        var protocol = loan.PickupProtocol;
+        if (protocol == null) throw new EntityNotFoundException("Pickup protocol not found");
+
+        return protocol;
+    }
+
+    /// <summary>
     /// Creates a pickup protocol for the loan.
     /// </summary>
     /// <param name="loan">Protocols loan.</param>

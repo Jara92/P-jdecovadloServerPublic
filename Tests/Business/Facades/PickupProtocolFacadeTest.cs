@@ -56,6 +56,42 @@ public class PickupProtocolFacadeTest
         };
     }
 
+    #region GetPickupProtocol
+
+    [Test]
+    public void GetPickupProtocol_PickupProtocolNotFound_ThrowsException()
+    {
+        // Arrange
+        _loan.PickupProtocol = null;
+
+        // Must throw EntityNotFoundException because the protocol was not found
+        Assert.Throws<EntityNotFoundException>(() => _pickupProtocolFacade.GetPickupProtocol(_loan));
+    }
+
+    [Test]
+    public void GetPickupProtocol_PickupProtocolFound_ReturnsProtocol()
+    {
+        // Arrange
+        _loan.PickupProtocol = new PickupProtocol()
+            { Id = 1, Loan = _loan, AcceptedRefundableDeposit = 2000, Description = "All OK" };
+
+        var expectedProtocol = new PickupProtocol()
+            { Id = 1, Loan = _loan, AcceptedRefundableDeposit = 2000, Description = "All OK" };
+
+        // Run the operation
+        var result = _pickupProtocolFacade.GetPickupProtocol(_loan);
+
+        // Check that the protocol was returned
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Id, Is.EqualTo(expectedProtocol.Id));
+        Assert.That(result.Loan.Id, Is.EqualTo(_loan.Id));
+        Assert.That(result.AcceptedRefundableDeposit, Is.EqualTo(expectedProtocol.AcceptedRefundableDeposit));
+        Assert.That(result.Description, Is.EqualTo(expectedProtocol.Description));
+        Assert.That(result.ConfirmedAt, Is.EqualTo(expectedProtocol.ConfirmedAt));
+    }
+
+    #endregion
+
     #region CreatePickupProtocol
 
     [Test]

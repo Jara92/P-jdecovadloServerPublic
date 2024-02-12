@@ -22,12 +22,4 @@ public class LoanFacade
 
         return loan;
     }
-
-    public PickupProtocol GetPickupProtocol(Loan loan)
-    {
-        var protocol = loan.PickupProtocol;
-        if (protocol == null) throw new EntityNotFoundException("Pickup protocol not found");
-
-        return protocol;
-    }
 }

@@ -54,7 +54,7 @@ public class PickupProtocolController : ACrudController<PickupProtocol>
         await _authorizationService.CheckPermissions(loan, LoanAuthorizationHandler.Operations.Read);
 
         // Get protocol
-        var protocol = _loanFacade.GetPickupProtocol(loan);
+        var protocol = _pickupProtocolFacade.GetPickupProtocol(loan);
         await _authorizationService.CheckPermissions(protocol, PickupProtocolAuthorizationHandler.Operations.Read);
 
         // build response
@@ -88,7 +88,7 @@ public class PickupProtocolController : ACrudController<PickupProtocol>
         // Get protocol and update it if it exists
         try
         {
-            var protocol = _loanFacade.GetPickupProtocol(loan);
+            var protocol = _pickupProtocolFacade.GetPickupProtocol(loan);
             await _authorizationService.CheckPermissions(protocol,
                 PickupProtocolAuthorizationHandler.Operations.Update);
             await _pickupProtocolFacade.UpdatePickupProtocol(protocol, request);

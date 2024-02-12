@@ -50,7 +50,7 @@ public class PickupProtocolImageController : ACrudController<Image>
         await _authorizationService.CheckPermissions(loan, ItemAuthorizationHandler.Operations.Read);
 
         // get pickup protocol instance
-        var pickupProtocol = _loanFacade.GetPickupProtocol(loan);
+        var pickupProtocol = _pickupProtocolFacade.GetPickupProtocol(loan);
 
         // Check permissions for the pickup protocol
         await _authorizationService.CheckPermissions(pickupProtocol,
@@ -86,7 +86,7 @@ public class PickupProtocolImageController : ACrudController<Image>
         await _authorizationService.CheckPermissions(loan, LoanAuthorizationHandler.Operations.Read);
 
         // get pickup protocol instance
-        var pickupProtocol = _loanFacade.GetPickupProtocol(loan);
+        var pickupProtocol = _pickupProtocolFacade.GetPickupProtocol(loan);
 
         // Check permissions for creating images of the pickup protocol
         await _authorizationService.CheckPermissions(pickupProtocol,
