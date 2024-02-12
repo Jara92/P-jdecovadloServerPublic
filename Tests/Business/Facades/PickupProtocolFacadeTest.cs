@@ -97,7 +97,7 @@ public class PickupProtocolFacadeTest
         _loan.PickupProtocol = new PickupProtocol() { Id = 1, Loan = _loan };
 
         // Run the operation
-        Assert.ThrowsAsync<ActionNotAllowedException>(async () =>
+        Assert.ThrowsAsync<OperationNotAllowedException>(async () =>
             await _pickupProtocolFacade.CreatePickupProtocol(_loan, request));
     }
 

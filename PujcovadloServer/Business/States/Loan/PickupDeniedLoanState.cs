@@ -15,7 +15,7 @@ public class PickupDeniedLoanState : ALoanState
                 loan.Status = newStatus;
                 break;
             default:
-                throw new ActionNotAllowedException(
+                throw new OperationNotAllowedException(
                     $"Cannot change loan status from {loan.Status} to {newStatus} as a tenant.");
         }
     }
@@ -31,7 +31,7 @@ public class PickupDeniedLoanState : ALoanState
                 loan.Status = newStatus;
                 break;
             default:
-                throw new ActionNotAllowedException(
+                throw new OperationNotAllowedException(
                     $"Cannot change loan status from {loan.Status} to {newStatus} as an owner.");
         }
     }

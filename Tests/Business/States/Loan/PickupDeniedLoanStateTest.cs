@@ -21,7 +21,7 @@ public class PickupDeniedLoanStateTest : ALoanStateTest
             _status,
             LoanStatus.Cancelled,
         };
-        
+
         // Check all allowed statuses
         foreach (var status in allowed)
         {
@@ -53,7 +53,7 @@ public class PickupDeniedLoanStateTest : ALoanStateTest
         foreach (var status in disallowed)
         {
             // Act & Assert
-            Assert.Throws<ActionNotAllowedException>(() => _state.HandleTenant(_loan, status));
+            Assert.Throws<OperationNotAllowedException>(() => _state.HandleTenant(_loan, status));
         }
     }
 
@@ -104,7 +104,7 @@ public class PickupDeniedLoanStateTest : ALoanStateTest
         foreach (var status in disallowed)
         {
             // Act & Assert
-            Assert.Throws<ActionNotAllowedException>(() => _state.HandleOwner(_loan, status));
+            Assert.Throws<OperationNotAllowedException>(() => _state.HandleOwner(_loan, status));
         }
     }
 

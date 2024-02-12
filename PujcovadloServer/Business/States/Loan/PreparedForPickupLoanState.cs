@@ -19,7 +19,7 @@ public class PreparedForPickupLoanState : ALoanState
                 MakeLoanActive(loan);
                 break;
             default:
-                throw new ActionNotAllowedException(
+                throw new OperationNotAllowedException(
                     $"Cannot change loan status from {loan.Status} to {newStatus} as a tenant.");
         }
     }
@@ -34,7 +34,7 @@ public class PreparedForPickupLoanState : ALoanState
                 loan.Status = newStatus;
                 break;
             default:
-                throw new ActionNotAllowedException(
+                throw new OperationNotAllowedException(
                     $"Cannot change loan status from {loan.Status} to {newStatus} as an owner.");
         }
     }
@@ -43,12 +43,12 @@ public class PreparedForPickupLoanState : ALoanState
     /// Realizes transition from PreparedForPickup status to Active status.
     /// </summary>
     /// <param name="loan">Loan to be updated.</param>
-    /// <exception cref="ActionNotAllowedException">Thrown when there is no pickup protocol.</exception>
+    /// <exception cref="OperationNotAllowedException">Thrown when there is no pickup protocol.</exception>
     private void MakeLoanActive(Entities.Loan loan)
     {
         // Check if pickup protocol exists (it should exist)
         if (loan.PickupProtocol == null)
-            throw new ActionNotAllowedException("Cannot change loan status to active without pickup protocol.");
+            throw new OperationNotAllowedException("Cannot change loan status to active without pickup protocol.");
 
         // Update the status of the loan
         loan.Status = LoanStatus.Active;

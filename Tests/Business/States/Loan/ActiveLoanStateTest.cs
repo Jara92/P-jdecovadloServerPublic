@@ -20,7 +20,7 @@ public class ActiveLoanStateTest : ALoanStateTest
         {
             _status
         };
-        
+
         // Check all allowed statuses
         foreach (var status in allowed)
         {
@@ -53,7 +53,7 @@ public class ActiveLoanStateTest : ALoanStateTest
         foreach (var status in disallowed)
         {
             // Act & Assert
-            Assert.Throws<ActionNotAllowedException>(() => _state.HandleTenant(_loan, status));
+            Assert.Throws<OperationNotAllowedException>(() => _state.HandleTenant(_loan, status));
         }
     }
 
@@ -103,7 +103,7 @@ public class ActiveLoanStateTest : ALoanStateTest
         foreach (var status in disallowed)
         {
             // Act & Assert
-            Assert.Throws<ActionNotAllowedException>(() => _state.HandleOwner(_loan, status));
+            Assert.Throws<OperationNotAllowedException>(() => _state.HandleOwner(_loan, status));
         }
     }
 

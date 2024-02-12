@@ -1,12 +1,10 @@
 using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
 using NuGet.Packaging;
 using PujcovadloServer.Authentication.Exceptions;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Enums;
 using PujcovadloServer.Business.Exceptions;
 using PujcovadloServer.Business.Filters;
-using PujcovadloServer.Business.Interfaces;
 using PujcovadloServer.Business.Services;
 using PujcovadloServer.Business.Services.Interfaces;
 using PujcovadloServer.Helpers;
@@ -26,7 +24,8 @@ public class ItemFacade
     private readonly IMapper _mapper;
     private readonly PujcovadloServerConfiguration _configuration;
 
-    public ItemFacade(ImageFacade imageFacade, ItemService itemService, LoanService loanService, ItemCategoryService itemCategoryService,
+    public ItemFacade(ImageFacade imageFacade, ItemService itemService, LoanService loanService,
+        ItemCategoryService itemCategoryService,
         ItemTagService itemTagService, IAuthenticateService authenticateService, IMapper mapper,
         PujcovadloServerConfiguration configuration)
     {
@@ -60,11 +59,11 @@ public class ItemFacade
         // New categories
         var ids = request.Categories.Select(c => c.Id);
         var categories = await _itemCategoryService.GetByIds(ids);
-        
+
         // Update categories
         item.Categories.Clear();
         item.Categories.AddRange(categories);
-        
+
         // new tags
         var tags = await _itemTagService.GetOrCreate(request.Tags.Select(t => t.Name).ToList());
 
@@ -114,18 +113,18 @@ public class ItemFacade
 
     public async Task DeleteItem(Item item)
     {
-        if(!await CanDelete(item))
-            throw new InvalidOperationException("Item cannot be deleted because there are running loans.");
+        if (!await CanDelete(item))
+            throw new OperationNotAllowedException("Item cannot be deleted because there are running loans.");
 
         // Delete the item
         await _itemService.Delete(item);
     }
-    
+
     public async Task<bool> CanDelete(Item item)
     {
         // Check if the item has any running loans
         var runningLoans = await _loanService.GetRunningLoansCountByItem(item);
-        
+
         // Return true if there are no running loans
         return runningLoans == 0;
     }
@@ -161,13 +160,13 @@ public class ItemFacade
         // Return item
         return item;
     }
-    
+
     public async Task AddImage(Item item, Image image, string filePath)
     {
         // Check that the item has not reached the maximum number of images
         if (item.Images.Count >= _configuration.MaxImagesPerItem)
             throw new ArgumentException("Max images per item exceeded.");
-        
+
         // set images item
         image.Item = item;
 

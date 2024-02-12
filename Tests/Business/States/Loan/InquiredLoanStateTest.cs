@@ -51,7 +51,7 @@ public class InquiredLoanStateTest : ALoanStateTest
         foreach (var status in disallowed)
         {
             // Act & Assert
-            Assert.Throws<ActionNotAllowedException>(() => _state.HandleTenant(_loan, status));
+            Assert.Throws<OperationNotAllowedException>(() => _state.HandleTenant(_loan, status));
         }
     }
 
@@ -101,7 +101,7 @@ public class InquiredLoanStateTest : ALoanStateTest
         foreach (var status in disallowed)
         {
             // Act & Assert
-            Assert.Throws<ActionNotAllowedException>(() => _state.HandleOwner(_loan, status));
+            Assert.Throws<OperationNotAllowedException>(() => _state.HandleOwner(_loan, status));
         }
     }
 

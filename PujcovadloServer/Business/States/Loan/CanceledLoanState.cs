@@ -9,7 +9,7 @@ public class CanceledLoanState : ALoanState
     protected override void HandleTenantImplementation(Entities.Loan loan, LoanStatus newStatus)
     {
         // Tenant can do nothing now
-        throw new ActionNotAllowedException(
+        throw new OperationNotAllowedException(
             $"Cannot change loan status from {loan.Status} to {newStatus} as a tenant.");
     }
 
@@ -17,7 +17,7 @@ public class CanceledLoanState : ALoanState
     protected override void HandleOwnerImplementation(Entities.Loan loan, LoanStatus newStatus)
     {
         // Owner can do nothing now
-        throw new ActionNotAllowedException(
+        throw new OperationNotAllowedException(
             $"Cannot change loan status from {loan.Status} to {newStatus} as an owner.");
     }
 }

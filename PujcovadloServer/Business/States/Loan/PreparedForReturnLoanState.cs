@@ -16,7 +16,7 @@ public class PreparedForReturnLoanState : ALoanState
                 loan.Status = newStatus;
                 break;
             default:
-                throw new ActionNotAllowedException(
+                throw new OperationNotAllowedException(
                     $"Cannot change loan status from {loan.Status} to {newStatus} as a tenant.");
         }
     }
@@ -25,7 +25,7 @@ public class PreparedForReturnLoanState : ALoanState
     protected override void HandleOwnerImplementation(Entities.Loan loan, LoanStatus newStatus)
     {
         // owner can do nothing now
-        throw new ActionNotAllowedException(
+        throw new OperationNotAllowedException(
             $"Cannot change loan status from {loan.Status} to {newStatus} as an owner.");
     }
 }

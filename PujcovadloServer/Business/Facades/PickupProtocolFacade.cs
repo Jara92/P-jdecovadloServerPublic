@@ -29,7 +29,7 @@ public class PickupProtocolFacade
     /// <param name="loan">Protocols loan.</param>
     /// <param name="request">Protocol request data.</param>
     /// <returns>Returns newly created pickup protocol</returns>
-    /// <exception cref="ActionNotAllowedException">Thrown if pickup protocol is not allowed to be created.</exception>
+    /// <exception cref="OperationNotAllowedException">Thrown if pickup protocol is not allowed to be created.</exception>
     public async Task<PickupProtocol> CreatePickupProtocol(Loan loan, PickupProtocolRequest request)
     {
         // Check if the loan is in the correct status
@@ -39,7 +39,7 @@ public class PickupProtocolFacade
 
         // Check if the protocol already exists
         if (loan.PickupProtocol != null)
-            throw new ActionNotAllowedException("Pickup protocol already exists.");
+            throw new OperationNotAllowedException("Pickup protocol already exists.");
 
         // Create protocol
         var protocol = _mapper.Map<PickupProtocol>(request);
@@ -56,12 +56,12 @@ public class PickupProtocolFacade
     /// </summary>
     /// <param name="protocol">Pickup protocol to update.</param>
     /// <param name="request">New data</param>
-    /// <exception cref="ActionNotAllowedException">Thrown if the action cannot be performed.</exception>
+    /// <exception cref="OperationNotAllowedException">Thrown if the action cannot be performed.</exception>
     public async Task UpdatePickupProtocol(PickupProtocol protocol, PickupProtocolRequest request)
     {
         // Check if the protocol can be updated
         if (protocol.Loan.Status != LoanStatus.PickupDenied)
-            throw new ActionNotAllowedException("Pickup protocol can be updated only if the loan pickup is denied.");
+            throw new OperationNotAllowedException("Pickup protocol can be updated only if the loan pickup is denied.");
 
         // Update protocol data
         protocol.Description = request.Description;
@@ -78,7 +78,7 @@ public class PickupProtocolFacade
 
         // Check loan status
         if (pickupProtocol.Loan.Status != LoanStatus.Accepted && pickupProtocol.Loan.Status != LoanStatus.PickupDenied)
-            throw new ActionNotAllowedException(
+            throw new OperationNotAllowedException(
                 "Images can be added only if the loan is accepted or pickup is denied.");
 
         // set images pickupProtocol

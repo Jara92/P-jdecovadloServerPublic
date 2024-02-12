@@ -45,7 +45,7 @@ public class PrepareForPickupLoanStateTest : ALoanStateTest
         _loan.PickupProtocol = null;
 
         // Act - OperationNotAllowedException is thrown
-        Assert.Throws<ActionNotAllowedException>(() => _state.HandleTenant(_loan, LoanStatus.Active));
+        Assert.Throws<OperationNotAllowedException>(() => _state.HandleTenant(_loan, LoanStatus.Active));
         // Make sure the status is not changed
         Assert.That(_loan.Status, Is.EqualTo(_status));
         // Make sure the protocol is not set
@@ -82,7 +82,7 @@ public class PrepareForPickupLoanStateTest : ALoanStateTest
         foreach (var status in disallowed)
         {
             // Act & Assert
-            Assert.Throws<ActionNotAllowedException>(() => _state.HandleTenant(_loan, status));
+            Assert.Throws<OperationNotAllowedException>(() => _state.HandleTenant(_loan, status));
         }
     }
 
@@ -131,7 +131,7 @@ public class PrepareForPickupLoanStateTest : ALoanStateTest
         foreach (var status in disallowed)
         {
             // Act & Assert
-            Assert.Throws<ActionNotAllowedException>(() => _state.HandleOwner(_loan, status));
+            Assert.Throws<OperationNotAllowedException>(() => _state.HandleOwner(_loan, status));
         }
     }
 

@@ -15,7 +15,7 @@ public class AcceptedLoanState : ALoanState
                 loan.Status = newStatus;
                 break;
             default:
-                throw new ActionNotAllowedException(
+                throw new OperationNotAllowedException(
                     $"Cannot change loan status from {loan.Status} to {newStatus} as a tenant.");
         }
     }
@@ -34,14 +34,14 @@ public class AcceptedLoanState : ALoanState
             case LoanStatus.PreparedForPickup:
                 // Pickup protocol is required for changing the status to PreparedForPickup
                 if (loan.PickupProtocol == null)
-                    throw new ActionNotAllowedException(
+                    throw new OperationNotAllowedException(
                         $"Cannot change loan status from {loan.Status} to {newStatus} as an owner without a pickup protocol.");
 
                 // Update the status
                 loan.Status = newStatus;
                 break;
             default:
-                throw new ActionNotAllowedException(
+                throw new OperationNotAllowedException(
                     $"Cannot change loan status from {loan.Status} to {newStatus} as an owner.");
         }
     }
