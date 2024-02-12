@@ -1,6 +1,5 @@
 using AutoMapper;
 using NuGet.Packaging;
-using PujcovadloServer.Authentication.Exceptions;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Enums;
 using PujcovadloServer.Business.Exceptions;
@@ -53,6 +52,7 @@ public class ItemFacade
 
         // update prices
         item.PricePerDay = request.PricePerDay;
+        item.RefundableDeposit = request.RefundableDeposit;
         item.PurchasePrice = request.PurchasePrice;
         item.SellingPrice = request.SellingPrice;
 
@@ -81,10 +81,9 @@ public class ItemFacade
     public async Task<Item> CreateItem(ItemRequest request)
     {
         var user = await _authenticateService.GetCurrentUser();
-        if (user == null) throw new NotAuthenticatedException("User not found.");
 
         // Fill request data
-        Item item = new();
+        var item = new Item();
         await FillItemRequest(item, request);
 
         // Set initial status
@@ -132,8 +131,6 @@ public class ItemFacade
     public async Task<PaginatedList<Item>> GetMyItems(ItemFilter filter)
     {
         var user = await _authenticateService.GetCurrentUser();
-
-        if (user == null) throw new NotAuthenticatedException("User not found.");
 
         // Set owner id
         filter.OwnerId = user.Id;

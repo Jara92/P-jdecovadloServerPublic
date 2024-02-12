@@ -12,11 +12,11 @@ public class ItemTagService(IItemTagRepository repository)
         return await repository.GetByName(name);
     }
 
-    public async Task<ItemTag> GetOrCreate(string name)
+    public virtual async Task<ItemTag> GetOrCreate(string name)
     {
         // get tag by name
         var tag = await GetByName(name);
-        
+
         // Create a new tag if it does not exist
         if (tag == null)
         {
@@ -26,11 +26,11 @@ public class ItemTagService(IItemTagRepository repository)
 
         return tag;
     }
-    
-    public async Task<List<ItemTag>> GetOrCreate(List<string> names)
+
+    public virtual async Task<List<ItemTag>> GetOrCreate(List<string> names)
     {
         //var tags = await Task.WhenAll(names.Select(async tagName => await GetOrCreate(tagName)));
-        
+
         var tags = new List<ItemTag>();
         foreach (var name in names)
         {

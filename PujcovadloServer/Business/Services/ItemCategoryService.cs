@@ -9,8 +9,8 @@ public class ItemCategoryService : ACrudService<ItemCategory, IItemCategoryRepos
     public ItemCategoryService(IItemCategoryRepository repository) : base(repository)
     {
     }
-    
-    public async Task<IList<ItemCategory>> GetByIds(IEnumerable<int> ids)
+
+    public virtual async Task<IList<ItemCategory>> GetByIds(IEnumerable<int> ids)
     {
         return await _repository.GetByIds(ids);
     }
