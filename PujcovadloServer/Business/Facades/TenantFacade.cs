@@ -38,24 +38,6 @@ public class TenantFacade
         return loans;
     }
 
-    public async Task<Loan> GetMyLoan(int id)
-    {
-        // TODO: Move this method to the LoanFacade
-        // Get current user
-        var user = await _authenticateService.GetCurrentUser();
-
-        // Get the loan
-        var loan = await _loanService.Get(id);
-
-        // Check that the loan exists
-        if (loan == null) throw new EntityNotFoundException();
-
-        // Check that the user is the tenant
-        if (loan.Tenant.Id != user.Id) throw new ForbiddenAccessException("You are not the tenant of this loan.");
-
-        return loan;
-    }
-
     private void PreCreateCheck(Loan loan)
     {
         // Check if the item is public

@@ -1,5 +1,4 @@
 using AutoMapper;
-using PujcovadloServer.AuthorizationHandlers.Exceptions;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Enums;
 using PujcovadloServer.Business.Exceptions;
@@ -43,24 +42,6 @@ public class OwnerFacade
         var loans = await _loanService.GetLoansByOwner(user, filter);
 
         return loans;
-    }
-
-    public async Task<Loan> GetMyLoan(int id)
-    {
-        // TODO: Move this method to the LoanFacade
-        // Get current user
-        var userId = _authenticateService.GetCurrentUserId();
-
-        // Get the loan
-        var loan = await _loanService.Get(id);
-
-        // Check that the loan exists
-        if (loan == null) throw new EntityNotFoundException();
-
-        // Check that the user is the tenant
-        if (loan.Item.Owner.Id != userId) throw new ForbiddenAccessException("You are not the owner of this loan.");
-
-        return loan;
     }
 
     public async Task UpdateMyLoan(Loan loan, OwnerLoanRequest request)

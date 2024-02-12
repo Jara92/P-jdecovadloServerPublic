@@ -19,14 +19,17 @@ namespace PujcovadloServer.Api.Controllers;
 [ServiceFilter(typeof(ExceptionFilter))]
 public class OwnerLoanController : ACrudController<Loan>
 {
+    private readonly LoanFacade _loanFacade;
     private readonly OwnerFacade _ownerFacade;
     private readonly LoanResponseGenerator _loanResponseGenerator;
     private readonly IMapper _mapper;
 
-    public OwnerLoanController(OwnerFacade loanFacade, LoanResponseGenerator loanResponseGenerator, LinkGenerator urlHelper, IMapper mapper,
+    public OwnerLoanController(LoanFacade loanFacade, OwnerFacade ownerFacade,
+        LoanResponseGenerator loanResponseGenerator, LinkGenerator urlHelper, IMapper mapper,
         AuthorizationService authorizationService) : base(authorizationService, urlHelper)
     {
-        _ownerFacade = loanFacade;
+        _loanFacade = loanFacade;
+        _ownerFacade = ownerFacade;
         _loanResponseGenerator = loanResponseGenerator;
         _mapper = mapper;
     }
@@ -40,25 +43,10 @@ public class OwnerLoanController : ACrudController<Loan>
         var loans = await _ownerFacade.GetMyLoans(filter);
 
         // Generate response list
-        var responseLoans = await _loanResponseGenerator.GenerateResponseList(loans, filter, nameof(GetLoans), "OwnerLoan");
+        var responseLoans =
+            await _loanResponseGenerator.GenerateResponseList(loans, filter, nameof(GetLoans), "OwnerLoan");
 
         return Ok(responseLoans);
-    }
-
-    [HttpGet("{id}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<LoanResponse>> GetLoan(int id)
-    {
-        var loan = await _ownerFacade.GetMyLoan(id);
-
-        await _authorizationService.CheckPermissions(loan, LoanAuthorizationHandler.Operations.Read);
-        
-        // generate response
-        var responseLoan = await _loanResponseGenerator.GenerateLoanDetailResponse(loan);
-
-        return Ok(responseLoan);
     }
 
     [HttpPut("{id}")]
@@ -69,10 +57,10 @@ public class OwnerLoanController : ACrudController<Loan>
     [ValidateIdFilter]
     public async Task<ActionResult<LoanResponse>> UpdateLoan(int id, [FromBody] OwnerLoanRequest request)
     {
-        var loan = await _ownerFacade.GetMyLoan(id);
+        var loan = await _loanFacade.GetLoan(id);
 
         await _authorizationService.CheckPermissions(loan, LoanAuthorizationHandler.Operations.Update);
-        
+
         await _ownerFacade.UpdateMyLoan(loan, request);
 
         return Ok();

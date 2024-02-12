@@ -19,15 +19,18 @@ namespace PujcovadloServer.Api.Controllers;
 [ServiceFilter(typeof(ExceptionFilter))]
 public class TenantLoanController : ACrudController<Loan>
 {
+    private readonly LoanFacade _loanFacade;
     private readonly TenantFacade _tenantFacade;
     private readonly LoanResponseGenerator _responseGenerator;
     private readonly IMapper _mapper;
 
-    public TenantLoanController(TenantFacade loanFacade, LoanResponseGenerator responseGenerator,
+    public TenantLoanController(LoanFacade loanFacade, TenantFacade tenantFacade,
+        LoanResponseGenerator responseGenerator,
         LinkGenerator urlHelper, IMapper mapper,
         AuthorizationService authorizationService) : base(authorizationService, urlHelper)
     {
-        _tenantFacade = loanFacade;
+        _loanFacade = loanFacade;
+        _tenantFacade = tenantFacade;
         _responseGenerator = responseGenerator;
         _mapper = mapper;
     }
@@ -45,22 +48,6 @@ public class TenantLoanController : ACrudController<Loan>
         return Ok(response);
     }
 
-    [HttpGet("{id}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<LoanResponse>> GetLoan(int id)
-    {
-        var loan = await _tenantFacade.GetMyLoan(id);
-
-        await _authorizationService.CheckPermissions(loan, LoanAuthorizationHandler.Operations.Read);
-
-        // Generate response
-        var response = await _responseGenerator.GenerateLoanDetailResponse(loan);
-
-        return Ok(response);
-    }
-
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -70,12 +57,12 @@ public class TenantLoanController : ACrudController<Loan>
             LoanAuthorizationHandler.Operations.Create);
 
         var loan = await _tenantFacade.CreateLoan(request);
-        
+
         // Generate response
         var response = await _responseGenerator.GenerateLoanDetailResponse(loan);
 
         // Created response with location header
-        return CreatedAtAction(_urlHelper.GetUriByAction(HttpContext, nameof(GetLoan), values: loan.Id), response);
+        return CreatedAtAction(_responseGenerator.GetLink(loan), response);
     }
 
     [HttpPut("{id}")]
@@ -86,7 +73,7 @@ public class TenantLoanController : ACrudController<Loan>
     [ValidateIdFilter]
     public async Task<ActionResult<LoanResponse>> UpdateLoan(int id, [FromBody] TenantLoanRequest request)
     {
-        var loan = await _tenantFacade.GetMyLoan(id);
+        var loan = await _loanFacade.GetLoan(id);
 
         await _authorizationService.CheckPermissions(loan, LoanAuthorizationHandler.Operations.Update);
 

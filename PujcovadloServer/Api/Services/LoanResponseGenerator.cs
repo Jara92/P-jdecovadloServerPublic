@@ -33,21 +33,8 @@ public class LoanResponseGenerator : ABaseResponseGenerator
     {
         var response = _mapper.Map<LoanResponse>(loan);
 
-        // Add links for the owner
-        if (await _authorizationService.CanPerformOperation(loan, LoanAuthorizationHandler.Operations.IsOwner))
-        {
-            // Link to loan detail
-            response.Links.Add(new LinkResponse(
-                _urlHelper.GetUriByAction(_httpContext, nameof(OwnerLoanController.GetLoan), "OwnerLoan",
-                    values: new { loan.Id }), "SELF", "GET"));
-        }
-        else
-        {
-            // Link to loan detail
-            response.Links.Add(new LinkResponse(
-                _urlHelper.GetUriByAction(_httpContext, nameof(TenantLoanController.GetLoan), "TenantLoan",
-                    values: new { loan.Id }), "SELF", "GET"));
-        }
+        // Add link to detail
+        response.Links.Add(new LinkResponse(GetLink(loan), "SELF", "GET"));
 
         AddCommonLinks(response, loan);
 
@@ -76,6 +63,8 @@ public class LoanResponseGenerator : ABaseResponseGenerator
         response.Links.Add(new LinkResponse(
             _urlHelper.GetUriByAction(_httpContext, nameof(ItemController.Get), "Item",
                 values: new { loan.Item.Id }), "ITEM", "GET"));
+
+        // TODO: Add update link
     }
 
     /// <summary>
@@ -139,5 +128,10 @@ public class LoanResponseGenerator : ABaseResponseGenerator
         }
 
         return response;
+    }
+
+    public string? GetLink(Loan loan)
+    {
+        return _urlHelper.GetUriByAction(_httpContext, nameof(LoanController.GetLoan), "Loan", values: loan.Id);
     }
 }

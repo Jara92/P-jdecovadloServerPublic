@@ -2,8 +2,6 @@ using AutoMapper;
 using PujcovadloServer.Api.Controllers;
 using PujcovadloServer.AuthorizationHandlers;
 using PujcovadloServer.Business.Entities;
-using PujcovadloServer.Business.Filters;
-using PujcovadloServer.Lib;
 using PujcovadloServer.Responses;
 
 namespace PujcovadloServer.Api.Services;
@@ -32,21 +30,11 @@ public class PickupProtocolResponseGenerator : ABaseResponseGenerator
     public async Task<PickupProtocolResponse> GeneratePickupProtocolDetailResponse(PickupProtocol protocol)
     {
         var response = _mapper.Map<PickupProtocolResponse>(protocol);
-        
-        // Link to loan for the owner
-        if (await _authorizationService.CanPerformOperation(protocol.Loan, LoanAuthorizationHandler.Operations.IsOwner))
-        {
-            response.Links.Add(new LinkResponse(
-                _urlHelper.GetUriByAction(_httpContext, nameof(OwnerLoanController.GetLoan), "OwnerLoan",
-                    values: new { protocol.Loan.Id }), "LOAN", "GET"));
-        }
-        // Link to loan or the tenant.
-        else
-        {
-            response.Links.Add(new LinkResponse(
-                _urlHelper.GetUriByAction(_httpContext, nameof(TenantLoanController.GetLoan), "TenantLoan",
-                    values: new { protocol.Loan.Id }), "LOAN", "GET"));
-        }
+
+        // Link to loan
+        response.Links.Add(new LinkResponse(
+            _urlHelper.GetUriByAction(_httpContext, nameof(LoanController.GetLoan), "Loan",
+                values: new { protocol.Loan.Id }), "LOAN", "GET"));
 
         // Add update link if user has permission
         if (await _authorizationService.CanPerformOperation(protocol,
@@ -56,7 +44,7 @@ public class PickupProtocolResponseGenerator : ABaseResponseGenerator
                 _urlHelper.GetUriByAction(_httpContext, nameof(PickupProtocolController.UpdateProtocol),
                     "PickupProtocol", values: new { protocol.Id }), "UPDATE", "PUT"));
         }
-        
+
         // todo: add images link
 
         // todo: add link for creating a new image?
