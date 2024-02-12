@@ -15,19 +15,17 @@ namespace PujcovadloServer.Api.Controllers;
 public class PickupProtocolImageController : ACrudController<Image>
 {
     private readonly LoanFacade _loanFacade;
-    private readonly OwnerFacade _ownerFacade;
-    private readonly ImageFacade _imageFacade;
+    private readonly PickupProtocolFacade _pickupProtocolFacade;
     private readonly ImageResponseGenerator _responseGenerator;
     private readonly IMapper _mapper;
     private readonly FileUploadService _fileUploadService;
 
-    public PickupProtocolImageController(LoanFacade loanFacade, OwnerFacade ownerFacade, ImageFacade imageFacade,
+    public PickupProtocolImageController(LoanFacade loanFacade, PickupProtocolFacade pickupProtocolFacade,
         ImageResponseGenerator responseGenerator, IMapper mapper, AuthorizationService authorizationService,
         LinkGenerator urlHelper, FileUploadService fileUploadService) : base(authorizationService, urlHelper)
     {
         _loanFacade = loanFacade;
-        _ownerFacade = ownerFacade;
-        _imageFacade = imageFacade;
+        _pickupProtocolFacade = pickupProtocolFacade;
         _responseGenerator = responseGenerator;
         _mapper = mapper;
         _fileUploadService = fileUploadService;
@@ -109,7 +107,7 @@ public class PickupProtocolImageController : ACrudController<Image>
         await _authorizationService.CheckPermissions(image, ImageAuthorizationHandler.Operations.Create);
 
         // Save the image to the database
-        await _ownerFacade.AddPickupProtocolImage(pickupProtocol, image, filePath);
+        await _pickupProtocolFacade.AddPickupProtocolImage(pickupProtocol, image, filePath);
 
         // Map the image to response
         var response = await _responseGenerator.GenerateImageDetailResponse(image);

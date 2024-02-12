@@ -20,17 +20,17 @@ namespace PujcovadloServer.Api.Controllers;
 public class PickupProtocolController : ACrudController<PickupProtocol>
 {
     private readonly LoanFacade _loanFacade;
-    private readonly OwnerFacade _ownerFacade;
+    private readonly PickupProtocolFacade _pickupProtocolFacade;
     private readonly PickupProtocolResponseGenerator _responseGenerator;
     private readonly IMapper _mapper;
 
-    public PickupProtocolController(LoanFacade loanFacade, OwnerFacade ownerFacade,
+    public PickupProtocolController(LoanFacade loanFacade, PickupProtocolFacade pickupProtocolFacade,
         PickupProtocolResponseGenerator responseGenerator,
         AuthorizationService authorizationService,
         LinkGenerator urlHelper, IMapper mapper) : base(authorizationService, urlHelper)
     {
         _loanFacade = loanFacade;
-        _ownerFacade = ownerFacade;
+        _pickupProtocolFacade = pickupProtocolFacade;
         _responseGenerator = responseGenerator;
         _mapper = mapper;
     }
@@ -91,7 +91,7 @@ public class PickupProtocolController : ACrudController<PickupProtocol>
             var protocol = _loanFacade.GetPickupProtocol(loan);
             await _authorizationService.CheckPermissions(protocol,
                 PickupProtocolAuthorizationHandler.Operations.Update);
-            await _ownerFacade.UpdatePickupProtocol(protocol, request);
+            await _pickupProtocolFacade.UpdatePickupProtocol(protocol, request);
 
             return NoContent();
         }
@@ -100,7 +100,7 @@ public class PickupProtocolController : ACrudController<PickupProtocol>
         {
             await _authorizationService.CheckPermissions(loan,
                 LoanAuthorizationHandler.Operations.CreatePickupProtocol);
-            var protocol = await _ownerFacade.CreatePickupProtocol(loan, request);
+            var protocol = await _pickupProtocolFacade.CreatePickupProtocol(loan, request);
 
             // generate response
             var response = await _responseGenerator.GeneratePickupProtocolDetailResponse(protocol);

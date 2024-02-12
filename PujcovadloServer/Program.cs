@@ -143,6 +143,7 @@ builder.Services.AddScoped<ImageFacade>();
 builder.Services.AddScoped<LoanFacade>();
 builder.Services.AddScoped<TenantFacade>();
 builder.Services.AddScoped<OwnerFacade>();
+builder.Services.AddScoped<PickupProtocolFacade>();
 
 // Filters
 builder.Services.AddScoped<ExceptionFilter>();
