@@ -22,7 +22,7 @@ public class ImageFacade
         _configuration = configuration;
     }
 
-    public async Task<Image> Create(Image image, string filePath)
+    public virtual async Task<Image> Create(Image image, string filePath)
     {
         var user = await _authenticateService.GetCurrentUser();
 

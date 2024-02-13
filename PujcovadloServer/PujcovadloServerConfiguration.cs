@@ -23,7 +23,7 @@ public class PujcovadloServerConfiguration
     /// <summary>
     /// Maximum images which can be associated with an item.
     /// </summary>
-    public int MaxImagesPerItem => _configuration.GetValue<int>("Business:MaxImagesPerItem");
+    public virtual int MaxImagesPerItem => _configuration.GetValue<int>("Business:MaxImagesPerItem");
 
     /// <summary>
     /// Maximum images which can be associated with a pickup protocol.

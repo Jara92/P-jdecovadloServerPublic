@@ -10,9 +10,8 @@ namespace PujcovadloServer.Business.Services;
 
 public class LoanService : ACrudService<Loan, ILoanRepository, LoanFilter>
 {
-    
     private readonly LoanStateFactory _loanStateFactory;
-    
+
     public LoanService(ILoanRepository repository, LoanStateFactory loanStateFactory) : base(repository)
     {
         _loanStateFactory = loanStateFactory;
@@ -23,7 +22,7 @@ public class LoanService : ACrudService<Loan, ILoanRepository, LoanFilter>
         filter.TenantId = user.Id;
         return await _repository.GetAll(filter);
     }
-    
+
     public virtual ILoanState GetState(Loan loan)
     {
         return _loanStateFactory.GetState(loan.Status);
@@ -34,8 +33,8 @@ public class LoanService : ACrudService<Loan, ILoanRepository, LoanFilter>
         filter.OwnerId = user.Id;
         return await _repository.GetAll(filter);
     }
-    
-    public async Task<int> GetRunningLoansCountByItem(Item item)
+
+    public virtual async Task<int> GetRunningLoansCountByItem(Item item)
     {
         return await _repository.GetRunningLoansCountByItem(item);
     }
