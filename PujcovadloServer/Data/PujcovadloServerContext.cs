@@ -16,13 +16,15 @@ namespace PujcovadloServer.Data
         public DbSet<Item> Item { get; set; } = default!;
         public DbSet<ItemCategory> ItemCategory { get; set; } = default!;
         public DbSet<Loan> Loan { get; set; } = default!;
-       // public DbSet<User> User { get; set; } = default!;
-       
-       public DbSet<ItemTag> ItemTag { get; set; } = default!;
-       
-       public DbSet<Image> Image { get; set; } = default!;
-       
-       public DbSet<PickupProtocol> PickupProtocol { get; set; } = default!;
+        // public DbSet<User> User { get; set; } = default!;
+
+        public DbSet<ItemTag> ItemTag { get; set; } = default!;
+
+        public DbSet<Image> Image { get; set; } = default!;
+
+        public DbSet<PickupProtocol> PickupProtocol { get; set; } = default!;
+
+        public DbSet<ReturnProtocol> ReturnProtocol { get; set; } = default!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -30,26 +32,37 @@ namespace PujcovadloServer.Data
             /*modelBuilder.Entity<Item>()
                 .HasMany<ItemCategory>(i => i.Categories)
                 .WithMany(c => c.Items);*/
-            
+
             // Make tags name unique
             modelBuilder.Entity<ItemTag>()
                 .HasIndex(u => u.Name)
                 .IsUnique();
-            
+
             // Add Loan.PickupProtocolId foreign key
             modelBuilder.Entity<Loan>()
                 .HasOne<PickupProtocol>(l => l.PickupProtocol)
                 .WithOne(p => p.Loan)
                 .HasForeignKey<Loan>(p => p.PickupProtocolId);
 
+            // Add Loan.ReturnProtocolId foreign key
+            modelBuilder.Entity<Loan>()
+                .HasOne<ReturnProtocol>(l => l.ReturnProtocol)
+                .WithOne(p => p.Loan)
+                .HasForeignKey<Loan>(p => p.ReturnProtocolId);
+
             // Add Image.PickupProtocolId foreign key
             modelBuilder.Entity<Image>()
                 .HasOne<PickupProtocol>(i => i.PickupProtocol)
                 .WithMany(p => p.Images);
-            
+
+            // Add Image.ReturnProtocolId foreign key
+            modelBuilder.Entity<Image>()
+                .HasOne<ReturnProtocol>(i => i.ReturnProtocol)
+                .WithMany(p => p.Images);
+
             base.OnModelCreating(modelBuilder);
         }
-        
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             // Lazy loading related data

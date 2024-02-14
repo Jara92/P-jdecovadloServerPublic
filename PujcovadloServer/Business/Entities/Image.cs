@@ -16,16 +16,18 @@ public class Image : BaseEntity
     [Column(TypeName = "VARCHAR")]
     [StringLength(256, MinimumLength = 1)]
     public string Path { get; set; } = default!;
-    
+
     public string Extension { get; set; } = default!;
-    
+
     public string MimeType { get; set; } = default!;
 
     public virtual ApplicationUser Owner { get; set; } = default!;
 
     public virtual Item? Item { get; set; }
-    
+
     public virtual PickupProtocol? PickupProtocol { get; set; }
+
+    public virtual ReturnProtocol? ReturnProtocol { get; set; }
 
     [ReadOnly(true)] public DateTime CreatedAt { get; set; } = DateTime.Now;
 }

@@ -31,6 +31,11 @@ public class PujcovadloServerConfiguration
     public int MaxImagesPerPickupProtocol => _configuration.GetValue<int>("Business:MaxImagesPerPickupProtocol");
 
     /// <summary>
+    /// Maximum images which can be associated with a return protocol.
+    /// </summary>
+    public int MaxImagesPerReturnProtocol => _configuration.GetValue<int>("Business:MaxImagesPerReturnProtocol");
+
+    /// <summary>
     /// Allowed file extensions which are accepted when uploading an image.
     /// </summary>
     public string[] AllowedImageExtensions =>

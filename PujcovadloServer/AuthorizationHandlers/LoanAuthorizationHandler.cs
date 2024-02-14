@@ -56,6 +56,14 @@ public class LoanAuthorizationHandler : BaseCrudAuthorizationHandler<OperationAu
                 }
 
                 break;
+            case nameof(Operations.CreateReturnProtocol):
+                // Only the owner can create the protocol
+                if (loan.Item.Owner.Id == userId)
+                {
+                    context.Succeed(requirement);
+                }
+
+                break;
             case nameof(Operations.IsOwner):
                 // I am the owner
                 // TODO: check options for reusing the this requirement inside other requirements
@@ -90,8 +98,8 @@ public class LoanAuthorizationHandler : BaseCrudAuthorizationHandler<OperationAu
         public static OperationAuthorizationRequirement CreatePickupProtocol = new OperationAuthorizationRequirement
             { Name = nameof(CreatePickupProtocol) };
 
-        /*public static OperationAuthorizationRequirement CreateReturnProtocol = new OperationAuthorizationRequirement
-            { Name = nameof(CreateReturnProtocol) };*/
+        public static OperationAuthorizationRequirement CreateReturnProtocol = new OperationAuthorizationRequirement
+            { Name = nameof(CreateReturnProtocol) };
 
         public static OperationAuthorizationRequirement IsOwner = new OperationAuthorizationRequirement
             { Name = nameof(IsOwner) };

@@ -1,3 +1,4 @@
+using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Enums;
 using PujcovadloServer.Business.Exceptions;
 
@@ -68,7 +69,6 @@ public class ActiveLoanStateTest : ALoanStateTest
         var allowed = new List<LoanStatus>
         {
             _status,
-            LoanStatus.PreparedForReturn,
             LoanStatus.Returned
         };
 
@@ -83,6 +83,44 @@ public class ActiveLoanStateTest : ALoanStateTest
             // Should be able to change the status
             Assert.That(_loan.Status, Is.EqualTo(status));
         }
+    }
+
+    [Test]
+    public void HandleOwner_ChangeStatusToPreparedForReturnButNoReturnProtocolSet_ThrowsException()
+    {
+        // Arrange
+        _loan.Status = _status;
+        _loan.ReturnProtocol = null;
+
+        // Act
+        Assert.Throws<OperationNotAllowedException>(() => _state.HandleOwner(_loan, LoanStatus.PreparedForReturn));
+
+        // Check that the status was not changed
+        Assert.That(_loan.Status, Is.EqualTo(_status));
+
+        // Check that Return protocol is still null
+        Assert.That(_loan.ReturnProtocol, Is.Null);
+    }
+
+    [Test]
+    public void HandleOwner_ChangeStatusToPreparedForReturnWhenReturnProtocolIsSet_Succeeds()
+    {
+        // Arrange
+        _loan.Status = _status;
+        var returnProtocol = new ReturnProtocol { Id = 1, Description = "descipriotn" };
+        _loan.ReturnProtocol = returnProtocol;
+
+        // Act
+        _state.HandleOwner(_loan, LoanStatus.PreparedForReturn);
+
+        // Check that the status was changed
+        Assert.That(_loan.Status, Is.EqualTo(LoanStatus.PreparedForReturn));
+
+        // Check that Return protocol is still set
+        Assert.That(_loan.ReturnProtocol, Is.EqualTo(returnProtocol));
+
+        // Check that Return protocol is not signed
+        Assert.That(_loan.ReturnProtocol.ConfirmedAt, Is.Null);
     }
 
     [Test]

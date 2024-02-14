@@ -32,12 +32,9 @@ public class ImageResponseGenerator : ABaseResponseGenerator
         var response = _mapper.Map<ImageResponse>(image);
 
         // Add link to the image using ItemImageController
-        if (image.Item != null)
-        {
-            response.Links.Add(new LinkResponse(
-                _urlHelper.GetUriByAction(_httpContext, nameof(ImageController.GetImage), "Image",
-                    values: new { id = image.Id }), "SELF", "GET"));
-        }
+        response.Links.Add(new LinkResponse(
+            _urlHelper.GetUriByAction(_httpContext, nameof(ImageController.GetImage), "Image",
+                values: new { id = image.Id }), "SELF", "GET"));
 
         AddCommonLinks(response, image);
 
@@ -75,6 +72,14 @@ public class ImageResponseGenerator : ABaseResponseGenerator
             response.Links.Add(new LinkResponse(
                 _urlHelper.GetUriByAction(_httpContext, nameof(PickupProtocolController.GetProtocol), "PickupProtocol",
                     values: new { loanId = image.PickupProtocol.Loan.Id }), "PICKUP_PROTOCOL", "GET"));
+        }
+
+        // Return protocol
+        if (image.ReturnProtocol != null)
+        {
+            response.Links.Add(new LinkResponse(
+                _urlHelper.GetUriByAction(_httpContext, nameof(ReturnProtocolController.GetProtocol), "ReturnProtocol",
+                    values: new { loanId = image.ReturnProtocol.Loan.Id }), "RETURN_PROTOCOL", "GET"));
         }
     }
 
