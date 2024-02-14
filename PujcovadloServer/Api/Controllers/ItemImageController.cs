@@ -88,7 +88,7 @@ public class ItemImageController : ACrudController<Image>
             Item = item
         };
 
-        await _authorizationService.CheckPermissions(image, ItemAuthorizationHandler.Operations.Create);
+        await _authorizationService.CheckPermissions(item, ImageAuthorizationHandler.Operations.Create);
 
         // Save the image to the database
         await _itemFacade.AddImage(item, image, filePath);
