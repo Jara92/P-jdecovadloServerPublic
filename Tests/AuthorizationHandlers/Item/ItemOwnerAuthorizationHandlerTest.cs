@@ -146,8 +146,8 @@ public class ItemOwnerAuthorizationHandlerTest
         // act
         await _authorizationHandler.HandleAsync(context);
 
-        // assert - Event the owner cannot create a new item using this handler
-        That(context.HasSucceeded, Is.False);
+        // assert - Owner can create an item
+        That(context.HasSucceeded, Is.True);
     }
 
     #endregion

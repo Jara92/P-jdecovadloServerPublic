@@ -19,6 +19,18 @@ public class
         OperationAuthorizationRequirement requirement,
         Business.Entities.Item resource)
     {
+        if (!context.User.IsInRole(UserRoles.Owner))
+        {
+            return;
+        }
+
+        // user is owner so he can create an item
+        if (requirement.Name == ItemOperations.Constants.CreateOperationName)
+        {
+            context.Succeed(requirement);
+            return;
+        }
+
         var userId = _authenticateService.TryGetCurrentUserId();
 
         // user not authenticated or not owner
