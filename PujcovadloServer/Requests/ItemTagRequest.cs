@@ -5,6 +5,6 @@ namespace PujcovadloServer.Requests;
 public class ItemTagRequest : EntityRequest
 {
     [Required]
-    [MaxLength(20)]
+    [StringLength(20, MinimumLength = 4)]
     public string Name { get; set; } = null!;
 }

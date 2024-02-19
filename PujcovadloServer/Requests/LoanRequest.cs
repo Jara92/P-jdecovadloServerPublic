@@ -15,7 +15,7 @@ public class LoanRequest : EntityRequest
     [LoanDateTimeRange]
     public DateTime? To { get; set; } = default!;
 
-    public string? TenantNote { get; set; }
+    [StringLength(256, MinimumLength = 0)] public string? TenantNote { get; set; }
 
-    [Required] public ItemRequest Item { get; set; } = default!;
+    [Required] public int ItemId { get; set; }
 }

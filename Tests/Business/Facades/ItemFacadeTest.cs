@@ -102,14 +102,8 @@ public class ItemFacadeTest
             PurchasePrice = 1000,
             SellingPrice = 2000,
             RefundableDeposit = 1000,
-            Categories = new List<ItemCategoryRequest>()
-            {
-                new() { Id = 1 }
-            },
-            Tags = new List<ItemTagRequest>()
-            {
-                new() { Name = "Tag" }
-            }
+            Categories = new List<int> { 1 },
+            Tags = new List<string> { "Tag" }
         };
 
         // Builde expected item
@@ -172,16 +166,8 @@ public class ItemFacadeTest
             PurchasePrice = 2000,
             SellingPrice = 4000,
             RefundableDeposit = 2000,
-            Categories = new List<ItemCategoryRequest>()
-            {
-                new() { Id = 1 },
-                new() { Id = 2 },
-            },
-            Tags = new List<ItemTagRequest>()
-            {
-                new() { Name = "Tag" },
-                new() { Name = "Tag2" },
-            }
+            Categories = new List<int> { 1, 2 },
+            Tags = new List<string> { "Tag", "Tag2" }
         };
 
         // Old item

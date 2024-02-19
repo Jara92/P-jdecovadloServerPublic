@@ -27,7 +27,7 @@ public class ItemTagService(IItemTagRepository repository)
         return tag;
     }
 
-    public virtual async Task<List<ItemTag>> GetOrCreate(List<string> names)
+    public virtual async Task<List<ItemTag>> GetOrCreate(IEnumerable<string> names)
     {
         //var tags = await Task.WhenAll(names.Select(async tagName => await GetOrCreate(tagName)));
 

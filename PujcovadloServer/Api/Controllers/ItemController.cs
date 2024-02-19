@@ -175,7 +175,7 @@ public class ItemController : ACrudController<Item>
         await _authorizationService.CheckPermissions(item, ItemOperations.Read);
 
         // Get categories
-        // TODO: user response generator instead.
+        // TODO: user response generator instead but not paginated.
         var categoriesResponse = _mapper.Map<List<ItemCategoryResponse>>(item.Categories);
 
         return Ok(categoriesResponse);

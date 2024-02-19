@@ -69,15 +69,14 @@ public class ItemFacade
         item.SellingPrice = request.SellingPrice;
 
         // New categories
-        var ids = request.Categories.Select(c => c.Id);
-        var categories = await _itemCategoryService.GetByIds(ids);
+        var categories = await _itemCategoryService.GetByIds(request.Categories);
 
         // Update categories
         item.Categories.Clear();
         item.Categories.AddRange(categories);
 
         // new tags
-        var tags = await _itemTagService.GetOrCreate(request.Tags.Select(t => t.Name).ToList());
+        var tags = await _itemTagService.GetOrCreate(request.Tags);
 
         // Update tags
         item.Tags.Clear();

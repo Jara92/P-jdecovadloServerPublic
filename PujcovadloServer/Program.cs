@@ -119,7 +119,6 @@ builder.Services.AddScoped<IAuthenticateService, AuthenticateService>();
 // Authorization handlers
 builder.Services.AddScoped<IAuthorizationHandler, ItemAdminAuthorizationHandler>();
 builder.Services.AddScoped<IAuthorizationHandler, ItemOwnerAuthorizationHandler>();
-builder.Services.AddScoped<IAuthorizationHandler, ItemHasRoleOwnerAuthorizationHandler>();
 builder.Services.AddScoped<IAuthorizationHandler, ItemGuestAuthorizationHandler>();
 
 builder.Services.AddScoped<IAuthorizationHandler, ImageAdminAuthorizationHandler>();

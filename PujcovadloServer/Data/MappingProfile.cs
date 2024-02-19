@@ -13,7 +13,10 @@ public class MappingProfile : Profile
         CreateMap<Item, ItemResponse>();
         CreateMap<Item, ItemDetailResponse>();
         CreateMap<Item, ItemOwnerResponse>();
-        CreateMap<ItemRequest, Item>();
+        CreateMap<ItemRequest, Item>()
+            // Ignore categories and tags because they are handled separately
+            .ForMember(r => r.Categories, opt => opt.Ignore())
+            .ForMember(r => r.Tags, opt => opt.Ignore());
 
         CreateMap<ItemCategory, ItemCategoryResponse>();
         CreateMap<ItemCategoryRequest, ItemCategory>();
@@ -26,7 +29,9 @@ public class MappingProfile : Profile
         CreateMap<ApplicationUser, UserResponse>();
 
         CreateMap<Loan, LoanResponse>();
-        CreateMap<LoanRequest, Loan>();
+        CreateMap<LoanRequest, Loan>()
+            // Ignore item because it need to be handled separately
+            .ForMember(r => r.Item, opt => opt.Ignore());
 
         CreateMap<PickupProtocol, PickupProtocolResponse>();
         CreateMap<PickupProtocolRequest, PickupProtocol>();

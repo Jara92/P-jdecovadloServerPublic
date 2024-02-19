@@ -1,27 +1,31 @@
 using System.ComponentModel.DataAnnotations;
+using PujcovadloServer.Api.Attributes;
 
 namespace PujcovadloServer.Requests;
 
-public class ItemRequest: EntityRequest
+public class ItemRequest : EntityRequest
 {
-    
+    [Required]
+    [StringLength(64, MinimumLength = 6)]
     public string Name { get; set; } = default!;
-    
+
+    [Required]
+    [StringLength(1024, MinimumLength = 0)]
     public string Description { get; set; } = default!;
-    
+
+    [Required]
+    [StringLength(256, MinimumLength = 0)]
     public string Parameters { get; set; } = "";
-    
-    public float PricePerDay { get; set; }
-    
-    public float? RefundableDeposit { get; set; }
-    
-    public float? SellingPrice { get; set; }
-    
-    public float? PurchasePrice { get; set; }
-    
-    [MaxLength(5)]
-    public virtual ICollection<ItemCategoryRequest> Categories { get; set; } = new List<ItemCategoryRequest>();
-    
-    [MaxLength(10)]
-    public virtual ICollection<ItemTagRequest> Tags { get; set; } = new List<ItemTagRequest>();
+
+    [Required] [Price(0, 1000000)] public float PricePerDay { get; set; }
+
+    [Price(0, 10000000)] public float? RefundableDeposit { get; set; }
+
+    [Price(0, 10000000)] public float? SellingPrice { get; set; }
+
+    [Price(0, 10000000)] public float? PurchasePrice { get; set; }
+
+    [MaxLength(5)] public virtual ICollection<int> Categories { get; set; } = new List<int>();
+
+    [MaxLength(10)] public virtual ICollection<string> Tags { get; set; } = new List<string>();
 }

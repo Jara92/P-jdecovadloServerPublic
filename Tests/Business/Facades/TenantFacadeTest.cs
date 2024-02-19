@@ -111,13 +111,13 @@ public class TenantFacadeTest
     public void CreateLoan_ItemNotFound_ThrowsException()
     {
         // Arrange
-        var request = new LoanRequest() { Item = new ItemRequest() { Id = 1 } };
+        var request = new LoanRequest() { ItemId = 1 };
 
         // Authentication service will return the user
         _authenticateService.Setup(o => o.GetCurrentUser()).ReturnsAsync(_user);
 
         // Item service will return null
-        _itemService.Setup(o => o.Get(request.Item.Id, true)).ReturnsAsync((Item)null);
+        _itemService.Setup(o => o.Get(request.ItemId, true)).ReturnsAsync((Item)null);
 
         // Must throw EntityNotFoundException because the item was not found
         Assert.ThrowsAsync<EntityNotFoundException>(async () => await _tenantFasade.CreateLoan(request));
@@ -126,7 +126,7 @@ public class TenantFacadeTest
         _authenticateService.Verify(o => o.GetCurrentUser(), Times.Once);
 
         // Verify that Get was called
-        _itemService.Verify(o => o.Get(request.Item.Id, true), Times.Once);
+        _itemService.Verify(o => o.Get(request.ItemId, true), Times.Once);
 
         // Verfiy that create was not called
         _loanService.Verify(l => l.Create(It.IsAny<Loan>()), Times.Never);
@@ -141,7 +141,7 @@ public class TenantFacadeTest
         // Simulate the request
         var request = new LoanRequest()
         {
-            Item = new ItemRequest { Id = 1 },
+            ItemId = 1,
             From = dateFrom,
             To = dateTo,
             TenantNote = "Note"
@@ -180,7 +180,7 @@ public class TenantFacadeTest
         _authenticateService.Setup(o => o.GetCurrentUser()).ReturnsAsync(_user);
 
         // Item service will return the item
-        _itemService.Setup(o => o.Get(request.Item.Id, true)).ReturnsAsync(item);
+        _itemService.Setup(o => o.Get(request.ItemId, true)).ReturnsAsync(item);
 
         // Mapper will map the request to loan
         _mapper.Setup(o => o.Map<Loan>(request)).Returns(mappedLoan);
@@ -195,7 +195,7 @@ public class TenantFacadeTest
         _authenticateService.Verify(o => o.GetCurrentUser(), Times.Once);
 
         // Verify that Get was called
-        _itemService.Verify(o => o.Get(request.Item.Id, true), Times.Once);
+        _itemService.Verify(o => o.Get(request.ItemId, true), Times.Once);
 
         // Verify that create was called
         _loanService.Verify(l => l.Create(mappedLoan), Times.Once);
@@ -221,7 +221,7 @@ public class TenantFacadeTest
         // Simulate the request
         var request = new LoanRequest()
         {
-            Item = new ItemRequest { Id = 1 },
+            ItemId = 1,
             From = dateFrom,
             To = dateTo,
             TenantNote = "Note"
@@ -261,7 +261,7 @@ public class TenantFacadeTest
         _authenticateService.Setup(o => o.GetCurrentUser()).ReturnsAsync(_user);
 
         // Item service will return the item
-        _itemService.Setup(o => o.Get(request.Item.Id, true)).ReturnsAsync(item);
+        _itemService.Setup(o => o.Get(request.ItemId, true)).ReturnsAsync(item);
 
         // Mapper will map the request to loan
         _mapper.Setup(o => o.Map<Loan>(request)).Returns(mappedLoan);
@@ -282,7 +282,7 @@ public class TenantFacadeTest
         // Simulate the request
         var request = new LoanRequest()
         {
-            Item = new ItemRequest { Id = 1 },
+            ItemId = 1,
             From = dateFrom,
             To = dateTo,
             TenantNote = "Note"
@@ -322,7 +322,7 @@ public class TenantFacadeTest
         _authenticateService.Setup(o => o.GetCurrentUser()).ReturnsAsync(_user);
 
         // Item service will return the item
-        _itemService.Setup(o => o.Get(request.Item.Id, true)).ReturnsAsync(item);
+        _itemService.Setup(o => o.Get(request.ItemId, true)).ReturnsAsync(item);
 
         // Mapper will map the request to loan
         _mapper.Setup(o => o.Map<Loan>(request)).Returns(mappedLoan);

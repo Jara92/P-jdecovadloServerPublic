@@ -11,8 +11,10 @@ public class LoanDateTimeRangeAttribute : ValidationAttribute
         return $"The {name} field is not valid.";
     }
 
-    protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+    protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
     {
+        if (value == null) return ValidationResult.Success;
+
         if (value is DateTime toDate && validationContext.ObjectInstance is LoanRequest request)
         {
             DateTime fromDate = request.From ?? DateTime.MinValue;
