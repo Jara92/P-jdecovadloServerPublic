@@ -9,7 +9,6 @@ using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Enums;
 using PujcovadloServer.Business.Facades;
 using PujcovadloServer.Business.Filters;
-using PujcovadloServer.Business.Services;
 using PujcovadloServer.Requests;
 using PujcovadloServer.Responses;
 
@@ -21,18 +20,21 @@ namespace PujcovadloServer.Api.Controllers;
 public class ItemController : ACrudController<Item>
 {
     private readonly IMapper _mapper;
-    private readonly ItemService _itemService;
     private readonly ItemFacade _itemFacade;
     private readonly ItemResponseGenerator _itemResponseGenerator;
+    private readonly ImageResponseGenerator _imageResponseGenerator;
+    private readonly FileUploadService _fileUploadService;
 
-    public ItemController(ItemFacade itemFacade, IMapper mapper, ItemService itemService, LinkGenerator urlHelper,
-        ItemResponseGenerator itemResponseGenerator, AuthorizationService authorizationService) : base(
+    public ItemController(ItemFacade itemFacade, IMapper mapper, LinkGenerator urlHelper,
+        ItemResponseGenerator itemResponseGenerator, ImageResponseGenerator imageResponseGenerator,
+        FileUploadService fileUploadService, AuthorizationService authorizationService) : base(
         authorizationService, urlHelper)
     {
         _itemFacade = itemFacade;
         _mapper = mapper;
-        _itemService = itemService;
         _itemResponseGenerator = itemResponseGenerator;
+        _imageResponseGenerator = imageResponseGenerator;
+        _fileUploadService = fileUploadService;
     }
 
     /// <summary>
@@ -48,11 +50,10 @@ public class ItemController : ACrudController<Item>
     public async Task<ActionResult<List<ItemResponse>>> Index([FromQuery] ItemFilter filter)
     {
         // Get items
-        var items = await _itemService.GetAll(filter);
+        var items = await _itemFacade.GetAll(filter);
 
         // get response list
         var response = await _itemResponseGenerator.GenerateResponseList(items, filter, nameof(Index), "Item");
-
 
         return Ok(response);
     }
@@ -180,24 +181,69 @@ public class ItemController : ACrudController<Item>
         return Ok(categoriesResponse);
     }
 
-    /*[HttpPut("{videoId:long}/Media/Subtitles/{culture}", Name = "AddVideoSubtitles")]
-    [ProducesResponseType(typeof(IEnumerable<MediaResponse>), (int)HttpStatusCode.OK)]
-    [ProducesResponseType(typeof(void), (int)HttpStatusCode.NotFound)]
-    [ProducesResponseType(typeof(void), (int)HttpStatusCode.Unauthorized)]
-    [ProducesResponseType(typeof(void), (int)HttpStatusCode.BadRequest)]
-    public async Task<Results<NotFound, Ok<IEnumerable<MediaResponse>>>> AddVideoSubtitles(long videoId, string culture, [FromForm]CreateSubtitleRequest createSubtitleRequest)
+    /// <summary>
+    /// Returns all images of the given item.
+    /// </summary>
+    /// <param name="id">Item id.</param>
+    /// <returns>All images associated with the item.</returns>
+    [HttpGet("{id}/images")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetImages(int id)
     {
-        var video = await _serviceManager.VideoService.Find(videoId);
-        var media = await _serviceManager.MediaService.CreateOrUpdateSubtitles(video, culture, createSubtitleRequest);
-        var allMedia = await _serviceManager.MediaService.FindAllByVideo(video.VideoId);
+        // get the item and check permissions
+        var item = await _itemFacade.GetItem(id);
 
-        var payload = new VideoMediaResponse
+        // Check permission for the item.
+        await _authorizationService.CheckPermissions(item, ItemOperations.Read);
+
+        // get the images and map them to response
+        var images = item.Images;
+
+        // generate response 
+        var response = await _imageResponseGenerator.GenerateResponseList(images);
+
+        return Ok(response);
+    }
+
+    /// <summary>
+    /// Creates new image for the given item.
+    /// </summary>
+    /// <param name="id">Item id.</param>
+    /// <param name="file">Image file.</param>
+    /// <returns>Newly create image.</returns>
+    /// <response code="201">Returns newly created image.</response>
+    /// <response code="400">If the request is not valid.</response>
+    /// <response code="403">If the user is not authorized to create the image.</response>
+    [HttpPost("{id}/images")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> AddImage(int id, IFormFile file)
+    {
+        // get the item and check permissions
+        var item = await _itemFacade.GetItem(id);
+
+        // Save the image to the file system
+        var filePath = await _fileUploadService.SaveUploadedImage(file);
+
+        // Create new image
+        var image = new Image()
         {
-            VideoId = video.VideoId,
-            Duration = video.Duration ?? 0,
-            Media = Mapper.Map<List<MediaResponse>>(allMedia)
+            Name = file.FileName,
+            Extension = _fileUploadService.GetFileExtension(file),
+            MimeType = _fileUploadService.GetMimeType(file),
+            Item = item
         };
-        await _webhookPublisher.PublishAsync(Webhook.VideoProcessed, payload, video.Site.SiteId);
-        return Ok(Mapper.Map<IEnumerable<MediaResponse>>(media));
-    }*/
+
+        await _authorizationService.CheckPermissions(item, ItemOperations.CreateImage);
+
+        // Save the image to the database
+        await _itemFacade.AddImage(item, image, filePath);
+
+        // Map the image to response
+        var response = await _imageResponseGenerator.GenerateImageDetailResponse(image);
+
+        return Created(_imageResponseGenerator.GetLink(image), response);
+    }
 }

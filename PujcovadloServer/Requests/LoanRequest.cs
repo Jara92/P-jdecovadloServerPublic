@@ -4,21 +4,18 @@ using PujcovadloServer.Business.Enums;
 
 namespace PujcovadloServer.Requests;
 
-public class TenantLoanRequest : EntityRequest
+public class LoanRequest : EntityRequest
 {
     public LoanStatus? Status { get; set; } = null!;
-    
+
+    [Required] [DataType(DataType.Date)] public DateTime? From { get; set; } = default!;
+
     [Required]
-    [DataType(DataType.Date)] 
-    public DateTime? From { get; set; } = default!;
-    
-    [Required]
-    [DataType(DataType.Date)] 
+    [DataType(DataType.Date)]
     [LoanDateTimeRange]
     public DateTime? To { get; set; } = default!;
 
     public string? TenantNote { get; set; }
 
-    [Required]
-    public ItemRequest Item { get; set; } = default!;
+    [Required] public ItemRequest Item { get; set; } = default!;
 }

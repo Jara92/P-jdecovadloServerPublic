@@ -17,32 +17,33 @@ public class ItemRepository : ACrudRepository<Item, ItemFilter>, IItemRepository
         _context = context;
         _dbSet = context.Item;
     }
-    
+
     public override async Task<PaginatedList<Item>> GetAll(ItemFilter filter)
     {
         var query = _dbSet.AsQueryable();
-        
+
         // Todo: dont show deleted items
-        
+
         // Filter by status
-        if(filter.Status != null)
+        if (filter.Status != null)
             query = query.Where(i => i.Status == filter.Status);
-        
+
         // Filter by category
-        if(filter.CategoryId != null)
+        if (filter.CategoryId != null)
             query = query.Where(i => i.Categories.Any(c => c.Id == filter.CategoryId));
-        
+
         // Search by name or description
-        if(filter.Search != null)
+        if (filter.Search != null)
             query = query.Where(i => i.Name.Contains(filter.Search) || i.Description.Contains(filter.Search));
-        
+
         // Search by owner
-        if(filter.OwnerId != null)
+        if (filter.OwnerId != null)
             query = query.Where(i => i.Owner.Id == filter.OwnerId);
 
         switch (filter.Sortby)
         {
             case "Id":
+            default:
                 query = filter.SortOrder == true ? query.OrderBy(i => i.Id) : query.OrderByDescending(i => i.Id);
                 break;
         }

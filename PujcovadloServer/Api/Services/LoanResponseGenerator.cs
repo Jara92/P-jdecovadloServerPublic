@@ -1,7 +1,6 @@
 using AutoMapper;
 using PujcovadloServer.Api.Controllers;
 using PujcovadloServer.AuthorizationHandlers;
-using PujcovadloServer.AuthorizationHandlers.Item;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Filters;
 using PujcovadloServer.Lib;
@@ -112,22 +111,10 @@ public class LoanResponseGenerator : ABaseResponseGenerator
 
         AddCommonLinks(response, loan);
 
-        // Add links for the owner
-        // TODO: remove this by merging the owner and tenant loans controllers
-        if (await _authorizationService.CanPerformOperation(loan, LoanOperations.CreatePickupProtocol))
-        {
-            // Link to my owner loans
-            response.Links.Add(new LinkResponse(
-                _urlHelper.GetUriByAction(_httpContext, nameof(OwnerLoanController.GetLoans), "OwnerLoan"),
-                "LIST", "GET"));
-        }
-        else
-        {
-            // Link to my tenant loans
-            response.Links.Add(new LinkResponse(
-                _urlHelper.GetUriByAction(_httpContext, nameof(TenantLoanController.GetLoans), "TenantLoan"),
-                "LIST", "GET"));
-        }
+        // Add link to all loans where the user participates
+        response.Links.Add(new LinkResponse(
+            _urlHelper.GetUriByAction(_httpContext, nameof(LoanController.GetLoans), "Loan"),
+            "LIST", "GET"));
 
         return response;
     }

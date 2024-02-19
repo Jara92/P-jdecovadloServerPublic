@@ -38,4 +38,9 @@ public class LoanService : ACrudService<Loan, ILoanRepository, LoanFilter>
     {
         return await _repository.GetRunningLoansCountByItem(item);
     }
+
+    public virtual async Task<PaginatedList<Loan>> GetLoansByUserId(string userId, LoanFilter filter)
+    {
+        return await _repository.GetAllByUserId(userId, filter);
+    }
 }

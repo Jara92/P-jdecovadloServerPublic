@@ -1,9 +1,7 @@
+using System.ComponentModel.DataAnnotations;
 using PujcovadloServer.Requests;
 
 namespace PujcovadloServer.Api.Attributes;
-
-using System;
-using System.ComponentModel.DataAnnotations;
 
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
 public class LoanDateTimeRangeAttribute : ValidationAttribute
@@ -15,7 +13,7 @@ public class LoanDateTimeRangeAttribute : ValidationAttribute
 
     protected override ValidationResult IsValid(object value, ValidationContext validationContext)
     {
-        if (value is DateTime toDate && validationContext.ObjectInstance is TenantLoanRequest request)
+        if (value is DateTime toDate && validationContext.ObjectInstance is LoanRequest request)
         {
             DateTime fromDate = request.From ?? DateTime.MinValue;
 

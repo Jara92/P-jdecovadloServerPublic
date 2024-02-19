@@ -98,7 +98,7 @@ public class TenantFacadeTest
 
         // Must throw NotAuthenticatedException because no user is authenticated
         Assert.ThrowsAsync<NotAuthenticatedException>(async () =>
-            await _tenantFasade.CreateLoan(new TenantLoanRequest()));
+            await _tenantFasade.CreateLoan(new LoanRequest()));
 
         // Verify that GetCurrentUser was called
         _authenticateService.Verify(o => o.GetCurrentUser(), Times.Once);
@@ -111,7 +111,7 @@ public class TenantFacadeTest
     public void CreateLoan_ItemNotFound_ThrowsException()
     {
         // Arrange
-        var request = new TenantLoanRequest() { Item = new ItemRequest() { Id = 1 } };
+        var request = new LoanRequest() { Item = new ItemRequest() { Id = 1 } };
 
         // Authentication service will return the user
         _authenticateService.Setup(o => o.GetCurrentUser()).ReturnsAsync(_user);
@@ -139,7 +139,7 @@ public class TenantFacadeTest
         var dateTo = dateFrom.AddDays(1);
 
         // Simulate the request
-        var request = new TenantLoanRequest()
+        var request = new LoanRequest()
         {
             Item = new ItemRequest { Id = 1 },
             From = dateFrom,
@@ -219,7 +219,7 @@ public class TenantFacadeTest
         var dateTo = dateFrom.AddDays(1);
 
         // Simulate the request
-        var request = new TenantLoanRequest()
+        var request = new LoanRequest()
         {
             Item = new ItemRequest { Id = 1 },
             From = dateFrom,
@@ -280,7 +280,7 @@ public class TenantFacadeTest
         var dateTo = dateFrom.AddDays(1);
 
         // Simulate the request
-        var request = new TenantLoanRequest()
+        var request = new LoanRequest()
         {
             Item = new ItemRequest { Id = 1 },
             From = dateFrom,
@@ -463,7 +463,7 @@ public class TenantFacadeTest
 
         // Must throw NotAuthenticatedException because no user is authenticated
         Assert.ThrowsAsync<NotAuthenticatedException>(async () =>
-            await _tenantFasade.UpdateMyLoan(new Loan(), new TenantLoanRequest()));
+            await _tenantFasade.UpdateMyLoan(new Loan(), new LoanRequest()));
 
         // Verify that GetCurrentUser was called
         _authenticateService.Verify(o => o.GetCurrentUser(), Times.Once);
@@ -483,7 +483,7 @@ public class TenantFacadeTest
 
         // Must throw ForbiddenAccessException because the user is not the tenant
         Assert.ThrowsAsync<ForbiddenAccessException>(async () =>
-            await _tenantFasade.UpdateMyLoan(loan, new TenantLoanRequest()));
+            await _tenantFasade.UpdateMyLoan(loan, new LoanRequest()));
 
         // Verify that GetCurrentUser was called
         _authenticateService.Verify(o => o.GetCurrentUser(), Times.Once);
@@ -498,7 +498,7 @@ public class TenantFacadeTest
         var loan = new Loan { Tenant = _user, Status = LoanStatus.Inquired };
 
         var newStatus = LoanStatus.Inquired;
-        var request = new TenantLoanRequest { Status = newStatus };
+        var request = new LoanRequest { Status = newStatus };
 
         var mockState = new Mock<ILoanState>();
 
@@ -533,7 +533,7 @@ public class TenantFacadeTest
         var loan = new Loan { Tenant = _user, Status = LoanStatus.Inquired };
 
         var newStatus = LoanStatus.Accepted;
-        var request = new TenantLoanRequest { Status = newStatus };
+        var request = new LoanRequest { Status = newStatus };
 
         // Mock the state so we can verify that the state change was called
         var mockState = new Mock<ILoanState>();
@@ -568,7 +568,7 @@ public class TenantFacadeTest
     {
         var loan = new Loan { Tenant = _user, Status = LoanStatus.Inquired };
 
-        var request = new TenantLoanRequest { };
+        var request = new LoanRequest { };
 
         // Mock the state so we can verify that the state change was called
         var mockState = new Mock<ILoanState>();
@@ -641,7 +641,7 @@ public class TenantFacadeTest
         };
 
         // Request with filled fields which are not allowed to be updated
-        var request = new TenantLoanRequest
+        var request = new LoanRequest
         {
             Id = 1,
             From = DateTime.Now.AddDays(5),

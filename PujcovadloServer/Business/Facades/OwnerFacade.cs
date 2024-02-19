@@ -21,7 +21,7 @@ public class OwnerFacade
         _configuration = configuration;
     }
 
-    public async Task<PaginatedList<Loan>> GetMyLoans(LoanFilter filter)
+    public virtual async Task<PaginatedList<Loan>> GetMyLoans(LoanFilter filter)
     {
         // Get current user
         var user = await _authenticateService.GetCurrentUser();
@@ -32,7 +32,7 @@ public class OwnerFacade
         return loans;
     }
 
-    public async Task UpdateMyLoan(Loan loan, OwnerLoanRequest request)
+    public virtual async Task UpdateMyLoan(Loan loan, LoanRequest request)
     {
         // Check if the status has been changed
         if (request.Status != null)

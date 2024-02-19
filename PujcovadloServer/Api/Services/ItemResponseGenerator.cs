@@ -3,6 +3,7 @@ using PujcovadloServer.Api.Controllers;
 using PujcovadloServer.AuthorizationHandlers;
 using PujcovadloServer.AuthorizationHandlers.Item;
 using PujcovadloServer.Business.Entities;
+using PujcovadloServer.Business.Facades;
 using PujcovadloServer.Business.Filters;
 using PujcovadloServer.Lib;
 using PujcovadloServer.Responses;
@@ -15,12 +16,15 @@ namespace PujcovadloServer.Api.Services;
 /// </summary>
 public class ItemResponseGenerator : ABaseResponseGenerator
 {
+    private readonly ItemFacade _itemFacade;
     private readonly IMapper _mapper;
 
-    public ItemResponseGenerator(IMapper mapper, LinkGenerator urlHelper, IHttpContextAccessor httpContextAccessor,
+    public ItemResponseGenerator(ItemFacade itemFacade, IMapper mapper, LinkGenerator urlHelper,
+        IHttpContextAccessor httpContextAccessor,
         AuthorizationService authorizationService) :
         base(httpContextAccessor, urlHelper, authorizationService)
     {
+        _itemFacade = itemFacade;
         _mapper = mapper;
     }
 
@@ -30,24 +34,14 @@ public class ItemResponseGenerator : ABaseResponseGenerator
     /// <param name="item">Item to be converted to a response</param>
     /// <param name="owner">Is the response meant for the owner? </param>
     /// <returns>ItemResponse which represents the Item.</returns>
-    private async Task<ItemResponse> GenerateSingleItemResponse(Item item, bool owner = false)
+    private async Task<ItemResponse> GenerateSingleItemResponse(Item item)
     {
         var response = _mapper.Map<ItemResponse>(item);
 
-        // Link to item detail - it is different for the owner.
-        if (owner)
-        {
-            response.Links.Add(new LinkResponse(
-                _urlHelper.GetUriByAction(_httpContext, nameof(MyItemController.Get), "MyItem",
-                    values: new { item.Id }), "SELF", "GET"));
-        }
-        else
-        {
-            response.Links.Add(new LinkResponse(
-                _urlHelper.GetUriByAction(_httpContext, nameof(ItemController.Get), "Item", values: new { item.Id }),
-                "SELF", "GET"));
-        }
-
+        // Link to item detail
+        response.Links.Add(new LinkResponse(
+            _urlHelper.GetUriByAction(_httpContext, nameof(ItemController.Get), "Item", values: new { item.Id }),
+            "SELF", "GET"));
 
         // item delete action if has permission
         if (await _authorizationService.CanPerformOperation(item, ItemOperations.Delete))
@@ -104,14 +98,14 @@ public class ItemResponseGenerator : ABaseResponseGenerator
     /// <param name="owner">Is the response meant for the owner? </param>
     /// <returns></returns>
     public async Task<ResponseList<ItemResponse>> GenerateResponseList(PaginatedList<Item> items, ItemFilter filter,
-        string action, string controller, bool owner = false)
+        string action, string controller)
     {
         // Create empty list
         var responseItems = new List<ItemResponse>();
 
         foreach (var item in items)
         {
-            responseItems.Add(await GenerateSingleItemResponse(item, owner));
+            responseItems.Add(await GenerateSingleItemResponse(item));
         }
 
         // Init links with pagination links
@@ -160,7 +154,7 @@ public class ItemResponseGenerator : ABaseResponseGenerator
 
         // Add links for owner
         response.Links.Add(new LinkResponse(
-            _urlHelper.GetUriByAction(_httpContext, nameof(MyItemController.Index), "MyItem"), "LIST", "GET"));
+            _urlHelper.GetUriByAction(_httpContext, nameof(ItemController.Index), "Item"), "LIST", "GET"));
 
         // item update action if has permission
         if (await _authorizationService.CanPerformOperation(item, ItemOperations.Update))
@@ -171,7 +165,8 @@ public class ItemResponseGenerator : ABaseResponseGenerator
         }
 
         // item delete action if has permission
-        if (await _authorizationService.CanPerformOperation(item, ItemOperations.Delete))
+        if (await _authorizationService.CanPerformOperation(item, ItemOperations.Delete) &&
+            await _itemFacade.CanDelete(item))
         {
             response.Links.Add(new LinkResponse(
                 _urlHelper.GetUriByAction(_httpContext, nameof(ItemController.Delete), "Item",

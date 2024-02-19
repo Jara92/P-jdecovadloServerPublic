@@ -27,7 +27,7 @@ public class TenantFacade
         _mapper = mapper;
     }
 
-    public async Task<PaginatedList<Loan>> GetMyLoans(LoanFilter filter)
+    public virtual async Task<PaginatedList<Loan>> GetMyLoans(LoanFilter filter)
     {
         // Get current user
         var user = await _authenticateService.GetCurrentUser();
@@ -50,7 +50,7 @@ public class TenantFacade
     }
 
 
-    public async Task<Loan> CreateLoan(TenantLoanRequest request)
+    public async Task<Loan> CreateLoan(LoanRequest request)
     {
         // Get current user
         var user = await _authenticateService.GetCurrentUser();
@@ -104,7 +104,7 @@ public class TenantFacade
         return loan.Days * loan.PricePerDay;
     }
 
-    public async Task UpdateMyLoan(Loan loan, TenantLoanRequest request)
+    public virtual async Task UpdateMyLoan(Loan loan, LoanRequest request)
     {
         // Get current user
         var user = await _authenticateService.GetCurrentUser();

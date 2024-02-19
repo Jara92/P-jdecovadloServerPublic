@@ -51,9 +51,6 @@ public class OwnerFacadeTest
         };
     }
 
-    #region GetMyLoan
-
-    #endregion
 
     #region UpdateMyLoan
 
@@ -62,7 +59,7 @@ public class OwnerFacadeTest
     {
         // Arrange
         _loan.Status = LoanStatus.Accepted;
-        var request = new OwnerLoanRequest() { Id = 10, Status = LoanStatus.Active };
+        var request = new LoanRequest() { Id = 10, Status = LoanStatus.Active };
         var stateMock = new Mock<AcceptedLoanState>();
 
         // Arrange
@@ -86,7 +83,7 @@ public class OwnerFacadeTest
     {
         // Arrange
         _loan.Status = LoanStatus.Accepted;
-        var request = new OwnerLoanRequest() { Id = 10, Status = LoanStatus.Accepted };
+        var request = new LoanRequest() { Id = 10, Status = LoanStatus.Accepted };
         var stateMock = new Mock<AcceptedLoanState>();
 
         // Arrange
@@ -110,7 +107,7 @@ public class OwnerFacadeTest
     {
         // Arrange
         _loan.Status = LoanStatus.Accepted;
-        var request = new OwnerLoanRequest() { Id = 10 };
+        var request = new LoanRequest() { Id = 10 };
         var stateMock = new Mock<AcceptedLoanState>();
 
         // Run the operation
@@ -143,7 +140,7 @@ public class OwnerFacadeTest
 
         // Arrange
         _loan.Status = LoanStatus.Accepted;
-        var request = new OwnerLoanRequest() { Id = 10 };
+        var request = new LoanRequest() { Id = 10 };
         var stateMock = new Mock<AcceptedLoanState>();
 
         // Run the operation

@@ -38,6 +38,18 @@ public class ItemFacade
         _configuration = configuration;
     }
 
+    public Task<PaginatedList<Item>> GetAll(ItemFilter filter)
+    {
+        var userId = _authenticateService.TryGetCurrentUserId();
+
+        // If user is not authenticated and filters only is items
+        if (userId != null && filter.OwnerId == userId)
+            return _itemService.GetAll(filter);
+
+        // User not or not filtering his own items
+        return _itemService.GetAllPublic(filter);
+    }
+
     /// <summary>
     /// Fill request data to the item.
     /// </summary>
