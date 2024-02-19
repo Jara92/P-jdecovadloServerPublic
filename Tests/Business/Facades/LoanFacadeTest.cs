@@ -376,7 +376,7 @@ public class LoanFacadeTest
     public void UpdateMyLoan_UserNotAuthenticated_ThrowsException()
     {
         // Arrange
-        var request = new LoanRequest() { Id = 10, Status = LoanStatus.Active };
+        var request = new LoanUpdateRequest { Id = 10, Status = LoanStatus.Active };
 
         // Arrange
         _authenticateService.Setup(x => x.GetCurrentUserId()).Throws(new NotAuthenticatedException());
@@ -394,7 +394,7 @@ public class LoanFacadeTest
     public async Task UpdateMyLoan_UserIsTheOwner_CallsOwnerFacadeUpdate()
     {
         // Arrange
-        var request = new LoanRequest() { Id = 10, Status = LoanStatus.Active };
+        var request = new LoanUpdateRequest { Id = 10, Status = LoanStatus.Active };
 
         // Arrange
         _authenticateService.Setup(x => x.GetCurrentUserId()).Returns(_owner.Id);
@@ -413,7 +413,7 @@ public class LoanFacadeTest
     public async Task UpdateMyLoan_UserIsTheTenant_CallsTenantFacadeUpdate()
     {
         // Arrange
-        var request = new LoanRequest() { Id = 10, Status = LoanStatus.Active };
+        var request = new LoanUpdateRequest { Id = 10, Status = LoanStatus.Active };
 
         // Arrange
         _authenticateService.Setup(x => x.GetCurrentUserId()).Returns(_tenant.Id);

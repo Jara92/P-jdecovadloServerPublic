@@ -50,7 +50,7 @@ public class LoanController : ACrudController<Loan>
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ValidateIdFilter]
-    public async Task<ActionResult<LoanResponse>> UpdateLoan(int id, [FromBody] LoanRequest request)
+    public async Task<ActionResult<LoanResponse>> UpdateLoan(int id, [FromBody] LoanUpdateRequest request)
     {
         var loan = await _loanFacade.GetLoan(id);
 

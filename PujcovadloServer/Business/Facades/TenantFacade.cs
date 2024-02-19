@@ -104,7 +104,7 @@ public class TenantFacade
         return loan.Days * loan.PricePerDay;
     }
 
-    public virtual async Task UpdateMyLoan(Loan loan, LoanRequest request)
+    public virtual async Task UpdateMyLoan(Loan loan, LoanUpdateRequest request)
     {
         // Get current user
         var user = await _authenticateService.GetCurrentUser();

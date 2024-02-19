@@ -463,7 +463,7 @@ public class TenantFacadeTest
 
         // Must throw NotAuthenticatedException because no user is authenticated
         Assert.ThrowsAsync<NotAuthenticatedException>(async () =>
-            await _tenantFasade.UpdateMyLoan(new Loan(), new LoanRequest()));
+            await _tenantFasade.UpdateMyLoan(new Loan(), new LoanUpdateRequest()));
 
         // Verify that GetCurrentUser was called
         _authenticateService.Verify(o => o.GetCurrentUser(), Times.Once);
@@ -483,7 +483,7 @@ public class TenantFacadeTest
 
         // Must throw ForbiddenAccessException because the user is not the tenant
         Assert.ThrowsAsync<ForbiddenAccessException>(async () =>
-            await _tenantFasade.UpdateMyLoan(loan, new LoanRequest()));
+            await _tenantFasade.UpdateMyLoan(loan, new LoanUpdateRequest()));
 
         // Verify that GetCurrentUser was called
         _authenticateService.Verify(o => o.GetCurrentUser(), Times.Once);
@@ -498,7 +498,7 @@ public class TenantFacadeTest
         var loan = new Loan { Tenant = _user, Status = LoanStatus.Inquired };
 
         var newStatus = LoanStatus.Inquired;
-        var request = new LoanRequest { Status = newStatus };
+        var request = new LoanUpdateRequest { Status = newStatus };
 
         var mockState = new Mock<ILoanState>();
 
@@ -533,7 +533,7 @@ public class TenantFacadeTest
         var loan = new Loan { Tenant = _user, Status = LoanStatus.Inquired };
 
         var newStatus = LoanStatus.Accepted;
-        var request = new LoanRequest { Status = newStatus };
+        var request = new LoanUpdateRequest { Status = newStatus };
 
         // Mock the state so we can verify that the state change was called
         var mockState = new Mock<ILoanState>();
@@ -568,7 +568,7 @@ public class TenantFacadeTest
     {
         var loan = new Loan { Tenant = _user, Status = LoanStatus.Inquired };
 
-        var request = new LoanRequest { };
+        var request = new LoanUpdateRequest { };
 
         // Mock the state so we can verify that the state change was called
         var mockState = new Mock<ILoanState>();
@@ -641,12 +641,12 @@ public class TenantFacadeTest
         };
 
         // Request with filled fields which are not allowed to be updated
-        var request = new LoanRequest
+        var request = new LoanUpdateRequest
         {
             Id = 1,
-            From = DateTime.Now.AddDays(5),
+            /*From = DateTime.Now.AddDays(5),
             To = DateTime.Now.AddDays(10),
-            Item = new ItemRequest { Id = 2 }
+            Item = new ItemRequest { Id = 2 }*/
         };
 
         // Authentication service will return the user

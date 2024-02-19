@@ -32,7 +32,7 @@ public class OwnerFacade
         return loans;
     }
 
-    public virtual async Task UpdateMyLoan(Loan loan, LoanRequest request)
+    public virtual async Task UpdateMyLoan(Loan loan, LoanUpdateRequest request)
     {
         // Check if the status has been changed
         if (request.Status != null)

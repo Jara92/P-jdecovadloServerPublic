@@ -52,7 +52,7 @@ public class LoanFacade
         return loan;
     }
 
-    public Task UpdateLoan(Loan loan, LoanRequest request)
+    public Task UpdateLoan(Loan loan, LoanUpdateRequest request)
     {
         var userId = _authenticateService.GetCurrentUserId();
 
