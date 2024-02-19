@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using PujcovadloServer.Api.Filters;
 using PujcovadloServer.Api.Services;
 using PujcovadloServer.AuthorizationHandlers;
+using PujcovadloServer.AuthorizationHandlers.Item;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Facades;
 using PujcovadloServer.Requests;
@@ -34,7 +35,7 @@ public class LoanController : ACrudController<Loan>
     {
         var loan = await _loanFacade.GetLoan(id);
 
-        await _authorizationService.CheckPermissions(loan, LoanAuthorizationHandler.Operations.Read);
+        await _authorizationService.CheckPermissions(loan, LoanOperations.Read);
 
         // Generate response
         var response = await _responseGenerator.GenerateLoanDetailResponse(loan);
@@ -48,7 +49,7 @@ public class LoanController : ACrudController<Loan>
     public async Task<ActionResult<LoanResponse>> CreateLoan([FromBody] TenantLoanRequest request)
     {
         await _authorizationService.CheckPermissions(new Loan(),
-            LoanAuthorizationHandler.Operations.Create);
+            LoanOperations.Create);
 
         var loan = await _tenantFacade.CreateLoan(request);
 

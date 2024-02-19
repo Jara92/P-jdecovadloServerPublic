@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PujcovadloServer.Api.Filters;
 using PujcovadloServer.AuthorizationHandlers;
+using PujcovadloServer.AuthorizationHandlers.Image;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Facades;
 
@@ -39,7 +40,7 @@ public class ImageDataController : ACrudController<Image>
         // Find the image by filename
         var image = await _imageFacade.GetImage(filename);
 
-        await _authorizationService.CheckPermissions(image, ImageAuthorizationHandler.Operations.Read);
+        await _authorizationService.CheckPermissions(image, ImageOperations.Read);
 
         // Get the image bytes
         var imageBytes = await _imageFacade.GetImageBytes(image);

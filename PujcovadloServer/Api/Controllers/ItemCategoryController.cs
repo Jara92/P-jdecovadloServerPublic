@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using PujcovadloServer.Api.Filters;
 using PujcovadloServer.Api.Services;
 using PujcovadloServer.AuthorizationHandlers;
+using PujcovadloServer.AuthorizationHandlers.Item;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Facades;
 using PujcovadloServer.Business.Filters;
@@ -73,7 +74,7 @@ public class ItemCategoryController : ACrudController<ItemCategory>
         // Get the category
         var category = await _itemCategoryFacade.Get(id);
 
-        await _authorizationService.CheckPermissions(category, ItemCategoryAuthorizationHandler.Operations.Read);
+        await _authorizationService.CheckPermissions(category, ItemCategoryOperations.Read);
 
         // Generate response
         var categoryResponse = await _categoryResponseGenerator.GenerateItemCategoryDetailResponse(category);

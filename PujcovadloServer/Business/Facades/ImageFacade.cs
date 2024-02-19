@@ -110,9 +110,31 @@ public class ImageFacade
         return image;
     }
 
+    public async Task<bool> CanDeleteImage(Image image)
+    {
+        // Image is associated with a pickup protocol and it is confirmed
+        if (image.PickupProtocol != null && image.PickupProtocol.ConfirmedAt != null)
+        {
+            return false;
+        }
+
+        // Image is associated with a return protocol and it is confirmed
+        if (image.ReturnProtocol != null && image.ReturnProtocol.ConfirmedAt != null)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
     public async Task DeleteImage(int itemId, int imageId)
     {
         var image = await GetImage(itemId, imageId);
+
+        if (!await CanDeleteImage(image))
+        {
+            throw new InvalidOperationException("Image cannot be deleted.");
+        }
 
         await DeleteImage(image);
     }

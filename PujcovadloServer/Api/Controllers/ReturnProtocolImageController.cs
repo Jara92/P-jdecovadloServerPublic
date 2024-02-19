@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using PujcovadloServer.Api.Filters;
 using PujcovadloServer.Api.Services;
 using PujcovadloServer.AuthorizationHandlers;
+using PujcovadloServer.AuthorizationHandlers.Item;
+using PujcovadloServer.AuthorizationHandlers.ReturnProtocol;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Facades;
 
@@ -46,15 +48,15 @@ public class ReturnProtocolImageController : ACrudController<Image>
         // get the item and check permissions
         var loan = await _loanFacade.GetLoan(loanId);
 
-        // Check permission for the item.
-        await _authorizationService.CheckPermissions(loan, ItemAuthorizationHandler.Operations.Read);
+        // Check permission for the loan.
+        await _authorizationService.CheckPermissions(loan, LoanOperations.Read);
 
         // get return protocol instance
         var returnProtocol = _returnProtocolFacade.GetReturnProtocol(loan);
 
         // Check permissions for the return protocol
         await _authorizationService.CheckPermissions(returnProtocol,
-            ReturnProtocolAuthorizationHandler.Operations.Read);
+            ReturnProtocolOperations.Read);
 
         // get the images and map them to response
         var images = returnProtocol.Images;
@@ -83,14 +85,14 @@ public class ReturnProtocolImageController : ACrudController<Image>
         var loan = await _loanFacade.GetLoan(loanId);
 
         // Verify that the user can read the loan data
-        await _authorizationService.CheckPermissions(loan, LoanAuthorizationHandler.Operations.Read);
+        await _authorizationService.CheckPermissions(loan, LoanOperations.Read);
 
         // get return protocol instance
         var returnProtocol = _returnProtocolFacade.GetReturnProtocol(loan);
 
         // Check permissions for creating images of the return protocol
         await _authorizationService.CheckPermissions(returnProtocol,
-            ReturnProtocolAuthorizationHandler.Operations.Update);
+            ReturnProtocolOperations.Update);
 
         // Save the image to the file system
         var filePath = await _fileUploadService.SaveUploadedImage(file);
@@ -104,7 +106,8 @@ public class ReturnProtocolImageController : ACrudController<Image>
             ReturnProtocol = returnProtocol
         };
 
-        await _authorizationService.CheckPermissions(image, ImageAuthorizationHandler.Operations.Create);
+        // TODO
+        //await _authorizationService.CheckPermissions(image, ReturnProtocolOperations.CreateImage);
 
         // Save the image to the database
         await _returnProtocolFacade.AddReturnProtocolImage(returnProtocol, image, filePath);

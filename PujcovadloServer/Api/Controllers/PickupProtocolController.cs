@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using PujcovadloServer.Api.Filters;
 using PujcovadloServer.Api.Services;
 using PujcovadloServer.AuthorizationHandlers;
+using PujcovadloServer.AuthorizationHandlers.Item;
+using PujcovadloServer.AuthorizationHandlers.PickupProtocol;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Exceptions;
 using PujcovadloServer.Business.Facades;
@@ -48,11 +50,11 @@ public class PickupProtocolController : ACrudController<PickupProtocol>
     {
         // Get loan
         var loan = await _loanFacade.GetLoan(loanId);
-        await _authorizationService.CheckPermissions(loan, LoanAuthorizationHandler.Operations.Read);
+        await _authorizationService.CheckPermissions(loan, LoanOperations.Read);
 
         // Get protocol
         var protocol = _pickupProtocolFacade.GetPickupProtocol(loan);
-        await _authorizationService.CheckPermissions(protocol, PickupProtocolAuthorizationHandler.Operations.Read);
+        await _authorizationService.CheckPermissions(protocol, PickupProtocolOperations.Read);
 
         // build response
         var response = await _responseGenerator.GeneratePickupProtocolDetailResponse(protocol);
@@ -80,14 +82,14 @@ public class PickupProtocolController : ACrudController<PickupProtocol>
     {
         // Get loan
         var loan = await _loanFacade.GetLoan(loanId);
-        await _authorizationService.CheckPermissions(loan, LoanAuthorizationHandler.Operations.Read);
+        await _authorizationService.CheckPermissions(loan, LoanOperations.Read);
 
         // Get protocol and update it if it exists
         try
         {
             var protocol = _pickupProtocolFacade.GetPickupProtocol(loan);
             await _authorizationService.CheckPermissions(protocol,
-                PickupProtocolAuthorizationHandler.Operations.Update);
+                PickupProtocolOperations.Update);
             await _pickupProtocolFacade.UpdatePickupProtocol(protocol, request);
 
             return NoContent();
@@ -96,7 +98,7 @@ public class PickupProtocolController : ACrudController<PickupProtocol>
         catch (EntityNotFoundException)
         {
             await _authorizationService.CheckPermissions(loan,
-                LoanAuthorizationHandler.Operations.CreatePickupProtocol);
+                LoanOperations.CreatePickupProtocol);
             var protocol = await _pickupProtocolFacade.CreatePickupProtocol(loan, request);
 
             // generate response

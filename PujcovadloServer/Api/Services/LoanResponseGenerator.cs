@@ -1,6 +1,7 @@
 using AutoMapper;
 using PujcovadloServer.Api.Controllers;
 using PujcovadloServer.AuthorizationHandlers;
+using PujcovadloServer.AuthorizationHandlers.Item;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Filters;
 using PujcovadloServer.Lib;
@@ -112,7 +113,8 @@ public class LoanResponseGenerator : ABaseResponseGenerator
         AddCommonLinks(response, loan);
 
         // Add links for the owner
-        if (await _authorizationService.CanPerformOperation(loan, LoanAuthorizationHandler.Operations.IsOwner))
+        // TODO: remove this by merging the owner and tenant loans controllers
+        if (await _authorizationService.CanPerformOperation(loan, LoanOperations.CreatePickupProtocol))
         {
             // Link to my owner loans
             response.Links.Add(new LinkResponse(

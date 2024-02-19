@@ -4,11 +4,11 @@ using Microsoft.AspNetCore.Mvc;
 using PujcovadloServer.Api.Filters;
 using PujcovadloServer.Api.Services;
 using PujcovadloServer.AuthorizationHandlers;
+using PujcovadloServer.AuthorizationHandlers.Item;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Enums;
 using PujcovadloServer.Business.Facades;
 using PujcovadloServer.Business.Filters;
-using PujcovadloServer.Business.Interfaces;
 using PujcovadloServer.Business.Services;
 using PujcovadloServer.Requests;
 using PujcovadloServer.Responses;
@@ -72,7 +72,7 @@ public class ItemController : ACrudController<Item>
         // Get the item and convert it to response
         var item = await _itemFacade.GetItem(id);
 
-        await _authorizationService.CheckPermissions(item, ItemAuthorizationHandler.Operations.Read);
+        await _authorizationService.CheckPermissions(item, ItemOperations.Read);
 
         // get item response
         var responseItem = await _itemResponseGenerator.GenerateItemDetailResponse(item);
@@ -94,7 +94,7 @@ public class ItemController : ACrudController<Item>
     public async Task<ActionResult<ItemResponse>> Create([FromBody] ItemRequest request)
     {
         await _authorizationService.CheckPermissions(_mapper.Map<Item>(request),
-            ItemAuthorizationHandler.Operations.Create);
+            ItemOperations.Create);
 
         var newItem = await _itemFacade.CreateItem(request);
 
@@ -126,7 +126,7 @@ public class ItemController : ACrudController<Item>
     {
         var item = await _itemFacade.GetItem(id);
 
-        await _authorizationService.CheckPermissions(item, ItemAuthorizationHandler.Operations.Update);
+        await _authorizationService.CheckPermissions(item, ItemOperations.Update);
 
         // Update the item
         await _itemFacade.UpdateItem(item, request);
@@ -149,7 +149,7 @@ public class ItemController : ACrudController<Item>
         // Get the item
         var item = await _itemFacade.GetItem(id);
 
-        await _authorizationService.CheckPermissions(item, ItemAuthorizationHandler.Operations.Delete);
+        await _authorizationService.CheckPermissions(item, ItemOperations.Delete);
 
         await _itemFacade.DeleteItem(item);
 
@@ -171,10 +171,33 @@ public class ItemController : ACrudController<Item>
         // Get item
         var item = await _itemFacade.GetItem(id);
 
+        await _authorizationService.CheckPermissions(item, ItemOperations.Read);
+
         // Get categories
         // TODO: user response generator instead.
         var categoriesResponse = _mapper.Map<List<ItemCategoryResponse>>(item.Categories);
 
         return Ok(categoriesResponse);
     }
+
+    /*[HttpPut("{videoId:long}/Media/Subtitles/{culture}", Name = "AddVideoSubtitles")]
+    [ProducesResponseType(typeof(IEnumerable<MediaResponse>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(void), (int)HttpStatusCode.NotFound)]
+    [ProducesResponseType(typeof(void), (int)HttpStatusCode.Unauthorized)]
+    [ProducesResponseType(typeof(void), (int)HttpStatusCode.BadRequest)]
+    public async Task<Results<NotFound, Ok<IEnumerable<MediaResponse>>>> AddVideoSubtitles(long videoId, string culture, [FromForm]CreateSubtitleRequest createSubtitleRequest)
+    {
+        var video = await _serviceManager.VideoService.Find(videoId);
+        var media = await _serviceManager.MediaService.CreateOrUpdateSubtitles(video, culture, createSubtitleRequest);
+        var allMedia = await _serviceManager.MediaService.FindAllByVideo(video.VideoId);
+
+        var payload = new VideoMediaResponse
+        {
+            VideoId = video.VideoId,
+            Duration = video.Duration ?? 0,
+            Media = Mapper.Map<List<MediaResponse>>(allMedia)
+        };
+        await _webhookPublisher.PublishAsync(Webhook.VideoProcessed, payload, video.Site.SiteId);
+        return Ok(Mapper.Map<IEnumerable<MediaResponse>>(media));
+    }*/
 }

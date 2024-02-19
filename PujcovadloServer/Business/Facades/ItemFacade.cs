@@ -167,6 +167,8 @@ public class ItemFacade
         // set images item
         image.Item = item;
 
+        // TODO: update item status 
+
         // Create using image facade
         await _imageFacade.Create(image, filePath);
     }

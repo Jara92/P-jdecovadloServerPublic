@@ -1,6 +1,7 @@
 using AutoMapper;
 using PujcovadloServer.Api.Controllers;
 using PujcovadloServer.AuthorizationHandlers;
+using PujcovadloServer.AuthorizationHandlers.PickupProtocol;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Responses;
 
@@ -38,7 +39,7 @@ public class PickupProtocolResponseGenerator : ABaseResponseGenerator
 
         // Add update link if user has permission
         if (await _authorizationService.CanPerformOperation(protocol,
-                PickupProtocolAuthorizationHandler.Operations.Update))
+                PickupProtocolOperations.Update))
         {
             response.Links.Add(new LinkResponse(
                 _urlHelper.GetUriByAction(_httpContext, nameof(PickupProtocolController.UpdateProtocol),

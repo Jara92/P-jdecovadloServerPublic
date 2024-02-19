@@ -1,6 +1,7 @@
 using AutoMapper;
 using PujcovadloServer.Api.Controllers;
 using PujcovadloServer.AuthorizationHandlers;
+using PujcovadloServer.AuthorizationHandlers.ReturnProtocol;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Responses;
 
@@ -38,7 +39,7 @@ public class ReturnProtocolResponseGenerator : ABaseResponseGenerator
 
         // Add update link if user has permission
         if (await _authorizationService.CanPerformOperation(protocol,
-                ReturnProtocolAuthorizationHandler.Operations.Update))
+                ReturnProtocolOperations.Update))
         {
             response.Links.Add(new LinkResponse(
                 _urlHelper.GetUriByAction(_httpContext, nameof(ReturnProtocolController.UpdateProtocol),

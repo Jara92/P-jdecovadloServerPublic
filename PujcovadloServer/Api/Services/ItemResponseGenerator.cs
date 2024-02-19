@@ -1,6 +1,7 @@
 using AutoMapper;
 using PujcovadloServer.Api.Controllers;
 using PujcovadloServer.AuthorizationHandlers;
+using PujcovadloServer.AuthorizationHandlers.Item;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Filters;
 using PujcovadloServer.Lib;
@@ -49,7 +50,7 @@ public class ItemResponseGenerator : ABaseResponseGenerator
 
 
         // item delete action if has permission
-        if (await _authorizationService.CanPerformOperation(item, ItemAuthorizationHandler.Operations.Delete))
+        if (await _authorizationService.CanPerformOperation(item, ItemOperations.Delete))
         {
             response.Links.Add(new LinkResponse(
                 _urlHelper.GetUriByAction(_httpContext, nameof(ItemController.Delete), "Item",
@@ -162,7 +163,7 @@ public class ItemResponseGenerator : ABaseResponseGenerator
             _urlHelper.GetUriByAction(_httpContext, nameof(MyItemController.Index), "MyItem"), "LIST", "GET"));
 
         // item update action if has permission
-        if (await _authorizationService.CanPerformOperation(item, ItemAuthorizationHandler.Operations.Update))
+        if (await _authorizationService.CanPerformOperation(item, ItemOperations.Update))
         {
             response.Links.Add(new LinkResponse(
                 _urlHelper.GetUriByAction(_httpContext, nameof(ItemController.Update), "Item",
@@ -170,7 +171,7 @@ public class ItemResponseGenerator : ABaseResponseGenerator
         }
 
         // item delete action if has permission
-        if (await _authorizationService.CanPerformOperation(item, ItemAuthorizationHandler.Operations.Delete))
+        if (await _authorizationService.CanPerformOperation(item, ItemOperations.Delete))
         {
             response.Links.Add(new LinkResponse(
                 _urlHelper.GetUriByAction(_httpContext, nameof(ItemController.Delete), "Item",

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using PujcovadloServer.Api.Filters;
 using PujcovadloServer.Api.Services;
 using PujcovadloServer.AuthorizationHandlers;
+using PujcovadloServer.AuthorizationHandlers.Item;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Facades;
 
@@ -48,7 +49,7 @@ public class ItemImageController : ACrudController<Image>
         var item = await _itemFacade.GetItem(id);
 
         // Check permission for the item.
-        await _authorizationService.CheckPermissions(item, ItemAuthorizationHandler.Operations.Read);
+        await _authorizationService.CheckPermissions(item, ItemOperations.Read);
 
         // get the images and map them to response
         var images = item.Images;
@@ -88,7 +89,7 @@ public class ItemImageController : ACrudController<Image>
             Item = item
         };
 
-        await _authorizationService.CheckPermissions(item, ImageAuthorizationHandler.Operations.Create);
+        await _authorizationService.CheckPermissions(item, ItemOperations.CreateImage);
 
         // Save the image to the database
         await _itemFacade.AddImage(item, image, filePath);

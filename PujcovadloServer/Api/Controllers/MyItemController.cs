@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using PujcovadloServer.Api.Filters;
 using PujcovadloServer.Api.Services;
 using PujcovadloServer.AuthorizationHandlers;
+using PujcovadloServer.AuthorizationHandlers.Item;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Enums;
 using PujcovadloServer.Business.Facades;
@@ -25,8 +26,10 @@ public class MyItemController : ACrudController<Item>
     private readonly ItemResponseGenerator _itemResponseGenerator;
     private readonly IMapper _mapper;
 
-    public MyItemController(ItemFacade itemFacade, ImageFacade imageFacade, ItemService itemService, ItemResponseGenerator itemResponseGenerator,
-        LinkGenerator urlHelper, IMapper mapper, AuthorizationService authorizationService) : base(authorizationService, urlHelper)
+    public MyItemController(ItemFacade itemFacade, ImageFacade imageFacade, ItemService itemService,
+        ItemResponseGenerator itemResponseGenerator,
+        LinkGenerator urlHelper, IMapper mapper, AuthorizationService authorizationService) : base(authorizationService,
+        urlHelper)
     {
         _itemService = itemService;
         _itemFacade = itemFacade;
@@ -44,8 +47,10 @@ public class MyItemController : ACrudController<Item>
         var items = await _itemFacade.GetMyItems(filter);
 
         // Map items to response
-        var response = await _itemResponseGenerator.GenerateResponseList(items, filter, nameof(MyItemController.Index), "MyItem", true);
-        
+        var response =
+            await _itemResponseGenerator.GenerateResponseList(items, filter, nameof(MyItemController.Index), "MyItem",
+                true);
+
         return Ok(response);
     }
 
@@ -62,7 +67,7 @@ public class MyItemController : ACrudController<Item>
         var item = await _itemFacade.GetItem(id);
 
         // Can read all item's data only if the user is can update the item
-        await _authorizationService.CheckPermissions(item, ItemAuthorizationHandler.Operations.Update);
+        await _authorizationService.CheckPermissions(item, ItemOperations.Update);
 
         var response = await _itemResponseGenerator.GenerateItemOwnerResponse(item);
 

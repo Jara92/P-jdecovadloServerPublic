@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using PujcovadloServer.Api.Filters;
 using PujcovadloServer.Api.Services;
 using PujcovadloServer.AuthorizationHandlers;
+using PujcovadloServer.AuthorizationHandlers.Image;
+using PujcovadloServer.AuthorizationHandlers.Item;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Facades;
 using PujcovadloServer.Responses;
@@ -41,7 +43,7 @@ public class ImageController : ACrudController<Image>
     {
         // get the image and return it
         var image = await _imageFacade.GetImage(id);
-        await _authorizationService.CheckPermissions(image, ItemAuthorizationHandler.Operations.Read);
+        await _authorizationService.CheckPermissions(image, ItemOperations.Read);
 
         // Generate response
         var response = await _responseGenerator.GenerateImageDetailResponse(image);
@@ -66,7 +68,7 @@ public class ImageController : ACrudController<Image>
     {
         // get the image
         var image = await _imageFacade.GetImage(id);
-        await _authorizationService.CheckPermissions(image, ItemAuthorizationHandler.Operations.Delete);
+        await _authorizationService.CheckPermissions(image, ImageOperations.Delete);
 
         // get the image and return it
         await _imageFacade.DeleteImage(image);

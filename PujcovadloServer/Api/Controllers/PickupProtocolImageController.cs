@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using PujcovadloServer.Api.Filters;
 using PujcovadloServer.Api.Services;
 using PujcovadloServer.AuthorizationHandlers;
+using PujcovadloServer.AuthorizationHandlers.Item;
+using PujcovadloServer.AuthorizationHandlers.PickupProtocol;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Facades;
 
@@ -46,15 +48,15 @@ public class PickupProtocolImageController : ACrudController<Image>
         // get the item and check permissions
         var loan = await _loanFacade.GetLoan(loanId);
 
-        // Check permission for the item.
-        await _authorizationService.CheckPermissions(loan, ItemAuthorizationHandler.Operations.Read);
+        // Check permission for the loan.
+        await _authorizationService.CheckPermissions(loan, LoanOperations.Read);
 
         // get pickup protocol instance
         var pickupProtocol = _pickupProtocolFacade.GetPickupProtocol(loan);
 
         // Check permissions for the pickup protocol
         await _authorizationService.CheckPermissions(pickupProtocol,
-            PickupProtocolAuthorizationHandler.Operations.Read);
+            PickupProtocolOperations.Read);
 
         // get the images and map them to response
         var images = pickupProtocol.Images;
@@ -83,14 +85,14 @@ public class PickupProtocolImageController : ACrudController<Image>
         var loan = await _loanFacade.GetLoan(loanId);
 
         // Verify that the user can read the loan data
-        await _authorizationService.CheckPermissions(loan, LoanAuthorizationHandler.Operations.Read);
+        await _authorizationService.CheckPermissions(loan, LoanOperations.Read);
 
         // get pickup protocol instance
         var pickupProtocol = _pickupProtocolFacade.GetPickupProtocol(loan);
 
         // Check permissions for creating images of the pickup protocol
         await _authorizationService.CheckPermissions(pickupProtocol,
-            PickupProtocolAuthorizationHandler.Operations.Update);
+            PickupProtocolOperations.Update);
 
         // Save the image to the file system
         var filePath = await _fileUploadService.SaveUploadedImage(file);
@@ -104,7 +106,8 @@ public class PickupProtocolImageController : ACrudController<Image>
             PickupProtocol = pickupProtocol
         };
 
-        await _authorizationService.CheckPermissions(image, ImageAuthorizationHandler.Operations.Create);
+        // TODO
+        //await _authorizationService.CheckPermissions(image, PickupProtocolOperations.CreateImage);
 
         // Save the image to the database
         await _pickupProtocolFacade.AddPickupProtocolImage(pickupProtocol, image, filePath);

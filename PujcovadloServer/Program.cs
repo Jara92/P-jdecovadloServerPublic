@@ -11,6 +11,12 @@ using PujcovadloServer.Api.Filters;
 using PujcovadloServer.Api.Services;
 using PujcovadloServer.Authentication;
 using PujcovadloServer.AuthorizationHandlers;
+using PujcovadloServer.AuthorizationHandlers.Image;
+using PujcovadloServer.AuthorizationHandlers.Item;
+using PujcovadloServer.AuthorizationHandlers.ItemCategory;
+using PujcovadloServer.AuthorizationHandlers.Loan;
+using PujcovadloServer.AuthorizationHandlers.PickupProtocol;
+using PujcovadloServer.AuthorizationHandlers.ReturnProtocol;
 using PujcovadloServer.Business.Facades;
 using PujcovadloServer.Business.Factories.State;
 using PujcovadloServer.Business.Interfaces;
@@ -111,12 +117,30 @@ builder.Services.AddScoped<PujcovadloServerConfiguration>();
 builder.Services.AddScoped<IAuthenticateService, AuthenticateService>();
 
 // Authorization handlers
-builder.Services.AddScoped<IAuthorizationHandler, ItemAuthorizationHandler>();
-builder.Services.AddScoped<IAuthorizationHandler, ImageAuthorizationHandler>();
-builder.Services.AddScoped<IAuthorizationHandler, ItemCategoryAuthorizationHandler>();
-builder.Services.AddScoped<IAuthorizationHandler, LoanAuthorizationHandler>();
-builder.Services.AddScoped<IAuthorizationHandler, PickupProtocolAuthorizationHandler>();
-builder.Services.AddScoped<IAuthorizationHandler, ReturnProtocolAuthorizationHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, ItemAdminAuthorizationHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, ItemOwnerAuthorizationHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, ItemHasRoleOwnerAuthorizationHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, ItemGuestAuthorizationHandler>();
+
+builder.Services.AddScoped<IAuthorizationHandler, ImageAdminAuthorizationHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, ImageOwnerAuthorizationHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, ImageGuestAuthorizationHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, ImageTenantAuthorizationHandler>();
+
+builder.Services.AddScoped<IAuthorizationHandler, ItemCategoryAdminAuthorizationHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, ItemCategoryGuestAuthorizationHandler>();
+
+builder.Services.AddScoped<IAuthorizationHandler, LoanAdminAuthorizationHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, LoanOwnerAuthorizationHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, LoanTenantAuthorizationHandler>();
+
+builder.Services.AddScoped<IAuthorizationHandler, PickupProtocolAdminAuthorizationHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, PickupProtocolOwnerAuthorizationHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, PickupProtocolTenantAuthorizationHandler>();
+
+builder.Services.AddScoped<IAuthorizationHandler, ReturnProtocolAdminAuthorizationHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, ReturnProtocolOwnerAuthorizationHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, ReturnProtocolTenantAuthorizationHandler>();
 
 //Factories
 builder.Services.AddScoped<LoanStateFactory>();

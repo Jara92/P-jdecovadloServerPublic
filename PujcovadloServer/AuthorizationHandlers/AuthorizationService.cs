@@ -45,8 +45,15 @@ public class AuthorizationService
             if (identity == null || !identity.IsAuthenticated)
                 throw new NotAuthenticatedException();
 
+            // Get failure reasons
+            var failureReasons =
+                authorizationResult.Failure.FailureReasons.Select(failureReason => failureReason.ToString());
+
             // Throw ForbiddenAccessException if not authorized
-            throw new ForbiddenAccessException("You are not authorized to perform this operation.");
+            throw new ForbiddenAccessException(
+                "You are not authorized to perform this operation.",
+                failureReasons.ToArray()
+            );
         }
     }
 

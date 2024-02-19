@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using PujcovadloServer.Api.Filters;
 using PujcovadloServer.Api.Services;
 using PujcovadloServer.AuthorizationHandlers;
+using PujcovadloServer.AuthorizationHandlers.Item;
+using PujcovadloServer.AuthorizationHandlers.ReturnProtocol;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Exceptions;
 using PujcovadloServer.Business.Facades;
@@ -48,11 +50,11 @@ public class ReturnProtocolController : ACrudController<ReturnProtocol>
     {
         // Get loan
         var loan = await _loanFacade.GetLoan(loanId);
-        await _authorizationService.CheckPermissions(loan, LoanAuthorizationHandler.Operations.Read);
+        await _authorizationService.CheckPermissions(loan, LoanOperations.Read);
 
         // Get protocol
         var protocol = _returnProtocolFacade.GetReturnProtocol(loan);
-        await _authorizationService.CheckPermissions(protocol, ReturnProtocolAuthorizationHandler.Operations.Read);
+        await _authorizationService.CheckPermissions(protocol, ReturnProtocolOperations.Read);
 
         // build response
         var response = await _responseGenerator.GenerateReturnProtocolDetailResponse(protocol);
@@ -80,14 +82,14 @@ public class ReturnProtocolController : ACrudController<ReturnProtocol>
     {
         // Get loan
         var loan = await _loanFacade.GetLoan(loanId);
-        await _authorizationService.CheckPermissions(loan, LoanAuthorizationHandler.Operations.Read);
+        await _authorizationService.CheckPermissions(loan, LoanOperations.Read);
 
         // Get protocol and update it if it exists
         try
         {
             var protocol = _returnProtocolFacade.GetReturnProtocol(loan);
             await _authorizationService.CheckPermissions(protocol,
-                ReturnProtocolAuthorizationHandler.Operations.Update);
+                ReturnProtocolOperations.Update);
             await _returnProtocolFacade.UpdateReturnProtocol(protocol, request);
 
             return NoContent();
@@ -96,7 +98,7 @@ public class ReturnProtocolController : ACrudController<ReturnProtocol>
         catch (EntityNotFoundException)
         {
             await _authorizationService.CheckPermissions(loan,
-                LoanAuthorizationHandler.Operations.CreateReturnProtocol);
+                LoanOperations.CreateReturnProtocol);
             var protocol = await _returnProtocolFacade.CreateReturnProtocol(loan, request);
 
             // generate response

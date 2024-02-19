@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using PujcovadloServer.Api.Filters;
 using PujcovadloServer.Api.Services;
 using PujcovadloServer.AuthorizationHandlers;
+using PujcovadloServer.AuthorizationHandlers.Item;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Enums;
 using PujcovadloServer.Business.Facades;
@@ -58,7 +59,7 @@ public class TenantLoanController : ACrudController<Loan>
     {
         var loan = await _loanFacade.GetLoan(id);
 
-        await _authorizationService.CheckPermissions(loan, LoanAuthorizationHandler.Operations.Update);
+        await _authorizationService.CheckPermissions(loan, LoanOperations.Update);
 
         await _tenantFacade.UpdateMyLoan(loan, request);
 
