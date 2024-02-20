@@ -298,4 +298,154 @@ public class ReturnProtocolFacadeTest
     }
 
     #endregion
+
+    #region AddImage
+
+    [Test]
+    public async Task AddImage_ItemHasMaxImagesPerProtocol_ThrowsException()
+    {
+        // Arrange
+        var returnProtocol = new ReturnProtocol();
+        returnProtocol.Loan = new Loan
+        {
+            Id = 1,
+        };
+
+        // Add 5 images to the item
+        returnProtocol.Images.Add(new Image());
+        returnProtocol.Images.Add(new Image());
+        returnProtocol.Images.Add(new Image());
+        returnProtocol.Images.Add(new Image());
+        returnProtocol.Images.Add(new Image());
+
+        // mock state
+        var state = new Mock<ILoanState>();
+        state.Setup(x => x.CanUpdateReturnProtocol(returnProtocol.Loan)).Returns(true);
+        _loanService.Setup(x => x.GetState(returnProtocol.Loan)).Returns(state.Object);
+
+        // new image
+        var image = new Image();
+        var path = "somePath/to/image.jpg";
+
+        // Mock configuration - maximum is 5 images per item
+        _configuration
+            .Setup(o => o.MaxImagesPerReturnProtocol)
+            .Returns(5);
+
+        // Must throw ArgumentException because the item has reached the maximum number of images
+        Assert.ThrowsAsync<ArgumentException>(async () =>
+            await _returnProtocolFacade.AddImage(returnProtocol, image, path));
+
+        // Verify that the item was not updated
+        _returnProtocolService.Verify(s => s.Update(returnProtocol), Times.Never);
+
+        // Verify that AddImage was not called
+        _imageFacade.Verify(o => o.Create(image, path), Times.Never);
+    }
+
+    [Test]
+    public async Task AddImage_ItemHasNotReachedMaxImagesPerProtocol_Success()
+    {
+        // Arrange
+        var returnProtocol = new ReturnProtocol();
+        returnProtocol.Loan = new Loan
+        {
+            Id = 1,
+        };
+
+        // Add 5 images to the item
+        returnProtocol.Images.Add(new Image());
+        returnProtocol.Images.Add(new Image());
+        returnProtocol.Images.Add(new Image());
+        returnProtocol.Images.Add(new Image());
+
+        // mock state
+        var state = new Mock<ILoanState>();
+        state.Setup(x => x.CanUpdateReturnProtocol(returnProtocol.Loan)).Returns(true);
+        _loanService.Setup(x => x.GetState(returnProtocol.Loan)).Returns(state.Object);
+
+        // new image
+        var image = new Image();
+        var path = "somePath/to/image.jpg";
+
+        // Mock configuration - maximum is 5 images per item
+        _configuration
+            .Setup(o => o.MaxImagesPerReturnProtocol)
+            .Returns(5);
+
+        // Must pass without an exception
+        await _returnProtocolFacade.AddImage(returnProtocol, image, path);
+
+        // Verify that the item was not updated
+        _returnProtocolService.Verify(s => s.Update(returnProtocol), Times.Once);
+
+        // Verify that AddImage was not called
+        _imageFacade.Verify(o => o.Create(image, path), Times.Once);
+    }
+
+    #endregion
+
+    #region DeleteImage
+
+    [Test]
+    public void DeleteImage_ImageDoesNotBelongToAReturnProtocol_ThrowsException()
+    {
+        // Arrange
+        var image = new Image { Id = 1, ReturnProtocol = null };
+
+        // Must throw ArgumentException because the item has reached the maximum number of images
+        Assert.ThrowsAsync<OperationNotAllowedException>(async () => await _returnProtocolFacade.DeleteImage(image));
+
+        // Verify that the item was not updated
+        _returnProtocolService.Verify(s => s.Update(It.IsAny<ReturnProtocol>()), Times.Never);
+
+        // Verify that DeleteImage was not called
+        _imageFacade.Verify(o => o.DeleteImage(image), Times.Never);
+    }
+
+    [Test]
+    public async Task DeleteImage_ImageBelongsToAReturnProtocolButCannotBeDeleted_Success()
+    {
+        // Arrange
+        var image = new Image { Id = 1 };
+        image.ReturnProtocol = new ReturnProtocol { Loan = new Loan { Id = 1 } };
+
+        // Mock state
+        var state = new Mock<ILoanState>();
+        state.Setup(x => x.CanUpdateReturnProtocol(image.ReturnProtocol.Loan)).Returns(false);
+        _loanService.Setup(x => x.GetState(image.ReturnProtocol.Loan)).Returns(state.Object);
+
+        // Act - must thrown OperationNotAllowedException
+        Assert.ThrowsAsync<OperationNotAllowedException>(async () => await _returnProtocolFacade.DeleteImage(image));
+
+        // Verify that the item was NOT updated
+        _returnProtocolService.Verify(s => s.Update(image.ReturnProtocol), Times.Never);
+
+        // Verify that DeleteImage was NOT called
+        _imageFacade.Verify(o => o.DeleteImage(image), Times.Never);
+    }
+
+    [Test]
+    public async Task DeleteImage_ImageBelongsToAReturnProtocol_Success()
+    {
+        // Arrange
+        var image = new Image { Id = 1 };
+        image.ReturnProtocol = new ReturnProtocol { Loan = new Loan { Id = 1 } };
+
+        // Mock state
+        var state = new Mock<ILoanState>();
+        state.Setup(x => x.CanUpdateReturnProtocol(image.ReturnProtocol.Loan)).Returns(true);
+        _loanService.Setup(x => x.GetState(image.ReturnProtocol.Loan)).Returns(state.Object);
+
+        // Act - delete the image
+        await _returnProtocolFacade.DeleteImage(image);
+
+        // Verify that the item was updated
+        _returnProtocolService.Verify(s => s.Update(image.ReturnProtocol), Times.Once);
+
+        // Verify that DeleteImage was called
+        _imageFacade.Verify(o => o.DeleteImage(image), Times.Once);
+    }
+
+    #endregion
 }

@@ -500,16 +500,23 @@ public class ItemFacadeTest
         item.Images.Add(new Image());
         item.Images.Add(new Image());
 
+        // new image
+        var image = new Image();
+        var path = "somePath/to/image.jpg";
+
         // Mock configuration - maximum is 5 images per item
         _configuration
             .Setup(o => o.MaxImagesPerItem)
             .Returns(5);
 
         // Must throw ArgumentException because the item has reached the maximum number of images
-        Assert.ThrowsAsync<ArgumentException>(async () => await _itemFacade.AddImage(item, new Image(), "path"));
+        Assert.ThrowsAsync<ArgumentException>(async () => await _itemFacade.AddImage(item, image, path));
+
+        // Verify that the item was not updated
+        _itemService.Verify(s => s.Update(item), Times.Never);
 
         // Verify that AddImage was not called
-        _imageFacade.Verify(o => o.Create(It.IsAny<Image>(), It.IsAny<string>()), Times.Never);
+        _imageFacade.Verify(o => o.Create(image, path), Times.Never);
     }
 
     [Test]
@@ -525,16 +532,23 @@ public class ItemFacadeTest
         item.Images.Add(new Image());
         item.Images.Add(new Image());
 
+        // new image
+        var image = new Image();
+        var path = "somePath/to/image.jpg";
+
         // Mock configuration - maximum is 5 images per item
         _configuration
             .Setup(o => o.MaxImagesPerItem)
             .Returns(5);
 
         // Must throw ArgumentException because the item has reached the maximum number of images
-        Assert.ThrowsAsync<ArgumentException>(async () => await _itemFacade.AddImage(item, new Image(), "path"));
+        Assert.ThrowsAsync<ArgumentException>(async () => await _itemFacade.AddImage(item, image, path));
+
+        // Verify that the item was not updated
+        _itemService.Verify(s => s.Update(item), Times.Never);
 
         // Verify that AddImage was not called
-        _imageFacade.Verify(o => o.Create(It.IsAny<Image>(), It.IsAny<string>()), Times.Never);
+        _imageFacade.Verify(o => o.Create(image, path), Times.Never);
     }
 
     [Test]
@@ -560,8 +574,47 @@ public class ItemFacadeTest
         // Must return the created item
         await _itemFacade.AddImage(item, newImage, newImagePath);
 
+        // Verify that the item was updated
+        _itemService.Verify(s => s.Update(item), Times.Once);
+
         // Verify that AddImage was called
         _imageFacade.Verify(o => o.Create(newImage, newImagePath), Times.Once);
+    }
+
+    #endregion
+
+    #region DeleteImage
+
+    [Test]
+    public void DeleteImage_ImageDoesNotBelongToAnItem_ThrowsException()
+    {
+        // Arrange
+        var image = new Image { Id = 1, Item = null };
+
+        // Must throw ArgumentException because the item has reached the maximum number of images
+        Assert.ThrowsAsync<OperationNotAllowedException>(async () => await _itemFacade.DeleteImage(image));
+
+        // Verify that the item was not updated
+        _itemService.Verify(s => s.Update(It.IsAny<Item>()), Times.Never);
+
+        // Verify that DeleteImage was not called
+        _imageFacade.Verify(o => o.DeleteImage(image), Times.Never);
+    }
+
+    [Test]
+    public async Task DeleteImage_ImageBelongsToAnItem_Success()
+    {
+        // Arrange
+        var image = new Image { Id = 1, Item = _item };
+
+        // Act - delete the image
+        await _itemFacade.DeleteImage(image);
+
+        // Verify that the item was updated
+        _itemService.Verify(s => s.Update(_item), Times.Once);
+
+        // Verify that DeleteImage was called
+        _imageFacade.Verify(o => o.DeleteImage(image), Times.Once);
     }
 
     #endregion

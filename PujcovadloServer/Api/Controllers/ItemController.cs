@@ -236,7 +236,7 @@ public class ItemController : ACrudController<Item>
             Item = item
         };
 
-        await _authorizationService.CheckPermissions(item, ItemOperations.CreateImage);
+        await _authorizationService.CheckPermissions(item, ItemOperations.Update);
 
         // Save the image to the database
         await _itemFacade.AddImage(item, image, filePath);
@@ -245,5 +245,37 @@ public class ItemController : ACrudController<Item>
         var response = await _imageResponseGenerator.GenerateImageDetailResponse(image);
 
         return Created(_imageResponseGenerator.GetLink(image), response);
+    }
+
+    /// <summary>
+    /// Deletes given image of the item.
+    /// </summary>
+    /// <param name="itemId">Item id.</param>
+    /// <param name="imageId">Image id.</param>
+    /// <returns></returns>
+    /// <response code="204">Image has been deleted</response>
+    /// <response code="400">If the request is not valid.</response>
+    /// <response code="403">If the user is not authorized to delete the image.</response>
+    /// <response code="404">If the image does not exist.</response>
+    [HttpDelete("{itemId}/images/{imageId}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteImage(int itemId, int imageId)
+    {
+        // get the loan and check permissions
+        var item = await _itemFacade.GetItem(itemId);
+
+        // Verify that the user can read the loan data
+        await _authorizationService.CheckPermissions(item, ItemOperations.Update);
+
+        // Get the image
+        var image = await _itemFacade.GetImage(item.Id, imageId);
+
+        // Delete the image
+        await _itemFacade.DeleteImage(image);
+
+        return NoContent();
     }
 }

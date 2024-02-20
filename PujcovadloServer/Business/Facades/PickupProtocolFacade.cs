@@ -131,7 +131,7 @@ public class PickupProtocolFacade
     /// <param name="filePath">Filepath of the image file.</param>
     /// <exception cref="OperationNotAllowedException">Thrown when the protocol cannot be updated.</exception>
     /// <exception cref="ArgumentException">Thrown when maximum amount of images was exceeded</exception>
-    public async Task AddPickupProtocolImage(PickupProtocol pickupProtocol, Image image, string filePath)
+    public async Task AddImage(PickupProtocol pickupProtocol, Image image, string filePath)
     {
         // Check that the item can be updated
         var canUpdateResult = CanUpdatePickupProtocol(pickupProtocol);
@@ -142,10 +142,60 @@ public class PickupProtocolFacade
         if (pickupProtocol.Images.Count >= _configuration.MaxImagesPerPickupProtocol)
             throw new ArgumentException("Max images per pickupProtocol exceeded.");
 
-        // set images pickupProtocol
+        // set image pickupProtocol
         image.PickupProtocol = pickupProtocol;
 
         // Create using image facade
         await _imageFacade.Create(image, filePath);
+
+        // Update pickupProtocol
+        await _pickupProtocolService.Update(pickupProtocol);
+    }
+
+    /// <summary>
+    /// Returns image of the pickup protocol.
+    /// </summary>
+    /// <param name="pickupProtocolId">PickupProtocol id</param>
+    /// <param name="imageId">Image id</param>
+    /// <returns>Image</returns>
+    /// <exception cref="EntityNotFoundException">Thrown when image with given imageId or pickupProtocolId does not exist</exception>
+    public async Task<Image> GetImage(int pickupProtocolId, int imageId)
+    {
+        // Get the image by id using the image facade
+        var image = await _imageFacade.GetImage(imageId);
+
+        // Check that the image belongs to the pickup protocol
+        if (image.PickupProtocol == null || image.PickupProtocol.Id != pickupProtocolId)
+        {
+            throw new EntityNotFoundException("Image not found");
+        }
+
+        return image;
+    }
+
+    /// <summary>
+    /// Deletes given image which belongs to a pickup protocol.
+    /// </summary>
+    /// <param name="image">Image to be deleted</param>
+    /// <returns></returns>
+    /// <exception cref="OperationNotAllowedException">Thrown if the image doest belong to a pickup protocol or if the image cannot be deleted.</exception>
+    public async Task DeleteImage(Image image)
+    {
+        // Check that the image belongs to the pickup protocol
+        if (image.PickupProtocol == null)
+        {
+            throw new OperationNotAllowedException("Image does not belong to any pickup protocol");
+        }
+
+        // Check if the protocol can be updated
+        var canUpdateResult = CanUpdatePickupProtocol(image.PickupProtocol);
+        if (canUpdateResult.CanUpdate == false)
+            throw new OperationNotAllowedException(canUpdateResult.Reason);
+
+        // Delete the image
+        await _imageFacade.DeleteImage(image);
+
+        // Update the protocol
+        await _pickupProtocolService.Update(image.PickupProtocol);
     }
 }
