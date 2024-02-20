@@ -19,15 +19,18 @@ public class LoanController : ACrudController<Loan>
     private readonly LoanFacade _loanFacade;
     private readonly TenantFacade _tenantFacade;
     private readonly OwnerFacade _ownerFacade;
+    private readonly ItemFacade _itemFacade;
     private readonly LoanResponseGenerator _responseGenerator;
 
     public LoanController(LoanFacade loanFacade, TenantFacade tenantFacade, OwnerFacade ownerFacade,
+        ItemFacade itemFacade,
         LoanResponseGenerator responseGenerator,
         AuthorizationService authorizationService, LinkGenerator urlHelper) : base(authorizationService, urlHelper)
     {
         _loanFacade = loanFacade;
         _tenantFacade = tenantFacade;
         _ownerFacade = ownerFacade;
+        _itemFacade = itemFacade;
         _responseGenerator = responseGenerator;
     }
 
@@ -82,8 +85,14 @@ public class LoanController : ACrudController<Loan>
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<LoanResponse>> CreateLoan([FromBody] LoanRequest request)
     {
+        // Check that the users can create a new loan
         await _authorizationService.CheckPermissions(new Loan(), LoanOperations.Create);
 
+        // Check if the item exists and that it can be used for a new loan
+        var item = await _itemFacade.GetItem(request.ItemId);
+        await _authorizationService.CheckPermissions(item, ItemOperations.Read);
+
+        // Create the loan
         var loan = await _tenantFacade.CreateLoan(request);
 
         // Generate response

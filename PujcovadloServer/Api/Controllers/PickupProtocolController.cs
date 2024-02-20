@@ -118,7 +118,7 @@ public class PickupProtocolController : ACrudController<PickupProtocol>
     /// </summary>
     /// <param name="loanId">Loan loanId.</param>
     /// <returns>All images associated with the item.</returns>
-    [HttpGet]
+    [HttpGet("images")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -134,8 +134,7 @@ public class PickupProtocolController : ACrudController<PickupProtocol>
         var pickupProtocol = _pickupProtocolFacade.GetPickupProtocol(loan);
 
         // Check permissions for the pickup protocol
-        await _authorizationService.CheckPermissions(pickupProtocol,
-            PickupProtocolOperations.Read);
+        await _authorizationService.CheckPermissions(pickupProtocol, PickupProtocolOperations.Read);
 
         // get the images and map them to response
         var images = pickupProtocol.Images;
@@ -155,12 +154,13 @@ public class PickupProtocolController : ACrudController<PickupProtocol>
     /// <response code="201">Returns newly created image.</response>
     /// <response code="400">If the request is not valid.</response>
     /// <response code="403">If the user is not authorized to create the image.</response>
-    [HttpPost]
+    [HttpPost("images")]
     [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> AddImage(int loanId, IFormFile file)
     {
-        // get the item and check permissions
+        // get the loan and check permissions
         var loan = await _loanFacade.GetLoan(loanId);
 
         // Verify that the user can read the loan data
@@ -170,8 +170,7 @@ public class PickupProtocolController : ACrudController<PickupProtocol>
         var pickupProtocol = _pickupProtocolFacade.GetPickupProtocol(loan);
 
         // Check permissions for creating images of the pickup protocol
-        await _authorizationService.CheckPermissions(pickupProtocol,
-            PickupProtocolOperations.Update);
+        await _authorizationService.CheckPermissions(pickupProtocol, PickupProtocolOperations.Update);
 
         // Save the image to the file system
         var filePath = await _fileUploadService.SaveUploadedImage(file);
@@ -185,14 +184,50 @@ public class PickupProtocolController : ACrudController<PickupProtocol>
             PickupProtocol = pickupProtocol
         };
 
-        await _authorizationService.CheckPermissions(image, PickupProtocolOperations.Update);
-
         // Save the image to the database
-        await _pickupProtocolFacade.AddPickupProtocolImage(pickupProtocol, image, filePath);
+        await _pickupProtocolFacade.AddImage(pickupProtocol, image, filePath);
 
         // Map the image to response
         var response = await _imageResponseGenerator.GenerateImageDetailResponse(image);
 
         return Created(_imageResponseGenerator.GetLink(image), response);
+    }
+
+    /// <summary>
+    /// Deleted given image of the pickup protocol.
+    /// </summary>
+    /// <param name="loanId">Item loanId.</param>
+    /// <param name="imageId">Image id.</param>
+    /// <returns></returns>
+    /// <response code="204">Image has been deleted</response>
+    /// <response code="400">If the request is not valid.</response>
+    /// <response code="403">If the user is not authorized to delete the image.</response>
+    /// <response code="404">If the image does not exist.</response>
+    [HttpDelete("images/{imageId}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteImage(int loanId, int imageId)
+    {
+        // get the loan and check permissions
+        var loan = await _loanFacade.GetLoan(loanId);
+
+        // Verify that the user can read the loan data
+        await _authorizationService.CheckPermissions(loan, LoanOperations.Read);
+
+        // get pickup protocol instance
+        var pickupProtocol = _pickupProtocolFacade.GetPickupProtocol(loan);
+
+        // Check permissions for updating the pickup protocol
+        await _authorizationService.CheckPermissions(pickupProtocol, PickupProtocolOperations.Update);
+
+        // Get the image
+        var image = await _pickupProtocolFacade.GetImage(pickupProtocol.Id, imageId);
+
+        // Delete the image
+        await _pickupProtocolFacade.DeleteImage(image);
+
+        return NoContent();
     }
 }

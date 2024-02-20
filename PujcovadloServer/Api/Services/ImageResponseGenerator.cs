@@ -53,17 +53,17 @@ public class ImageResponseGenerator : ABaseResponseGenerator
             _urlHelper.GetUriByAction(_httpContext, nameof(ImageDataController.GetImage), "ImageData",
                 values: new { filename = image.Path }), "DATA", "GET"));
 
-        // Add delete link
-        response.Links.Add(new LinkResponse(
-            _urlHelper.GetUriByAction(_httpContext, nameof(ImageController.DeleteImage), "Image",
-                values: new { id = image.Id }), "DELETE", "DELETE"));
-
         // Image item
         if (image.Item != null)
         {
             response.Links.Add(new LinkResponse(
                 _urlHelper.GetUriByAction(_httpContext, nameof(ItemController.Get), "Item",
                     values: new { image.Item.Id }), "ITEM", "GET"));
+
+            // Add delete link
+            response.Links.Add(new LinkResponse(
+                _urlHelper.GetUriByAction(_httpContext, nameof(ItemController.DeleteImage), "Item",
+                    values: new { itemId = image.Item.Id, imageId = image.Id }), "DELETE", "DELETE"));
         }
 
         // Pickup protocol
@@ -72,6 +72,11 @@ public class ImageResponseGenerator : ABaseResponseGenerator
             response.Links.Add(new LinkResponse(
                 _urlHelper.GetUriByAction(_httpContext, nameof(PickupProtocolController.GetProtocol), "PickupProtocol",
                     values: new { loanId = image.PickupProtocol.Loan.Id }), "PICKUP_PROTOCOL", "GET"));
+
+            // Add delete link
+            response.Links.Add(new LinkResponse(
+                _urlHelper.GetUriByAction(_httpContext, nameof(PickupProtocolController.DeleteImage), "PickupProtocol",
+                    values: new { loanId = image.PickupProtocol.Loan.Id, imageId = image.Id }), "DELETE", "DELETE"));
         }
 
         // Return protocol
@@ -80,6 +85,11 @@ public class ImageResponseGenerator : ABaseResponseGenerator
             response.Links.Add(new LinkResponse(
                 _urlHelper.GetUriByAction(_httpContext, nameof(ReturnProtocolController.GetProtocol), "ReturnProtocol",
                     values: new { loanId = image.ReturnProtocol.Loan.Id }), "RETURN_PROTOCOL", "GET"));
+
+            // Add delete link
+            response.Links.Add(new LinkResponse(
+                _urlHelper.GetUriByAction(_httpContext, nameof(ReturnProtocolController.DeleteImage), "ReturnProtocol",
+                    values: new { loanId = image.ReturnProtocol.Loan.Id, imageId = image.Id }), "DELETE", "DELETE"));
         }
     }
 

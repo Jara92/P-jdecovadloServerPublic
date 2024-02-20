@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using PujcovadloServer.Api.Filters;
 using PujcovadloServer.Api.Services;
 using PujcovadloServer.AuthorizationHandlers;
-using PujcovadloServer.AuthorizationHandlers.Image;
 using PujcovadloServer.AuthorizationHandlers.Item;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Facades;
@@ -49,30 +48,5 @@ public class ImageController : ACrudController<Image>
         var response = await _responseGenerator.GenerateImageDetailResponse(image);
 
         return Ok(response);
-    }
-
-    /// <summary>
-    /// Deletes image by given id.
-    /// </summary>
-    /// <param name="id">Image id</param>
-    /// <returns></returns>
-    /// <response code="204">If the image was deleted successfully.</response>
-    /// <response code="400">If the request is not valid.</response>
-    /// <response code="403">If the user is not authorized to delete the image.</response>
-    /// <response code="404">If the image was not found.</response>
-    [HttpDelete("{id}")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DeleteImage(int id)
-    {
-        // get the image
-        var image = await _imageFacade.GetImage(id);
-        await _authorizationService.CheckPermissions(image, ImageOperations.Delete);
-
-        // get the image and return it
-        await _imageFacade.DeleteImage(image);
-
-        return NoContent();
     }
 }

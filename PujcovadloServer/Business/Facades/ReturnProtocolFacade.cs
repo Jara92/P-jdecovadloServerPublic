@@ -25,11 +25,11 @@ public class ReturnProtocolFacade
     }
 
     /// <summary>
-    /// Returns pickup protocol for the loan.
+    /// Returns return protocol for the loan.
     /// </summary>
     /// <param name="loan">The loan.</param>
     /// <returns>Return protocol of the loan</returns>
-    /// <exception cref="EntityNotFoundException">Thrown when the loan has no pickup protocol.</exception>
+    /// <exception cref="EntityNotFoundException">Thrown when the loan has no return protocol.</exception>
     public ReturnProtocol GetReturnProtocol(Loan loan)
     {
         var protocol = loan.ReturnProtocol;
@@ -58,12 +58,12 @@ public class ReturnProtocolFacade
     }
 
     /// <summary>
-    /// Creates a pickup protocol for the loan.
+    /// Creates a return protocol for the loan.
     /// </summary>
     /// <param name="loan">Protocols loan.</param>
     /// <param name="request">Protocol request data.</param>
-    /// <returns>Returns newly created pickup protocol</returns>
-    /// <exception cref="OperationNotAllowedException">Thrown if pickup protocol is not allowed to be created.</exception>
+    /// <returns>Returns newly created return protocol</returns>
+    /// <exception cref="OperationNotAllowedException">Thrown if return protocol is not allowed to be created.</exception>
     public async Task<ReturnProtocol> CreateReturnProtocol(Loan loan, ReturnProtocolRequest request)
     {
         // Check if the protocol can be created
@@ -117,7 +117,7 @@ public class ReturnProtocolFacade
         await _returnProtocolService.Update(protocol);
     }
 
-    public async Task AddReturnProtocolImage(ReturnProtocol returnProtocol, Image image, string filePath)
+    public async Task AddImage(ReturnProtocol returnProtocol, Image image, string filePath)
     {
         // Check if the protocol can be updated
         var canUpdateResult = CanUpdateReturnProtocol(returnProtocol);
@@ -128,10 +128,60 @@ public class ReturnProtocolFacade
         if (returnProtocol.Images.Count >= _configuration.MaxImagesPerReturnProtocol)
             throw new ArgumentException("Max images per returnProtocol exceeded.");
 
-        // set images returnProtocol
+        // set image returnProtocol
         image.ReturnProtocol = returnProtocol;
 
         // Create using image facade
         await _imageFacade.Create(image, filePath);
+
+        // Update returnProtocol
+        await _returnProtocolService.Update(returnProtocol);
+    }
+
+    /// <summary>
+    /// Returns image of the return protocol.
+    /// </summary>
+    /// <param name="returnProtocolId">ReturnProtocol id</param>
+    /// <param name="imageId">Image id</param>
+    /// <returns>Image</returns>
+    /// <exception cref="EntityNotFoundException">Thrown when image with given imageId or returnProtocolId does not exist</exception>
+    public async Task<Image> GetImage(int returnProtocolId, int imageId)
+    {
+        // Get the image by id using the image facade
+        var image = await _imageFacade.GetImage(imageId);
+
+        // Check that the image belongs to the return protocol
+        if (image.ReturnProtocol == null || image.ReturnProtocol.Id != returnProtocolId)
+        {
+            throw new EntityNotFoundException("Image not found");
+        }
+
+        return image;
+    }
+
+    /// <summary>
+    /// Deletes given image which belongs to a return protocol.
+    /// </summary>
+    /// <param name="image">Image to be deleted</param>
+    /// <returns></returns>
+    /// <exception cref="OperationNotAllowedException">Thrown if the image doest belong to a return protocol or if the image cannot be deleted.</exception>
+    public async Task DeleteImage(Image image)
+    {
+        // Check that the image belongs to the return protocol
+        if (image.ReturnProtocol == null)
+        {
+            throw new OperationNotAllowedException("Image does not belong to any return protocol");
+        }
+
+        // Check if the protocol can be updated
+        var canUpdateResult = CanUpdateReturnProtocol(image.ReturnProtocol);
+        if (canUpdateResult.CanUpdate == false)
+            throw new OperationNotAllowedException(canUpdateResult.Reason);
+
+        // Delete the image
+        await _imageFacade.DeleteImage(image);
+
+        // Update returnProtocol
+        await _returnProtocolService.Update(image.ReturnProtocol);
     }
 }

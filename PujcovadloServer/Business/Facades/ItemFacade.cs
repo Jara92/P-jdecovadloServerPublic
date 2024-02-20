@@ -186,10 +186,55 @@ public class ItemFacade
         if (item.Images.Count >= _configuration.MaxImagesPerItem)
             throw new ArgumentException("Max images per item exceeded.");
 
-        // set images item
+        // set image item
         image.Item = item;
 
         // Create using image facade
         await _imageFacade.Create(image, filePath);
+
+        // Update item
+        await _itemService.Update(item);
+    }
+
+    /// <summary>
+    /// Returns image of the item.
+    /// </summary>
+    /// <param name="itemId">Item Id</param>
+    /// <param name="imageId">Image id</param>
+    /// <returns></returns>
+    /// <exception cref="EntityNotFoundException">Thrown when image with given imageId and itemId does not exist.</exception>
+    public async Task<Image> GetImage(int itemId, int imageId)
+    {
+        // Get the image by id using the image facade
+        var image = await _imageFacade.GetImage(imageId);
+
+        // Check that the image belongs to the item
+        if (image.Item == null || image.Item.Id != itemId)
+        {
+            throw new EntityNotFoundException("Image not found");
+        }
+
+        return image;
+    }
+
+    /// <summary>
+    /// Deletes an image which belongs to an item.
+    /// </summary>
+    /// <param name="image">The image to be deleted.</param>
+    /// <returns></returns>
+    /// <exception cref="OperationNotAllowedException">thrown when the image does not belong to an item.</exception>
+    public async Task DeleteImage(Image image)
+    {
+        // Check that the image belongs to an item
+        if (image.Item == null)
+        {
+            throw new OperationNotAllowedException("Image does not belong to any item");
+        }
+
+        // Delete the image
+        await _imageFacade.DeleteImage(image);
+
+        // Update item
+        await _itemService.Update(image.Item);
     }
 }

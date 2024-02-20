@@ -87,17 +87,7 @@ public class ImageFacade
     {
         // Get image and check that it is not null
         var image = await _imageService.Get(imageId);
-        if (image == null) throw new EntityNotFoundException();
-
-        return image;
-    }
-
-    public async Task<Image> GetImage(int itemId, int imageId)
-    {
-        var image = await GetImage(imageId);
-
-        // Check that the image is associated with the item
-        if (image.Item?.Id != itemId) throw new ArgumentException("Image is not associated with the item.");
+        if (image == null) throw new EntityNotFoundException("Image not found");
 
         return image;
     }
@@ -110,36 +100,7 @@ public class ImageFacade
         return image;
     }
 
-    public async Task<bool> CanDeleteImage(Image image)
-    {
-        // Image is associated with a pickup protocol and it is confirmed
-        if (image.PickupProtocol != null && image.PickupProtocol.ConfirmedAt != null)
-        {
-            return false;
-        }
-
-        // Image is associated with a return protocol and it is confirmed
-        if (image.ReturnProtocol != null && image.ReturnProtocol.ConfirmedAt != null)
-        {
-            return false;
-        }
-
-        return true;
-    }
-
-    public async Task DeleteImage(int itemId, int imageId)
-    {
-        var image = await GetImage(itemId, imageId);
-
-        if (!await CanDeleteImage(image))
-        {
-            throw new InvalidOperationException("Image cannot be deleted.");
-        }
-
-        await DeleteImage(image);
-    }
-
-    public async Task DeleteImage(Image image)
+    public virtual async Task DeleteImage(Image image)
     {
         await _imageService.Delete(image);
     }

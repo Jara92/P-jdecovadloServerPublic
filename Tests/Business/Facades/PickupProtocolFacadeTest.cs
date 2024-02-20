@@ -262,4 +262,154 @@ public class PickupProtocolFacadeTest
     }
 
     #endregion
+
+    #region AddImage
+
+    [Test]
+    public async Task AddImage_ItemHasMaxImagesPerProtocol_ThrowsException()
+    {
+        // Arrange
+        var pickupProtocol = new PickupProtocol();
+        pickupProtocol.Loan = new Loan
+        {
+            Id = 1,
+        };
+
+        // Add 5 images to the item
+        pickupProtocol.Images.Add(new Image());
+        pickupProtocol.Images.Add(new Image());
+        pickupProtocol.Images.Add(new Image());
+        pickupProtocol.Images.Add(new Image());
+        pickupProtocol.Images.Add(new Image());
+
+        // mock state
+        var state = new Mock<ILoanState>();
+        state.Setup(x => x.CanUpdatePickupProtocol(pickupProtocol.Loan)).Returns(true);
+        _loanService.Setup(x => x.GetState(pickupProtocol.Loan)).Returns(state.Object);
+
+        // new image
+        var image = new Image();
+        var path = "somePath/to/image.jpg";
+
+        // Mock configuration - maximum is 5 images per item
+        _configuration
+            .Setup(o => o.MaxImagesPerPickupProtocol)
+            .Returns(5);
+
+        // Must throw ArgumentException because the item has reached the maximum number of images
+        Assert.ThrowsAsync<ArgumentException>(async () =>
+            await _pickupProtocolFacade.AddImage(pickupProtocol, image, path));
+
+        // Verify that the item was not updated
+        _pickupProtocolService.Verify(s => s.Update(pickupProtocol), Times.Never);
+
+        // Verify that AddImage was not called
+        _imageFacade.Verify(o => o.Create(image, path), Times.Never);
+    }
+
+    [Test]
+    public async Task AddImage_ItemHasNotReachedMaxImagesPerProtocol_Success()
+    {
+        // Arrange
+        var pickupProtocol = new PickupProtocol();
+        pickupProtocol.Loan = new Loan
+        {
+            Id = 1,
+        };
+
+        // Add 5 images to the item
+        pickupProtocol.Images.Add(new Image());
+        pickupProtocol.Images.Add(new Image());
+        pickupProtocol.Images.Add(new Image());
+        pickupProtocol.Images.Add(new Image());
+
+        // mock state
+        var state = new Mock<ILoanState>();
+        state.Setup(x => x.CanUpdatePickupProtocol(pickupProtocol.Loan)).Returns(true);
+        _loanService.Setup(x => x.GetState(pickupProtocol.Loan)).Returns(state.Object);
+
+        // new image
+        var image = new Image();
+        var path = "somePath/to/image.jpg";
+
+        // Mock configuration - maximum is 5 images per item
+        _configuration
+            .Setup(o => o.MaxImagesPerPickupProtocol)
+            .Returns(5);
+
+        // Must pass without an exception
+        await _pickupProtocolFacade.AddImage(pickupProtocol, image, path);
+
+        // Verify that the item was not updated
+        _pickupProtocolService.Verify(s => s.Update(pickupProtocol), Times.Once);
+
+        // Verify that AddImage was not called
+        _imageFacade.Verify(o => o.Create(image, path), Times.Once);
+    }
+
+    #endregion
+
+    #region DeleteImage
+
+    [Test]
+    public void DeleteImage_ImageDoesNotBelongToAPickupProtocol_ThrowsException()
+    {
+        // Arrange
+        var image = new Image { Id = 1, PickupProtocol = null };
+
+        // Must throw ArgumentException because the item has reached the maximum number of images
+        Assert.ThrowsAsync<OperationNotAllowedException>(async () => await _pickupProtocolFacade.DeleteImage(image));
+
+        // Verify that the item was not updated
+        _pickupProtocolService.Verify(s => s.Update(It.IsAny<PickupProtocol>()), Times.Never);
+
+        // Verify that DeleteImage was not called
+        _imageFacade.Verify(o => o.DeleteImage(image), Times.Never);
+    }
+
+    [Test]
+    public async Task DeleteImage_ImageBelongsToAPickupProtocolButCannotBeDeleted_Success()
+    {
+        // Arrange
+        var image = new Image { Id = 1 };
+        image.PickupProtocol = new PickupProtocol { Loan = new Loan { Id = 1 } };
+
+        // Mock state
+        var state = new Mock<ILoanState>();
+        state.Setup(x => x.CanUpdatePickupProtocol(image.PickupProtocol.Loan)).Returns(false);
+        _loanService.Setup(x => x.GetState(image.PickupProtocol.Loan)).Returns(state.Object);
+
+        // Act - must thrown OperationNotAllowedException
+        Assert.ThrowsAsync<OperationNotAllowedException>(async () => await _pickupProtocolFacade.DeleteImage(image));
+
+        // Verify that the item was NOT updated
+        _pickupProtocolService.Verify(s => s.Update(image.PickupProtocol), Times.Never);
+
+        // Verify that DeleteImage was NOT called
+        _imageFacade.Verify(o => o.DeleteImage(image), Times.Never);
+    }
+
+    [Test]
+    public async Task DeleteImage_ImageBelongsToAPickupProtocol_Success()
+    {
+        // Arrange
+        var image = new Image { Id = 1 };
+        image.PickupProtocol = new PickupProtocol { Loan = new Loan { Id = 1 } };
+
+        // Mock state
+        var state = new Mock<ILoanState>();
+        state.Setup(x => x.CanUpdatePickupProtocol(image.PickupProtocol.Loan)).Returns(true);
+        _loanService.Setup(x => x.GetState(image.PickupProtocol.Loan)).Returns(state.Object);
+
+        // Act - delete the image
+        await _pickupProtocolFacade.DeleteImage(image);
+
+        // Verify that the item was updated
+        _pickupProtocolService.Verify(s => s.Update(image.PickupProtocol), Times.Once);
+
+        // Verify that DeleteImage was called
+        _imageFacade.Verify(o => o.DeleteImage(image), Times.Once);
+    }
+
+    #endregion
 }
