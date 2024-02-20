@@ -63,7 +63,7 @@ public class ItemFacadeTest
             SellingPrice = 2000,
             RefundableDeposit = 1000,
             Status = ItemStatus.Public,
-            Owner = _user
+            Owner = _owner
         };
     }
 
@@ -270,8 +270,8 @@ public class ItemFacadeTest
 
         await _itemFacade.UpdateItem(oldItem, request);
 
-        // Asserations
-        Assert.That(oldItem.Status, Is.EqualTo(ItemStatus.Approving));
+        // Asserations - status is the same
+        Assert.That(oldItem.Status, Is.EqualTo(ItemStatus.Denied));
     }
 
     #endregion
@@ -315,40 +315,24 @@ public class ItemFacadeTest
 
     #endregion
 
-    #region GetMyItems
+    #region GetAll
 
     [Test]
-    public async Task GetMyItems_UserNotAuthenticated_ThrowsException()
-    {
-        // User is not authenticated - must 
-        _authenticateService
-            .Setup(o => o.GetCurrentUser())
-            .ThrowsAsync(new NotAuthenticatedException());
-
-        // Must throw UserNotAuthenticatedException because the user is not authenticated
-        Assert.ThrowsAsync<NotAuthenticatedException>(async () => await _itemFacade.GetMyItems(new ItemFilter()));
-
-        // Verify that GetCurrentUser was called
-        _authenticateService.Verify(o => o.GetCurrentUser(), Times.Once);
-
-        // Verify that GetAll was not called
-        _itemService.Verify(o => o.GetAll(It.IsAny<ItemFilter>()), Times.Never);
-    }
-
-    [Test]
-    public async Task GetMyItems_UserAuthenticated_ReturnsItems()
+    public async Task GetAll_UserAuthenticatedButNotTheFilteredOwner_ReturnsSelectedOwnersPublicItems()
     {
         // Arrange
         var filter = new ItemFilter()
         {
             CategoryId = 1, Page = 2, PageSize = 10, Status = ItemStatus.Approving, Search = "Search", Sortby = "Id",
-            SortOrder = true
+            SortOrder = true, OwnerId = _owner.Id
         };
         var expectedFilter = new ItemFilter()
         {
-            CategoryId = 1, Page = 2, PageSize = 10, Status = ItemStatus.Approving, Search = "Search", Sortby = "Id",
+            CategoryId = 1, Page = 2, PageSize = 10,
+            Status = ItemStatus.Approving,
+            Search = "Search", Sortby = "Id",
             SortOrder = true,
-            OwnerId = _user.Id
+            OwnerId = _owner.Id
         };
 
         var expectedItems = new PaginatedList<Item>(new List<Item>()
@@ -359,17 +343,17 @@ public class ItemFacadeTest
 
         // User is authenticated
         _authenticateService
-            .Setup(o => o.GetCurrentUser())
-            .ReturnsAsync(_user);
+            .Setup(o => o.TryGetCurrentUserId())
+            .Returns(_user.Id);
 
         // Mock item service
         _itemService
             // The GetAll method must be called with the expected filter
-            .Setup(o => o.GetAll(filter))
+            .Setup(o => o.GetAllPublic(filter))
             .ReturnsAsync(expectedItems);
 
         // Must return the created item
-        var result = await _itemFacade.GetMyItems(filter);
+        var result = await _itemFacade.GetAll(filter);
 
         // assert filter
         AssertItemFilter(expectedFilter, filter);
@@ -387,10 +371,76 @@ public class ItemFacadeTest
 
 
         // Verify that GetCurrentUser was called
-        _authenticateService.Verify(o => o.GetCurrentUser(), Times.Once);
+        _authenticateService.Verify(o => o.TryGetCurrentUserId(), Times.Once);
 
-        // Verify that GetAll was called - with the expected filter
+        // Verify that GetAllPublic was called because the user filters someone else's items
+        _itemService.Verify(o => o.GetAllPublic(filter), Times.Once);
+
+        // Verify that GetAll was not called because that would return private items of filtered user too
+        _itemService.Verify(o => o.GetAll(filter), Times.Never);
+    }
+
+    [Test]
+    public async Task GetAll_UserAuthenticatedAndIsTheFilteredOwner_ReturnsHisItems()
+    {
+        // Arrange
+        var filter = new ItemFilter()
+        {
+            CategoryId = 1, Page = 2, PageSize = 10, Status = ItemStatus.Approving, Search = "Search", Sortby = "Id",
+            SortOrder = true, OwnerId = _owner.Id
+        };
+        var expectedFilter = new ItemFilter()
+        {
+            CategoryId = 1, Page = 2, PageSize = 10,
+            Status = ItemStatus.Approving,
+            Search = "Search", Sortby = "Id",
+            SortOrder = true,
+            OwnerId = _owner.Id
+        };
+
+        var expectedItems = new PaginatedList<Item>(new List<Item>()
+        {
+            new Item() { Id = 2 },
+            new Item() { Id = 3 }
+        }, 2, expectedFilter.Page, expectedFilter.PageSize);
+
+        // User is authenticated
+        _authenticateService
+            .Setup(o => o.TryGetCurrentUserId())
+            .Returns(_owner.Id);
+
+        // Mock item service
+        _itemService
+            // The GetAll method must be called with the expected filter
+            .Setup(o => o.GetAll(filter))
+            .ReturnsAsync(expectedItems);
+
+        // Must return the created item
+        var result = await _itemFacade.GetAll(filter);
+
+        // assert filter
+        AssertItemFilter(expectedFilter, filter);
+
+        // assert
+        Assert.That(result.Count, Is.EqualTo(expectedItems.Count));
+        Assert.That(result.PageIndex, Is.EqualTo(expectedItems.PageIndex));
+        Assert.That(result.TotalPages, Is.EqualTo(expectedItems.TotalPages));
+
+        // assert items
+        for (var i = 0; i < result.Count; i++)
+        {
+            Assert.That(result[i].Id, Is.EqualTo(expectedItems[i].Id));
+        }
+
+
+        // Verify that GetCurrentUser was called
+        _authenticateService.Verify(o => o.TryGetCurrentUserId(), Times.Once);
+
+        // Verify that GetAll was called
         _itemService.Verify(o => o.GetAll(filter), Times.Once);
+
+        // Verify that GetAllPublic was not called because the user filters his own items
+        _itemService.Verify(o => o.GetAllPublic(filter), Times.Never);
     }
 
     #endregion

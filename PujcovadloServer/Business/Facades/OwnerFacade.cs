@@ -21,6 +21,11 @@ public class OwnerFacade
         _configuration = configuration;
     }
 
+    /// <summary>
+    /// Retruns paginated list of loans where the current user is the owner.
+    /// </summary>
+    /// <param name="filter">Filter to be used.</param>
+    /// <returns></returns>
     public virtual async Task<PaginatedList<Loan>> GetMyLoans(LoanFilter filter)
     {
         // Get current user

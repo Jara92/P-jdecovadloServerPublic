@@ -7,6 +7,7 @@ using PujcovadloServer.Business.Enums;
 using PujcovadloServer.Business.Exceptions;
 using PujcovadloServer.Business.Services;
 using PujcovadloServer.Business.Services.Interfaces;
+using PujcovadloServer.Business.States.Loan;
 using PujcovadloServer.Requests;
 
 namespace Tests.Business.Facades;
@@ -36,7 +37,7 @@ public class PickupProtocolFacadeTest
         _configuration = new Mock<PujcovadloServerConfiguration>(null);
 
         _pickupProtocolFacade = new PickupProtocolFacade(_imageFacade.Object, _pickupProtocolService.Object,
-            _mapper.Object, _configuration.Object);
+            _loanService.Object, _mapper.Object, _configuration.Object);
 
         _user = new ApplicationUser() { Id = "1" };
         _owner = new ApplicationUser() { Id = "2" };
@@ -110,6 +111,11 @@ public class PickupProtocolFacadeTest
             LoanStatus.Returned
         };
 
+        // Mock state
+        var state = new Mock<ILoanState>();
+        state.Setup(x => x.CanCreatePickupProtocol(_loan)).Returns(false);
+        _loanService.Setup(x => x.GetState(_loan)).Returns(state.Object);
+
         // Arrange
         var request = new PickupProtocolRequest() { Description = "All Ok", AcceptedRefundableDeposit = 2000 };
 
@@ -132,6 +138,11 @@ public class PickupProtocolFacadeTest
         _loan.Status = LoanStatus.Accepted;
         _loan.PickupProtocol = new PickupProtocol() { Id = 1, Loan = _loan };
 
+        // Mock state
+        var state = new Mock<ILoanState>();
+        state.Setup(x => x.CanCreatePickupProtocol(_loan)).Returns(true);
+        _loanService.Setup(x => x.GetState(_loan)).Returns(state.Object);
+
         // Run the operation
         Assert.ThrowsAsync<OperationNotAllowedException>(async () =>
             await _pickupProtocolFacade.CreatePickupProtocol(_loan, request));
@@ -144,6 +155,11 @@ public class PickupProtocolFacadeTest
         var request = new PickupProtocolRequest() { Description = "All Ok", AcceptedRefundableDeposit = 2000 };
         _loan.Status = LoanStatus.Accepted;
         _loan.PickupProtocol = null;
+
+        // Mock state
+        var state = new Mock<ILoanState>();
+        state.Setup(x => x.CanCreatePickupProtocol(_loan)).Returns(true);
+        _loanService.Setup(x => x.GetState(_loan)).Returns(state.Object);
 
         // Arrange the mock
         _mapper.Setup(x => x.Map<PickupProtocol>(request)).Returns(new PickupProtocol()
@@ -163,6 +179,86 @@ public class PickupProtocolFacadeTest
 
         // Check that the protocol was created
         _pickupProtocolService.Verify(x => x.Create(result), Times.Once);
+    }
+
+    #endregion
+
+    #region UpdatePickupProtocol
+
+    [Test]
+    public async Task UpdatePickupProtocol_LoanStatusIsNotAccepted_ThrowsException()
+    {
+        // Arrange
+        _loan.PickupProtocol = new PickupProtocol() { Id = 1, Loan = _loan };
+        var request = new PickupProtocolRequest() { Description = "All Ok", AcceptedRefundableDeposit = 2000 };
+
+        var disallowedStatuses = new List<LoanStatus>()
+        {
+            LoanStatus.Inquired,
+            LoanStatus.Denied,
+            LoanStatus.Cancelled,
+            LoanStatus.PreparedForPickup,
+            LoanStatus.Active,
+            LoanStatus.PreparedForReturn,
+            LoanStatus.ReturnDenied,
+            LoanStatus.Returned
+        };
+
+        // Mock state
+        var state = new Mock<ILoanState>();
+        state.Setup(x => x.CanUpdatePickupProtocol(_loan)).Returns(false);
+        _loanService.Setup(x => x.GetState(_loan)).Returns(state.Object);
+
+        // Check that each disallowed status throws an exception
+        foreach (var status in disallowedStatuses)
+        {
+            _loan.Status = status;
+
+            // Run the operation
+            Assert.ThrowsAsync<OperationNotAllowedException>(() =>
+                _pickupProtocolFacade.UpdatePickupProtocol(_loan.PickupProtocol, request));
+        }
+    }
+
+    [Test]
+    public async Task UpdatePickupProtocol_PickupProtocolExists_Success()
+    {
+        // Arrange statuses that allow the protocol to be updated
+        var statuses = new List<LoanStatus>() { LoanStatus.Accepted, LoanStatus.PickupDenied };
+
+        // Arrange
+        var request = new PickupProtocolRequest() { Description = "All Ok", AcceptedRefundableDeposit = 2000 };
+        _loan.PickupProtocol = new PickupProtocol() { Id = 1, Loan = _loan };
+
+        // Mock state
+        var state = new Mock<ILoanState>();
+        state.Setup(x => x.CanUpdatePickupProtocol(_loan)).Returns(true);
+        _loanService.Setup(x => x.GetState(_loan)).Returns(state.Object);
+
+        // Arrange the mock
+        _mapper.Setup(x => x.Map<PickupProtocol>(request)).Returns(new PickupProtocol()
+        {
+            Description = request.Description,
+            AcceptedRefundableDeposit = request.AcceptedRefundableDeposit
+        });
+
+
+        foreach (var status in statuses)
+        {
+            _loan.Status = status;
+
+            // Run the operation
+            await _pickupProtocolFacade.UpdatePickupProtocol(_loan.PickupProtocol, request);
+
+            // Check that the protocol was created
+            Assert.That(_loan.PickupProtocol, Is.Not.Null);
+            Assert.That(_loan.PickupProtocol.Loan.Id, Is.EqualTo(_loan.PickupProtocol.Id));
+            Assert.That(_loan.PickupProtocol.Description, Is.EqualTo(request.Description));
+            Assert.That(_loan.PickupProtocol.AcceptedRefundableDeposit, Is.EqualTo(request.AcceptedRefundableDeposit));
+        }
+
+        // Check that the protocol was updated exactly statuses.Count times
+        _pickupProtocolService.Verify(x => x.Update(_loan.PickupProtocol), Times.Exactly(statuses.Count));
     }
 
     #endregion

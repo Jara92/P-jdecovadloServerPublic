@@ -40,4 +40,10 @@ public class ActiveLoanState : ALoanState
         // Change the loan status
         loan.Status = LoanStatus.PreparedForReturn;
     }
+
+    /// <inheritdoc cref="ILoanState"/>
+    public override bool CanUpdateReturnProtocol(Entities.Loan loan) => true;
+
+    /// <inheritdoc cref="ILoanState"/>
+    public override bool CanCreateReturnProtocol(Entities.Loan loan) => true;
 }

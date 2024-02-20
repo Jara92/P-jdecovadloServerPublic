@@ -7,6 +7,7 @@ using PujcovadloServer.Business.Enums;
 using PujcovadloServer.Business.Exceptions;
 using PujcovadloServer.Business.Services;
 using PujcovadloServer.Business.Services.Interfaces;
+using PujcovadloServer.Business.States.Loan;
 using PujcovadloServer.Requests;
 
 namespace Tests.Business.Facades;
@@ -36,7 +37,7 @@ public class ReturnProtocolFacadeTest
         _configuration = new Mock<PujcovadloServerConfiguration>(null);
 
         _returnProtocolFacade = new ReturnProtocolFacade(_imageFacade.Object, _returnProtocolService.Object,
-            _mapper.Object, _configuration.Object);
+            _loanService.Object, _mapper.Object, _configuration.Object);
 
         _user = new ApplicationUser() { Id = "1" };
         _owner = new ApplicationUser() { Id = "2" };
@@ -118,6 +119,11 @@ public class ReturnProtocolFacadeTest
             Description = request.Description, ReturnedRefundableDeposit = request.ReturnedRefundableDeposit,
         };
 
+        // Mock the state
+        var state = new Mock<ILoanState>();
+        state.Setup(x => x.CanCreateReturnProtocol(_loan)).Returns(false);
+        _loanService.Setup(x => x.GetState(_loan)).Returns(state.Object);
+
         // Mock the mapper
         _mapper.Setup(x => x.Map<ReturnProtocol>(request)).Returns(returnProtocol);
 
@@ -134,7 +140,7 @@ public class ReturnProtocolFacadeTest
     }
 
     [Test]
-    public void CreateReturnProtocol_LoanStatusActiveOrReturnDenied_Success()
+    public void CreateReturnProtocol_LoanStatusActive_Success()
     {
         _loan.Status = LoanStatus.Active;
         _loan.ReturnProtocol = null;
@@ -146,6 +152,11 @@ public class ReturnProtocolFacadeTest
         {
             Description = request.Description, ReturnedRefundableDeposit = request.ReturnedRefundableDeposit,
         };
+
+        // Mock state 
+        var state = new Mock<ILoanState>();
+        state.Setup(x => x.CanCreateReturnProtocol(_loan)).Returns(true);
+        _loanService.Setup(x => x.GetState(_loan)).Returns(state.Object);
 
         // Mock the mapper
         _mapper.Setup(x => x.Map<ReturnProtocol>(request)).Returns(returnProtocol);
@@ -162,6 +173,11 @@ public class ReturnProtocolFacadeTest
         var request = new ReturnProtocolRequest() { Description = "All Ok", ReturnedRefundableDeposit = 2000 };
         _loan.Status = LoanStatus.Active;
         _loan.ReturnProtocol = new ReturnProtocol() { Id = 1, Loan = _loan };
+
+        // Mock state
+        var state = new Mock<ILoanState>();
+        state.Setup(x => x.CanCreateReturnProtocol(_loan)).Returns(true);
+        _loanService.Setup(x => x.GetState(_loan)).Returns(state.Object);
 
         // Run the operation
         Assert.ThrowsAsync<OperationNotAllowedException>(async () =>
@@ -183,6 +199,11 @@ public class ReturnProtocolFacadeTest
             ReturnedRefundableDeposit = request.ReturnedRefundableDeposit
         });
 
+        // mock state
+        var state = new Mock<ILoanState>();
+        state.Setup(x => x.CanCreateReturnProtocol(_loan)).Returns(true);
+        _loanService.Setup(x => x.GetState(_loan)).Returns(state.Object);
+
         // Run the operation
         var result = await _returnProtocolFacade.CreateReturnProtocol(_loan, request);
 
@@ -194,6 +215,86 @@ public class ReturnProtocolFacadeTest
 
         // Check that the protocol was created
         _returnProtocolService.Verify(x => x.Create(result), Times.Once);
+    }
+
+    #endregion
+
+    #region UpdateReturnProtocol
+
+    [Test]
+    public async Task UpdateReturnProtocol_LoanStatusIsNotAccepted_ThrowsException()
+    {
+        // Arrange
+        _loan.ReturnProtocol = new ReturnProtocol() { Id = 1, Loan = _loan };
+        var request = new ReturnProtocolRequest() { Description = "All Ok", ReturnedRefundableDeposit = 2000 };
+
+        var disallowedStatuses = new List<LoanStatus>()
+        {
+            LoanStatus.Inquired,
+            LoanStatus.Denied,
+            LoanStatus.Accepted,
+            LoanStatus.Cancelled,
+            LoanStatus.PreparedForPickup,
+            LoanStatus.PickupDenied,
+            LoanStatus.PreparedForReturn,
+            LoanStatus.Returned
+        };
+
+        // Mock state
+        var state = new Mock<ILoanState>();
+        state.Setup(x => x.CanUpdateReturnProtocol(_loan)).Returns(false);
+        _loanService.Setup(x => x.GetState(_loan)).Returns(state.Object);
+
+        // Check that each disallowed status throws an exception
+        foreach (var status in disallowedStatuses)
+        {
+            _loan.Status = status;
+
+            // Run the operation
+            Assert.ThrowsAsync<OperationNotAllowedException>(() =>
+                _returnProtocolFacade.UpdateReturnProtocol(_loan.ReturnProtocol, request));
+        }
+    }
+
+    [Test]
+    public async Task UpdateReturnProtocol_ReturnProtocolExists_Success()
+    {
+        // Arrange statuses that allow the protocol to be updated
+        var statuses = new List<LoanStatus>() { LoanStatus.Active, LoanStatus.ReturnDenied, };
+
+        // Arrange
+        var request = new ReturnProtocolRequest() { Description = "All Ok", ReturnedRefundableDeposit = 2000 };
+        _loan.ReturnProtocol = new ReturnProtocol() { Id = 1, Loan = _loan };
+
+        // Mock state
+        var state = new Mock<ILoanState>();
+        state.Setup(x => x.CanUpdateReturnProtocol(_loan)).Returns(true);
+        _loanService.Setup(x => x.GetState(_loan)).Returns(state.Object);
+
+        // Arrange the mock
+        _mapper.Setup(x => x.Map<ReturnProtocol>(request)).Returns(new ReturnProtocol()
+        {
+            Description = request.Description,
+            ReturnedRefundableDeposit = request.ReturnedRefundableDeposit
+        });
+
+
+        foreach (var status in statuses)
+        {
+            _loan.Status = status;
+
+            // Run the operation
+            await _returnProtocolFacade.UpdateReturnProtocol(_loan.ReturnProtocol, request);
+
+            // Check that the protocol was created
+            Assert.That(_loan.ReturnProtocol, Is.Not.Null);
+            Assert.That(_loan.ReturnProtocol.Loan.Id, Is.EqualTo(_loan.ReturnProtocol.Id));
+            Assert.That(_loan.ReturnProtocol.Description, Is.EqualTo(request.Description));
+            Assert.That(_loan.ReturnProtocol.ReturnedRefundableDeposit, Is.EqualTo(request.ReturnedRefundableDeposit));
+        }
+
+        // Check that the protocol was updated exactly statuses.Count times
+        _returnProtocolService.Verify(x => x.Update(_loan.ReturnProtocol), Times.Exactly(statuses.Count));
     }
 
     #endregion

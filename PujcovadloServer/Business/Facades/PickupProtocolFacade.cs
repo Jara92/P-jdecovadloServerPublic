@@ -1,6 +1,5 @@
 using AutoMapper;
 using PujcovadloServer.Business.Entities;
-using PujcovadloServer.Business.Enums;
 using PujcovadloServer.Business.Exceptions;
 using PujcovadloServer.Business.Services;
 using PujcovadloServer.Requests;
@@ -11,14 +10,17 @@ public class PickupProtocolFacade
 {
     private readonly ImageFacade _imageFacade;
     private readonly PickupProtocolService _pickupProtocolService;
+    private readonly LoanService _loanService;
     private readonly IMapper _mapper;
     private readonly PujcovadloServerConfiguration _configuration;
 
-    public PickupProtocolFacade(ImageFacade imageFacade, PickupProtocolService pickupProtocolService, IMapper mapper,
-        PujcovadloServerConfiguration configuration)
+    public PickupProtocolFacade(ImageFacade imageFacade, PickupProtocolService pickupProtocolService,
+        LoanService loanService,
+        IMapper mapper, PujcovadloServerConfiguration configuration)
     {
         _imageFacade = imageFacade;
         _pickupProtocolService = pickupProtocolService;
+        _loanService = loanService;
         _mapper = mapper;
         _configuration = configuration;
     }
@@ -38,6 +40,27 @@ public class PickupProtocolFacade
     }
 
     /// <summary>
+    /// Can the pickup protocol be created?
+    /// </summary>
+    /// <param name="loan">Loan of the pickup protocol</param>
+    /// <returns>CanCreate = if the pickup protocol can be created.</returns>
+    public (bool CanCreate, string Reason) CanCreatePickupProtocol(Loan loan)
+    {
+        // Get current loan status
+        var loanState = _loanService.GetState(loan);
+
+        // Check if the protocol can be created in the current loan status
+        if (loanState.CanCreatePickupProtocol(loan) == false)
+            return (false, "Pickup protocol cannot be created in the current loan status.");
+
+        // Check if the protocol already exists
+        if (loan.PickupProtocol != null)
+            return (false, "Pickup protocol already exists.");
+
+        return (true, "OK");
+    }
+
+    /// <summary>
     /// Creates a pickup protocol for the loan.
     /// </summary>
     /// <param name="loan">Protocols loan.</param>
@@ -46,14 +69,10 @@ public class PickupProtocolFacade
     /// <exception cref="OperationNotAllowedException">Thrown if pickup protocol is not allowed to be created.</exception>
     public async Task<PickupProtocol> CreatePickupProtocol(Loan loan, PickupProtocolRequest request)
     {
-        // Check if the loan is in the correct status
-        if (loan.Status != LoanStatus.Accepted)
-            throw new OperationNotAllowedException("Loan must be in status " + LoanStatus.Accepted +
-                                                   " to create pickup protocol.");
-
-        // Check if the protocol already exists
-        if (loan.PickupProtocol != null)
-            throw new OperationNotAllowedException("Pickup protocol already exists.");
+        // Check if the protocol can be created
+        var canCreateResult = CanCreatePickupProtocol(loan);
+        if (canCreateResult.CanCreate == false)
+            throw new OperationNotAllowedException(canCreateResult.Reason);
 
         // Create protocol
         var protocol = _mapper.Map<PickupProtocol>(request);
@@ -66,6 +85,25 @@ public class PickupProtocolFacade
     }
 
     /// <summary>
+    /// Can the pickup protocol be updated?
+    /// </summary>
+    /// <param name="protocol"></param>
+    /// <returns>CanUpdate = true if the pickup protocol can be updated.</returns>
+    public (bool CanUpdate, string Reason) CanUpdatePickupProtocol(PickupProtocol protocol)
+    {
+        // Get current loan status
+        var loanState = _loanService.GetState(protocol.Loan);
+
+        // Check if the protocol can be updated
+        if (loanState.CanUpdatePickupProtocol(protocol.Loan) == false)
+        {
+            return (false, "Pickup protocol cannot be updated in the current loan status.");
+        }
+
+        return (true, "OK");
+    }
+
+    /// <summary>
     /// Updated PickupProtocol.
     /// </summary>
     /// <param name="protocol">Pickup protocol to update.</param>
@@ -74,8 +112,9 @@ public class PickupProtocolFacade
     public async Task UpdatePickupProtocol(PickupProtocol protocol, PickupProtocolRequest request)
     {
         // Check if the protocol can be updated
-        if (protocol.Loan.Status != LoanStatus.PickupDenied)
-            throw new OperationNotAllowedException("Pickup protocol can be updated only if the loan pickup is denied.");
+        var canUpdateResult = CanUpdatePickupProtocol(protocol);
+        if (canUpdateResult.CanUpdate == false)
+            throw new OperationNotAllowedException(canUpdateResult.Reason);
 
         // Update protocol data
         protocol.Description = request.Description;
@@ -84,16 +123,24 @@ public class PickupProtocolFacade
         await _pickupProtocolService.Update(protocol);
     }
 
+    /// <summary>
+    /// Add image to the pickup protocol.
+    /// </summary>
+    /// <param name="pickupProtocol">Pickup protocol to be updated.</param>
+    /// <param name="image">Image to be added</param>
+    /// <param name="filePath">Filepath of the image file.</param>
+    /// <exception cref="OperationNotAllowedException">Thrown when the protocol cannot be updated.</exception>
+    /// <exception cref="ArgumentException">Thrown when maximum amount of images was exceeded</exception>
     public async Task AddPickupProtocolImage(PickupProtocol pickupProtocol, Image image, string filePath)
     {
+        // Check that the item can be updated
+        var canUpdateResult = CanUpdatePickupProtocol(pickupProtocol);
+        if (canUpdateResult.CanUpdate == false)
+            throw new OperationNotAllowedException(canUpdateResult.Reason);
+
         // Check that the item has not reached the maximum number of images
         if (pickupProtocol.Images.Count >= _configuration.MaxImagesPerPickupProtocol)
             throw new ArgumentException("Max images per pickupProtocol exceeded.");
-
-        // Check loan status
-        if (pickupProtocol.Loan.Status != LoanStatus.Accepted && pickupProtocol.Loan.Status != LoanStatus.PickupDenied)
-            throw new OperationNotAllowedException(
-                "Images can be added only if the loan is accepted or pickup is denied.");
 
         // set images pickupProtocol
         image.PickupProtocol = pickupProtocol;

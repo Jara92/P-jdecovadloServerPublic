@@ -24,6 +24,11 @@ public class LoanFacade
         _authenticateService = authenticateService;
     }
 
+    /// <summary>
+    /// Returns paginated list of loans by given filter.
+    /// </summary>
+    /// <param name="filter">Filter to be used.</param>
+    /// <returns>Paginated list of loans.</returns>
     public Task<PaginatedList<Loan>> GetLoans(LoanFilter filter)
     {
         var userId = _authenticateService.GetCurrentUserId();
@@ -44,6 +49,12 @@ public class LoanFacade
         return _loanService.GetLoansByUserId(userId, filter);
     }
 
+    /// <summary>
+    /// Returns loan by given id.
+    /// </summary>
+    /// <param name="loanId">Id of the loan</param>
+    /// <returns>Loan</returns>
+    /// <exception cref="EntityNotFoundException">thrown when loan with given id does not exist.</exception>
     public async Task<Loan> GetLoan(int loanId)
     {
         var loan = await _loanService.Get(loanId);
@@ -52,6 +63,12 @@ public class LoanFacade
         return loan;
     }
 
+    /// <summary>
+    /// Updates loan by given request.
+    /// </summary>
+    /// <param name="loan">Loan to be updated.</param>
+    /// <param name="request">Request to update the loan.</param>
+    /// <returns></returns>
     public Task UpdateLoan(Loan loan, LoanUpdateRequest request)
     {
         var userId = _authenticateService.GetCurrentUserId();

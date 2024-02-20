@@ -35,4 +35,7 @@ public class PickupDeniedLoanState : ALoanState
                     $"Cannot change loan status from {loan.Status} to {newStatus} as an owner.");
         }
     }
+
+    /// <inheritdoc cref="ILoanState"/>
+    public override bool CanUpdatePickupProtocol(Entities.Loan loan) => true;
 }

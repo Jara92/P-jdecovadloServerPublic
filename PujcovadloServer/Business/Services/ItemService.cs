@@ -13,7 +13,7 @@ public class ItemService(IItemRepository repository) : ACrudService<Item, IItemR
         return await _repository.GetAll(filter);
     }
 
-    public async Task<PaginatedList<Item>> GetAllPublic(ItemFilter filter)
+    public virtual async Task<PaginatedList<Item>> GetAllPublic(ItemFilter filter)
     {
         filter.Status = ItemStatus.Public;
         return await GetAll(filter);

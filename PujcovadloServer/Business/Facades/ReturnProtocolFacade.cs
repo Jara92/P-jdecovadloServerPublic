@@ -1,6 +1,5 @@
 using AutoMapper;
 using PujcovadloServer.Business.Entities;
-using PujcovadloServer.Business.Enums;
 using PujcovadloServer.Business.Exceptions;
 using PujcovadloServer.Business.Services;
 using PujcovadloServer.Requests;
@@ -11,14 +10,16 @@ public class ReturnProtocolFacade
 {
     private readonly ImageFacade _imageFacade;
     private readonly ReturnProtocolService _returnProtocolService;
+    private readonly LoanService _loanService;
     private readonly IMapper _mapper;
     private readonly PujcovadloServerConfiguration _configuration;
 
-    public ReturnProtocolFacade(ImageFacade imageFacade, ReturnProtocolService returnProtocolService, IMapper mapper,
-        PujcovadloServerConfiguration configuration)
+    public ReturnProtocolFacade(ImageFacade imageFacade, ReturnProtocolService returnProtocolService,
+        LoanService loanService, IMapper mapper, PujcovadloServerConfiguration configuration)
     {
         _imageFacade = imageFacade;
         _returnProtocolService = returnProtocolService;
+        _loanService = loanService;
         _mapper = mapper;
         _configuration = configuration;
     }
@@ -42,16 +43,18 @@ public class ReturnProtocolFacade
     /// </summary>
     /// <param name="loan">The loan</param>
     /// <exception cref="OperationNotAllowedException">Thrown is the protocol cannot be created.</exception>
-    public void CheckCanCreateReturnProtocol(Loan loan)
+    public (bool CanCreate, string Reason) CanCreateReturnProtocol(Loan loan)
     {
-        // Check if the loan is in the correct status
-        if (loan.Status != LoanStatus.Active)
-            throw new OperationNotAllowedException("Loan must be in status " + LoanStatus.Active +
-                                                   " to create pickup protocol.");
+        // Check if the loan state allows the protocol to be created
+        var loanState = _loanService.GetState(loan);
+        if (loanState.CanCreateReturnProtocol(loan) == false)
+            return (false, "Return protocol cannot be created in the current loan status.");
 
         // Check if the protocol already exists
         if (loan.ReturnProtocol != null)
-            throw new OperationNotAllowedException("Return protocol already exists.");
+            return (false, "Return protocol already exists");
+
+        return (true, "OK");
     }
 
     /// <summary>
@@ -63,7 +66,10 @@ public class ReturnProtocolFacade
     /// <exception cref="OperationNotAllowedException">Thrown if pickup protocol is not allowed to be created.</exception>
     public async Task<ReturnProtocol> CreateReturnProtocol(Loan loan, ReturnProtocolRequest request)
     {
-        CheckCanCreateReturnProtocol(loan);
+        // Check if the protocol can be created
+        var canCreateResult = CanCreateReturnProtocol(loan);
+        if (canCreateResult.CanCreate == false)
+            throw new OperationNotAllowedException(canCreateResult.Reason);
 
         // Create protocol
         var protocol = _mapper.Map<ReturnProtocol>(request);
@@ -79,12 +85,16 @@ public class ReturnProtocolFacade
     /// Tests if the protocol can be updated.
     /// </summary>
     /// <param name="protocol">Protocol to be updated.</param>
+    /// <returns>CanUpdate = true if the protocol can be updated.</returns>
     /// <exception cref="OperationNotAllowedException">Thrown is the protocol cannot be created.</exception>
-    public void CheckCanUpdateReturnProtocol(ReturnProtocol protocol)
+    public (bool CanUpdate, string Reason) CanUpdateReturnProtocol(ReturnProtocol protocol)
     {
-        if (protocol.Loan.Status != LoanStatus.Active && protocol.Loan.Status != LoanStatus.ReturnDenied)
-            throw new OperationNotAllowedException(
-                "Return protocol can be updated only if the loan is active or returns is denied.");
+        // Check if the loan state allows the protocol to be updated
+        var loanState = _loanService.GetState(protocol.Loan);
+        if (loanState.CanUpdateReturnProtocol(protocol.Loan) == false)
+            return (false, "Return protocol cannot be updated in the current loan status.");
+
+        return (true, "OK");
     }
 
     /// <summary>
@@ -95,7 +105,10 @@ public class ReturnProtocolFacade
     /// <exception cref="OperationNotAllowedException">Thrown if the action cannot be performed.</exception>
     public async Task UpdateReturnProtocol(ReturnProtocol protocol, ReturnProtocolRequest request)
     {
-        CheckCanUpdateReturnProtocol(protocol);
+        // Check if the protocol can be updated
+        var canUpdateResult = CanUpdateReturnProtocol(protocol);
+        if (canUpdateResult.CanUpdate == false)
+            throw new OperationNotAllowedException(canUpdateResult.Reason);
 
         // Update protocol data
         protocol.Description = request.Description;
@@ -106,7 +119,10 @@ public class ReturnProtocolFacade
 
     public async Task AddReturnProtocolImage(ReturnProtocol returnProtocol, Image image, string filePath)
     {
-        CheckCanUpdateReturnProtocol(returnProtocol);
+        // Check if the protocol can be updated
+        var canUpdateResult = CanUpdateReturnProtocol(returnProtocol);
+        if (canUpdateResult.CanUpdate == false)
+            throw new OperationNotAllowedException(canUpdateResult.Reason);
 
         // Check that the item has not reached the maximum number of images
         if (returnProtocol.Images.Count >= _configuration.MaxImagesPerReturnProtocol)

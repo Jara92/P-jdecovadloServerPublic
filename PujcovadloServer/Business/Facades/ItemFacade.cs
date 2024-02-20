@@ -38,6 +38,11 @@ public class ItemFacade
         _configuration = configuration;
     }
 
+    /// <summary>
+    /// Returns all items by given filter.
+    /// </summary>
+    /// <param name="filter">Filter data</param>
+    /// <returns>Paginated and filtered items</returns>
     public Task<PaginatedList<Item>> GetAll(ItemFilter filter)
     {
         var userId = _authenticateService.TryGetCurrentUserId();
@@ -109,20 +114,27 @@ public class ItemFacade
         return item;
     }
 
+    /// <summary>
+    /// Updates item using <see cref="ItemRequest"/>
+    /// </summary>
+    /// <param name="item">Item to be updated.</param>
+    /// <param name="request">Request with new data.</param>
     public async Task UpdateItem(Item item, ItemRequest request)
     {
         await FillItemRequest(item, request);
-
-        // Item updated so we need to approve it
-        if (item.Status == ItemStatus.Denied)
-            item.Status = ItemStatus.Approving;
 
         // Update the item
         await _itemService.Update(item);
     }
 
+    /// <summary>
+    /// Deletes the item if it is allowed.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <exception cref="OperationNotAllowedException"></exception>
     public async Task DeleteItem(Item item)
     {
+        // Check if the item can be deleted
         if (!await CanDelete(item))
             throw new OperationNotAllowedException("Item cannot be deleted because there are running loans.");
 
@@ -130,6 +142,11 @@ public class ItemFacade
         await _itemService.Delete(item);
     }
 
+    /// <summary>
+    /// Can the item be deleted?
+    /// </summary>
+    /// <param name="item">Item to be deleted</param>
+    /// <returns>True - if the item can be deleted</returns>
     public async Task<bool> CanDelete(Item item)
     {
         // Check if the item has any running loans
@@ -137,19 +154,6 @@ public class ItemFacade
 
         // Return true if there are no running loans
         return runningLoans == 0;
-    }
-
-    public async Task<PaginatedList<Item>> GetMyItems(ItemFilter filter)
-    {
-        var user = await _authenticateService.GetCurrentUser();
-
-        // Set owner id
-        filter.OwnerId = user.Id;
-
-        // Get items
-        var items = await _itemService.GetAll(filter);
-
-        return items;
     }
 
     /// <summary>
@@ -169,6 +173,13 @@ public class ItemFacade
         return item;
     }
 
+    /// <summary>
+    /// Adds a new image to the item
+    /// </summary>
+    /// <param name="item">Item</param>
+    /// <param name="image">New image to be added.</param>
+    /// <param name="filePath">Filepath to the image file.</param>
+    /// <exception cref="ArgumentException">Thrown when maximum amount of images per item was exceeded.</exception>
     public async Task AddImage(Item item, Image image, string filePath)
     {
         // Check that the item has not reached the maximum number of images
@@ -177,8 +188,6 @@ public class ItemFacade
 
         // set images item
         image.Item = item;
-
-        // TODO: update item status 
 
         // Create using image facade
         await _imageFacade.Create(image, filePath);

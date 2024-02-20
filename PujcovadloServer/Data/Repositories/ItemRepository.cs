@@ -22,8 +22,6 @@ public class ItemRepository : ACrudRepository<Item, ItemFilter>, IItemRepository
     {
         var query = _dbSet.AsQueryable();
 
-        // Todo: dont show deleted items
-
         // Filter by status
         if (filter.Status != null)
             query = query.Where(i => i.Status == filter.Status);

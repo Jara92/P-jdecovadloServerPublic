@@ -21,6 +21,18 @@ public abstract class ALoanState : ILoanState
         HandleOwnerImplementation(loan, newStatus);
     }
 
+    /// <inheritdoc cref="ILoanState"/>
+    public virtual bool CanUpdatePickupProtocol(Entities.Loan loan) => false;
+
+    /// <inheritdoc cref="ILoanState"/>
+    public virtual bool CanCreatePickupProtocol(Entities.Loan loan) => false;
+
+    /// <inheritdoc cref="ILoanState"/>
+    public virtual bool CanUpdateReturnProtocol(Entities.Loan loan) => false;
+
+    /// <inheritdoc cref="ILoanState"/>
+    public virtual bool CanCreateReturnProtocol(Entities.Loan loan) => false;
+
     protected abstract void HandleTenantImplementation(Entities.Loan loan, LoanStatus newStatus);
 
     protected abstract void HandleOwnerImplementation(Entities.Loan loan, LoanStatus newStatus);

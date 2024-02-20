@@ -27,4 +27,7 @@ public class ReturnDeniedLoanState : ALoanState
                     $"Cannot change loan status from {loan.Status} to {newStatus} as an owner.");
         }
     }
+
+    /// <inheritdoc cref="ILoanState"/>
+    public override bool CanUpdateReturnProtocol(Entities.Loan loan) => true;
 }
