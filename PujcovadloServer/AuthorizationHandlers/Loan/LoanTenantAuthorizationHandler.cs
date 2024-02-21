@@ -53,6 +53,12 @@ public class
             context.Succeed(requirement);
         }
 
+        // tenant can review the loan
+        if (requirement.Name == LoanOperations.Constants.ReviewOperationName)
+        {
+            context.Succeed(requirement);
+        }
+
         return Task.CompletedTask;
     }
 }

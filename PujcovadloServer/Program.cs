@@ -152,6 +152,7 @@ builder.Services.AddScoped<IImageRepository, ImageRepository>();
 builder.Services.AddScoped<ILoanRepository, LoanRepository>();
 builder.Services.AddScoped<IPickupProtocolRepository, PickupProtocolRepository>();
 builder.Services.AddScoped<IReturnProtocolRepository, ReturnProtocolRepository>();
+builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 
 // Services
 builder.Services.AddScoped<ItemService>();
@@ -161,6 +162,7 @@ builder.Services.AddScoped<ImageService>();
 builder.Services.AddScoped<LoanService>();
 builder.Services.AddScoped<PickupProtocolService>();
 builder.Services.AddScoped<ReturnProtocolService>();
+builder.Services.AddScoped<ReviewService>();
 
 // Facades
 builder.Services.AddScoped<ItemFacade>();
@@ -171,6 +173,7 @@ builder.Services.AddScoped<TenantFacade>();
 builder.Services.AddScoped<OwnerFacade>();
 builder.Services.AddScoped<PickupProtocolFacade>();
 builder.Services.AddScoped<ReturnProtocolFacade>();
+builder.Services.AddScoped<ReviewFacade>();
 
 // Filters
 builder.Services.AddScoped<ExceptionFilter>();
@@ -182,6 +185,7 @@ builder.Services.AddScoped<LoanResponseGenerator>();
 builder.Services.AddScoped<ImageResponseGenerator>();
 builder.Services.AddScoped<PickupProtocolResponseGenerator>();
 builder.Services.AddScoped<ReturnProtocolResponseGenerator>();
+builder.Services.AddScoped<ReviewResponseGenerator>();
 
 // File upload service
 builder.Services.AddScoped<FileUploadService>();

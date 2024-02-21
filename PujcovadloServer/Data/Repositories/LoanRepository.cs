@@ -12,6 +12,7 @@ public class LoanRepository : ACrudRepository<Loan, LoanFilter>, ILoanRepository
     private readonly PujcovadloServerContext _context;
     private readonly DbSet<Loan> _dbSet;
 
+    // TODO: Move this to a service
     private readonly List<LoanStatus> _finalStatuses = new()
         { LoanStatus.Denied, LoanStatus.Returned, LoanStatus.Cancelled };
 

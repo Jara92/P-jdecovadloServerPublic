@@ -20,4 +20,7 @@ public class CanceledLoanState : ALoanState
         throw new OperationNotAllowedException(
             $"Cannot change loan status from {loan.Status} to {newStatus} as an owner.");
     }
+
+    /// <inheritdoc cref="ILoanState"/>
+    public override bool CanCreateReview(Entities.Loan loan) => true;
 }

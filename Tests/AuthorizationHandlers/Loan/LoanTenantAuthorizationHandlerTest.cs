@@ -117,7 +117,7 @@ public class LoanTenantAuthorizationHandlerTest
         var requirements = new List<IAuthorizationRequirement>
         {
             LoanOperations.Read, LoanOperations.Delete, LoanOperations.Create, LoanOperations.Update,
-            LoanOperations.CreatePickupProtocol, LoanOperations.CreatePickupProtocol
+            LoanOperations.CreatePickupProtocol, LoanOperations.CreatePickupProtocol, LoanOperations.CreateReview
         };
 
         foreach (var user in users)
@@ -358,6 +358,46 @@ public class LoanTenantAuthorizationHandlerTest
 
         // assert - tenant cannot create protocol
         Assert.That(context.HasSucceeded, Is.False);
+    }
+
+    #endregion
+
+    #region CreateReview
+
+    [Test]
+    public async Task CreateReview_UserHasTenantRoleButIsNotTheTenant_ReturnsFalse()
+    {
+        _loan.Tenant = new ApplicationUser { Id = "20" };
+
+        // Mock user
+        _authenticateService.Setup(x => x.TryGetCurrentUserId()).Returns(_tenant.FindFirstValue(ClaimTypes.Sid));
+
+        // act
+        var context =
+            new AuthorizationHandlerContext(new List<IAuthorizationRequirement> { LoanOperations.CreateReview },
+                _tenant, _loan);
+        await _authorizationHandler.HandleAsync(context);
+
+        // assert - tenant cannot review other tenant's loan
+        Assert.That(context.HasSucceeded, Is.False);
+    }
+
+    [Test]
+    public async Task CreateReview_UserHasTenantRoleAndIsTheTenant_ReturnsTrue()
+    {
+        _loan.Tenant = new ApplicationUser { Id = _tenantId };
+
+        // Mock user
+        _authenticateService.Setup(x => x.TryGetCurrentUserId()).Returns(_tenant.FindFirstValue(ClaimTypes.Sid));
+
+        // act
+        var context =
+            new AuthorizationHandlerContext(new List<IAuthorizationRequirement> { LoanOperations.CreateReview },
+                _tenant, _loan);
+        await _authorizationHandler.HandleAsync(context);
+
+        // assert - tenant can review his own loan
+        Assert.That(context.HasSucceeded, Is.True);
     }
 
     #endregion

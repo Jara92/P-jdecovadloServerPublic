@@ -117,7 +117,7 @@ public class LoanOwnerAuthorizationHandlerTest
         var requirements = new List<IAuthorizationRequirement>
         {
             LoanOperations.Read, LoanOperations.Delete, LoanOperations.Create, LoanOperations.Update,
-            LoanOperations.CreatePickupProtocol, LoanOperations.CreatePickupProtocol
+            LoanOperations.CreatePickupProtocol, LoanOperations.CreatePickupProtocol, LoanOperations.CreateReview
         };
 
         foreach (var user in users)
@@ -357,6 +357,46 @@ public class LoanOwnerAuthorizationHandlerTest
         await _authorizationHandler.HandleAsync(context);
 
         // assert - owner can read his own loan
+        Assert.That(context.HasSucceeded, Is.True);
+    }
+
+    #endregion
+
+    #region CreateReview
+
+    [Test]
+    public async Task CreateReview_UserHasOwnerRoleButIsNotTheOwner_ReturnsFalse()
+    {
+        _loan.Item.Owner = new ApplicationUser { Id = "20" };
+
+        // Mock user
+        _authenticateService.Setup(x => x.TryGetCurrentUserId()).Returns(_owner.FindFirstValue(ClaimTypes.Sid));
+
+        // act
+        var context =
+            new AuthorizationHandlerContext(new List<IAuthorizationRequirement> { LoanOperations.CreateReview },
+                _owner, _loan);
+        await _authorizationHandler.HandleAsync(context);
+
+        // assert - owner cannot review other owner's loan
+        Assert.That(context.HasSucceeded, Is.False);
+    }
+
+    [Test]
+    public async Task CreateReview_UserHasOwnerRoleAndIsTheOwner_ReturnsTrue()
+    {
+        _loan.Item.Owner = new ApplicationUser { Id = _ownerId };
+
+        // Mock user
+        _authenticateService.Setup(x => x.TryGetCurrentUserId()).Returns(_owner.FindFirstValue(ClaimTypes.Sid));
+
+        // act
+        var context =
+            new AuthorizationHandlerContext(new List<IAuthorizationRequirement> { LoanOperations.CreateReview },
+                _tenant, _loan);
+        await _authorizationHandler.HandleAsync(context);
+
+        // assert - owner can review his own loan
         Assert.That(context.HasSucceeded, Is.True);
     }
 

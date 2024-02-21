@@ -46,6 +46,12 @@ public class
             context.Succeed(requirement);
         }
 
+        // owner can review the loan
+        if (requirement.Name == LoanOperations.Constants.ReviewOperationName)
+        {
+            context.Succeed(requirement);
+        }
+
         return Task.CompletedTask;
     }
 }

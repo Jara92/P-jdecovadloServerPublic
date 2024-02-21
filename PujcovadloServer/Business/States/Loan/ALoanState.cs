@@ -33,6 +33,9 @@ public abstract class ALoanState : ILoanState
     /// <inheritdoc cref="ILoanState"/>
     public virtual bool CanCreateReturnProtocol(Entities.Loan loan) => false;
 
+    /// <inheritdoc cref="ILoanState"/>
+    public virtual bool CanCreateReview(Entities.Loan loan) => false;
+
     protected abstract void HandleTenantImplementation(Entities.Loan loan, LoanStatus newStatus);
 
     protected abstract void HandleOwnerImplementation(Entities.Loan loan, LoanStatus newStatus);

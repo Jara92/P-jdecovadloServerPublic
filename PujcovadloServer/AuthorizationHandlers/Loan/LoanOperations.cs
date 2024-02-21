@@ -22,6 +22,9 @@ public class LoanOperations
     public static OperationAuthorizationRequirement CreateReturnProtocol =
         new OperationAuthorizationRequirement { Name = Constants.CreateReturnProtocolOperationName };
 
+    public static OperationAuthorizationRequirement CreateReview =
+        new OperationAuthorizationRequirement { Name = Constants.ReviewOperationName };
+
     public class Constants
     {
         public static readonly string CreateOperationName = "Create";
@@ -30,5 +33,6 @@ public class LoanOperations
         public static readonly string DeleteOperationName = "Delete";
         public static readonly string CreatePickupProtocolOperationName = "CreatePickupProtocol";
         public static readonly string CreateReturnProtocolOperationName = "CreateReturnProtocol";
+        public static readonly string ReviewOperationName = "CreateReview";
     }
 }

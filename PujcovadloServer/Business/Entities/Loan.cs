@@ -33,6 +33,8 @@ public class Loan : BaseEntity
 
     public virtual ReturnProtocol? ReturnProtocol { get; set; }
 
+    public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
+
     public DateTime CreatedAt { get; set; } = DateTime.Now;
 
     public DateTime? UpdatedAt { get; set; }

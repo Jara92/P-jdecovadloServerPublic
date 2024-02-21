@@ -26,6 +26,8 @@ namespace PujcovadloServer.Data
 
         public DbSet<ReturnProtocol> ReturnProtocol { get; set; } = default!;
 
+        public DbSet<Review> Review { get; set; } = default!;
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // https://learn.microsoft.com/en-us/ef/core/modeling/relationships/many-to-many

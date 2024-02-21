@@ -39,6 +39,9 @@ public class MappingProfile : Profile
         CreateMap<ReturnProtocol, ReturnProtocolResponse>();
         CreateMap<ReturnProtocolRequest, ReturnProtocol>();
 
+        CreateMap<Review, ReviewResponse>();
+        CreateMap<ReviewRequest, Review>();
+
         // CreateMap<ItemCategory, ItemCategoryDto>();
         //CreateMap<ItemCategoryDto, ItemCategory>();
     }

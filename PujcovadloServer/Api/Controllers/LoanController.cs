@@ -20,18 +20,22 @@ public class LoanController : ACrudController<Loan>
     private readonly TenantFacade _tenantFacade;
     private readonly OwnerFacade _ownerFacade;
     private readonly ItemFacade _itemFacade;
+    private readonly ReviewFacade _reviewFacade;
     private readonly LoanResponseGenerator _responseGenerator;
+    private readonly ReviewResponseGenerator _reviewResponseGenerator;
 
     public LoanController(LoanFacade loanFacade, TenantFacade tenantFacade, OwnerFacade ownerFacade,
-        ItemFacade itemFacade,
-        LoanResponseGenerator responseGenerator,
+        ItemFacade itemFacade, ReviewFacade reviewFacade,
+        LoanResponseGenerator responseGenerator, ReviewResponseGenerator reviewResponseGenerator,
         AuthorizationService authorizationService, LinkGenerator urlHelper) : base(authorizationService, urlHelper)
     {
         _loanFacade = loanFacade;
         _tenantFacade = tenantFacade;
         _ownerFacade = ownerFacade;
         _itemFacade = itemFacade;
+        _reviewFacade = reviewFacade;
         _responseGenerator = responseGenerator;
+        _reviewResponseGenerator = reviewResponseGenerator;
     }
 
     [HttpGet]
@@ -100,5 +104,32 @@ public class LoanController : ACrudController<Loan>
 
         // Created response with location header
         return CreatedAtAction(_responseGenerator.GetLink(loan), response);
+    }
+
+    /// <summary>
+    /// Returns all images of the given item.
+    /// </summary>
+    /// <param name="loanId">Loan id.</param>
+    /// <param name="request">Review request data.</param>
+    /// <returns>All images associated with the item.</returns>
+    [HttpPost("{loanId}/reviews")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> CreateReview(int loanId, [FromBody] ReviewRequest request)
+    {
+        // get the loan and check permissions
+        var loan = await _loanFacade.GetLoan(loanId);
+
+        // Check permission for the loan.
+        await _authorizationService.CheckPermissions(loan, LoanOperations.CreateReview);
+
+        // Create the review
+        var review = await _reviewFacade.CreateReview(loan, request);
+
+        // generate response 
+        var response = await _reviewResponseGenerator.GenerateReviewDetailResponse(review);
+
+        return CreatedAtAction(_reviewResponseGenerator.GetLink(review), response);
     }
 }

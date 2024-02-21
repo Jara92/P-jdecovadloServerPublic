@@ -1,7 +1,9 @@
 using AutoMapper;
 using PujcovadloServer.Api.Controllers;
 using PujcovadloServer.AuthorizationHandlers;
+using PujcovadloServer.AuthorizationHandlers.Item;
 using PujcovadloServer.Business.Entities;
+using PujcovadloServer.Business.Facades;
 using PujcovadloServer.Business.Filters;
 using PujcovadloServer.Lib;
 using PujcovadloServer.Responses;
@@ -15,12 +17,13 @@ namespace PujcovadloServer.Api.Services;
 public class LoanResponseGenerator : ABaseResponseGenerator
 {
     private readonly IMapper _mapper;
+    private readonly ReviewFacade _reviewFacade;
 
-    public LoanResponseGenerator(IMapper mapper, LinkGenerator urlHelper,
-        IHttpContextAccessor httpContextAccessor,
-        AuthorizationService authorizationService) :
+    public LoanResponseGenerator(ReviewFacade reviewFacade, IMapper mapper, LinkGenerator urlHelper,
+        IHttpContextAccessor httpContextAccessor, AuthorizationService authorizationService) :
         base(httpContextAccessor, urlHelper, authorizationService)
     {
+        _reviewFacade = reviewFacade;
         _mapper = mapper;
     }
 
@@ -115,6 +118,15 @@ public class LoanResponseGenerator : ABaseResponseGenerator
         response.Links.Add(new LinkResponse(
             _urlHelper.GetUriByAction(_httpContext, nameof(LoanController.GetLoans), "Loan"),
             "LIST", "GET"));
+
+        // Link to review
+        if (await _authorizationService.CanPerformOperation(loan, LoanOperations.CreateReview) // Check permissions
+            && (await _reviewFacade.CanCreateReview(loan)).CanCreate) // Check if the review can be created
+        {
+            response.Links.Add(new LinkResponse(
+                _urlHelper.GetUriByAction(_httpContext, nameof(LoanController.CreateReview), "Loan",
+                    values: new { loanId = loan.Id }), "CREATE_REVIEW", "POST"));
+        }
 
         return response;
     }

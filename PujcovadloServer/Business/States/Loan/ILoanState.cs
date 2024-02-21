@@ -25,4 +25,6 @@ public interface ILoanState
     public bool CanUpdateReturnProtocol(Entities.Loan loan);
 
     public bool CanCreateReturnProtocol(Entities.Loan loan);
+
+    public bool CanCreateReview(Entities.Loan loan);
 }
