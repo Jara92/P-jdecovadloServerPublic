@@ -46,7 +46,7 @@ public class LoanController : ACrudController<Loan>
         var loans = await _loanFacade.GetLoans(filter);
 
         // generate response list
-        var response = await _responseGenerator.GenerateResponseList(loans, filter, nameof(GetLoans), "TenantLoan");
+        var response = await _responseGenerator.GenerateResponseList(loans, filter, nameof(GetLoans), "Loan");
 
         return Ok(response);
     }
