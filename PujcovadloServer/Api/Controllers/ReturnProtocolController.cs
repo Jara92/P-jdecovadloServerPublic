@@ -187,6 +187,9 @@ public class ReturnProtocolController : ACrudController<ReturnProtocol>
         // Save the image to the database
         await _returnProtocolFacade.AddImage(returnProtocol, image, filePath);
 
+        // Delete temporary file
+        _fileUploadService.CleanUp(filePath);
+
         // Map the image to response
         var response = await _imageResponseGenerator.GenerateImageDetailResponse(image);
 

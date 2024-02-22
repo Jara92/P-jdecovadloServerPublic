@@ -3,6 +3,7 @@ using PujcovadloServer.Api.Controllers;
 using PujcovadloServer.AuthorizationHandlers;
 using PujcovadloServer.AuthorizationHandlers.PickupProtocol;
 using PujcovadloServer.Business.Entities;
+using PujcovadloServer.Business.Facades;
 using PujcovadloServer.Responses;
 
 namespace PujcovadloServer.Api.Services;
@@ -14,12 +15,13 @@ namespace PujcovadloServer.Api.Services;
 public class PickupProtocolResponseGenerator : ABaseResponseGenerator
 {
     private readonly IMapper _mapper;
+    private readonly ImageFacade _imageFacade;
 
-    public PickupProtocolResponseGenerator(IMapper mapper, LinkGenerator urlHelper,
-        IHttpContextAccessor httpContextAccessor,
-        AuthorizationService authorizationService) :
+    public PickupProtocolResponseGenerator(ImageFacade imageFacade, IMapper mapper, LinkGenerator urlHelper,
+        IHttpContextAccessor httpContextAccessor, AuthorizationService authorizationService) :
         base(httpContextAccessor, urlHelper, authorizationService)
     {
+        _imageFacade = imageFacade;
         _mapper = mapper;
     }
 
@@ -46,7 +48,12 @@ public class PickupProtocolResponseGenerator : ABaseResponseGenerator
                     "PickupProtocol", values: new { protocol.Id }), "UPDATE", "PUT"));
         }
 
-        // todo: add images link
+        // Image links
+        for (var i = 0; i < protocol.Images.Count; i++)
+        {
+            var imageUrl = await _imageFacade.GetImagePath(protocol.Images[i]);
+            response.Images[i].Links.Add(new LinkResponse(imageUrl, "DATA", "GET"));
+        }
 
         // todo: add link for creating a new image?
 

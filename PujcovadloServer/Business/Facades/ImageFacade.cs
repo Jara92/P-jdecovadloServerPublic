@@ -1,6 +1,7 @@
 using AutoMapper;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Exceptions;
+using PujcovadloServer.Business.Interfaces;
 using PujcovadloServer.Business.Services;
 using PujcovadloServer.Business.Services.Interfaces;
 
@@ -12,14 +13,16 @@ public class ImageFacade
     private readonly IAuthenticateService _authenticateService;
     private readonly IMapper _mapper;
     private readonly PujcovadloServerConfiguration _configuration;
+    private readonly IFileStorage _fileStorage;
 
     public ImageFacade(ImageService imageService, IAuthenticateService authenticateService, IMapper mapper,
-        PujcovadloServerConfiguration configuration)
+        PujcovadloServerConfiguration configuration, IFileStorage fileStorage)
     {
         _imageService = imageService;
         _authenticateService = authenticateService;
         _mapper = mapper;
         _configuration = configuration;
+        _fileStorage = fileStorage;
     }
 
     public virtual async Task<Image> Create(Image image, string filePath)
@@ -30,42 +33,12 @@ public class ImageFacade
         image.Owner = user;
 
         // Move the file to the images directory
-        image.Path = await MoveImageFile(image, filePath);
+        image.Path = await _fileStorage.Save(filePath, _configuration.ImagesPath, image.MimeType, image.Extension);
 
         // save the image
         await _imageService.Create(image);
 
         return image;
-    }
-
-    /// <summary>
-    /// Moves temporary image file to the images directory.
-    /// </summary>
-    /// <param name="image">Image to be saved.</param>
-    /// <param name="filePath">Path to the tmp file which contains image data.</param>
-    /// <returns>Filename of the new image.</returns>
-    /// <exception cref="FileNotFoundException">Thrown when the temporary file was not found.</exception>
-    private async Task<string> MoveImageFile(Image image, string filePath)
-    {
-        // Check if the file exists
-        if (!File.Exists(filePath)) throw new FileNotFoundException();
-
-        // Create directory if it does not exist
-        Directory.CreateDirectory(_configuration.ImagesPath);
-
-        // Make sure the directory exists
-        await Task.Run(() => Directory.CreateDirectory(_configuration.ImagesPath));
-
-        // Generate new file name
-        var newFileName = Guid.NewGuid() + image.Extension;
-
-        // Move the file to the images directory
-        var newFilePath = Path.Combine(_configuration.ImagesPath, newFileName);
-
-        // Move the temporary file to the images directory under the new name
-        await Task.Run(() => File.Move(filePath, newFilePath));
-
-        return newFileName;
     }
 
     public async Task<byte[]> GetImageBytes(Image image)
@@ -81,6 +54,11 @@ public class ImageFacade
         }
 
         throw new FileNotFoundException("Image not found.");
+    }
+
+    public async Task<string> GetImagePath(Image image)
+    {
+        return await _fileStorage.GetFilePath(_configuration.ImagesPath, image.Path);
     }
 
     public async Task<Image> GetImage(int imageId)
@@ -103,5 +81,7 @@ public class ImageFacade
     public virtual async Task DeleteImage(Image image)
     {
         await _imageService.Delete(image);
+
+        await _fileStorage.Delete(_configuration.ImagesPath, image.Path);
     }
 }

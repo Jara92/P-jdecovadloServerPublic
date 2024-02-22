@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Minio;
 using NSwag;
 using PujcovadloServer;
 using PujcovadloServer.Api.Filters;
@@ -101,6 +102,13 @@ builder.Services.AddAuthentication(options =>
         };
     });
 
+// Minio object storage configuration
+builder.Services.AddMinio(configureClient => configureClient
+    .WithSSL(false)
+    .WithEndpoint(builder.Configuration["Minio:Endpoint"])
+    .WithCredentials(builder.Configuration["Minio:AccessKey"], builder.Configuration["Minio:SecretKey"])
+);
+
 // Authorization setup
 builder.Services.AddAuthorization(options =>
 {
@@ -109,6 +117,9 @@ builder.Services.AddAuthorization(options =>
         .RequireAuthenticatedUser()
         .Build();
 });
+
+// FileStorage
+builder.Services.AddScoped<IFileStorage, MinioFileStorage>();
 
 // Configuration
 builder.Services.AddScoped<PujcovadloServerConfiguration>();

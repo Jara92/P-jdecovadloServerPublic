@@ -12,7 +12,7 @@ public class ReturnProtocolResponse
 
     public virtual LoanResponse Loan { get; set; } = default!;
 
-    public ICollection<ImageResponse> Images { get; set; } = new List<ImageResponse>();
+    public IList<ImageResponse> Images { get; set; } = new List<ImageResponse>();
 
     public DateTime? CreatedAt { get; set; } = DateTime.Now;
 

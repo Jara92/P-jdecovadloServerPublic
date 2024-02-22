@@ -1,0 +1,13 @@
+version: '3'
+services:
+  pujcovadlo_mini:
+    image: quay.io/minio/minio
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - /var/pujcovadlo_minio_data:/data
+    environment:
+      MINIO_ROOT_USER: root
+      MINIO_ROOT_PASSWORD: password

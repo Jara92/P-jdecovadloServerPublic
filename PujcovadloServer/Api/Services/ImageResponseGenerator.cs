@@ -2,6 +2,7 @@ using AutoMapper;
 using PujcovadloServer.Api.Controllers;
 using PujcovadloServer.AuthorizationHandlers;
 using PujcovadloServer.Business.Entities;
+using PujcovadloServer.Business.Facades;
 using PujcovadloServer.Responses;
 
 namespace PujcovadloServer.Api.Services;
@@ -13,12 +14,13 @@ namespace PujcovadloServer.Api.Services;
 public class ImageResponseGenerator : ABaseResponseGenerator
 {
     private readonly IMapper _mapper;
+    private readonly ImageFacade _imageFacade;
 
-    public ImageResponseGenerator(IMapper mapper, LinkGenerator urlHelper,
-        IHttpContextAccessor httpContextAccessor,
-        AuthorizationService authorizationService) :
+    public ImageResponseGenerator(ImageFacade imageFacade, IMapper mapper, LinkGenerator urlHelper,
+        IHttpContextAccessor httpContextAccessor, AuthorizationService authorizationService) :
         base(httpContextAccessor, urlHelper, authorizationService)
     {
+        _imageFacade = imageFacade;
         _mapper = mapper;
     }
 
@@ -36,7 +38,7 @@ public class ImageResponseGenerator : ABaseResponseGenerator
             _urlHelper.GetUriByAction(_httpContext, nameof(ImageController.GetImage), "Image",
                 values: new { id = image.Id }), "SELF", "GET"));
 
-        AddCommonLinks(response, image);
+        await AddCommonLinks(response, image);
 
         return response;
     }
@@ -46,12 +48,11 @@ public class ImageResponseGenerator : ABaseResponseGenerator
     /// </summary>
     /// <param name="response">Response to be advanced.</param>
     /// <param name="image">Image which is the response about.</param>
-    private void AddCommonLinks(ImageResponse response, Image image)
+    private async Task AddCommonLinks(ImageResponse response, Image image)
     {
         // Add link to the image data
-        response.Links.Add(new LinkResponse(
-            _urlHelper.GetUriByAction(_httpContext, nameof(ImageDataController.GetImage), "ImageData",
-                values: new { filename = image.Path }), "DATA", "GET"));
+        var imageUrl = await _imageFacade.GetImagePath(image);
+        response.Links.Add(new LinkResponse(imageUrl, "DATA", "GET"));
 
         // Image item
         if (image.Item != null)

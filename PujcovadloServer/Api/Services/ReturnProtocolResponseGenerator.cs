@@ -3,6 +3,7 @@ using PujcovadloServer.Api.Controllers;
 using PujcovadloServer.AuthorizationHandlers;
 using PujcovadloServer.AuthorizationHandlers.ReturnProtocol;
 using PujcovadloServer.Business.Entities;
+using PujcovadloServer.Business.Facades;
 using PujcovadloServer.Responses;
 
 namespace PujcovadloServer.Api.Services;
@@ -14,12 +15,13 @@ namespace PujcovadloServer.Api.Services;
 public class ReturnProtocolResponseGenerator : ABaseResponseGenerator
 {
     private readonly IMapper _mapper;
+    private readonly ImageFacade _imageFacade;
 
-    public ReturnProtocolResponseGenerator(IMapper mapper, LinkGenerator urlHelper,
-        IHttpContextAccessor httpContextAccessor,
-        AuthorizationService authorizationService) :
+    public ReturnProtocolResponseGenerator(ImageFacade imageFacade, IMapper mapper, LinkGenerator urlHelper,
+        IHttpContextAccessor httpContextAccessor, AuthorizationService authorizationService) :
         base(httpContextAccessor, urlHelper, authorizationService)
     {
+        _imageFacade = imageFacade;
         _mapper = mapper;
     }
 
@@ -46,7 +48,13 @@ public class ReturnProtocolResponseGenerator : ABaseResponseGenerator
                     "ReturnProtocol", values: new { protocol.Id }), "UPDATE", "PUT"));
         }
 
-        // todo: add images link
+        // Images link
+        // Image links
+        for (var i = 0; i < protocol.Images.Count; i++)
+        {
+            var imageUrl = await _imageFacade.GetImagePath(protocol.Images[i]);
+            response.Images[i].Links.Add(new LinkResponse(imageUrl, "DATA", "GET"));
+        }
 
         // todo: add link for creating a new image?
 

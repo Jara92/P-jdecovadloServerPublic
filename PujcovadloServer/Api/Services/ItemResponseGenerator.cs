@@ -17,14 +17,17 @@ namespace PujcovadloServer.Api.Services;
 public class ItemResponseGenerator : ABaseResponseGenerator
 {
     private readonly ItemFacade _itemFacade;
+    private readonly ImageFacade _imageFacade;
     private readonly IMapper _mapper;
 
-    public ItemResponseGenerator(ItemFacade itemFacade, IMapper mapper, LinkGenerator urlHelper,
+    public ItemResponseGenerator(ItemFacade itemFacade, ImageFacade imageFacade, IMapper mapper,
+        LinkGenerator urlHelper,
         IHttpContextAccessor httpContextAccessor,
         AuthorizationService authorizationService) :
         base(httpContextAccessor, urlHelper, authorizationService)
     {
         _itemFacade = itemFacade;
+        _imageFacade = imageFacade;
         _mapper = mapper;
     }
 
@@ -53,25 +56,25 @@ public class ItemResponseGenerator : ABaseResponseGenerator
 
         // TODO: add link to owner
 
-        foreach (var image in response.Images)
+        for (var i = 0; i < item.Images.Count; i++)
         {
-            AddImageLinks(item, image);
+            await AddImageLinks(item, item.Images[i], response.Images[i]);
         }
 
         return response;
     }
 
-    private void AddImageLinks(Item item, ImageResponse image)
+    private async Task AddImageLinks(Item item, Image image, ImageResponse imageResponse)
     {
         // LInk to image detail
-        image.Links.Add(new LinkResponse(
+        imageResponse.Links.Add(new LinkResponse(
             _urlHelper.GetUriByAction(_httpContext, nameof(ImageController.GetImage), "Image",
-                values: new { id = image.Id }), "SELF", "GET"));
+                values: new { id = imageResponse.Id }), "SELF", "GET"));
+
+        var imageUrl = await _imageFacade.GetImagePath(image);
 
         // Link to image data
-        image.Links.Add(new LinkResponse(
-            _urlHelper.GetUriByAction(_httpContext, nameof(ImageDataController.GetImage), "ImageData",
-                values: new { fileName = image.Path }), "DATA", "GET"));
+        imageResponse.Links.Add(new LinkResponse(imageUrl, "DATA", "GET"));
     }
 
     /// <summary>
@@ -79,12 +82,12 @@ public class ItemResponseGenerator : ABaseResponseGenerator
     /// </summary>
     /// <param name="item">Item which is the response about.</param>
     /// <param name="response">Response for the links to be added.</param>
-    private void AddItemDetailLinks(Item item, ItemDetailResponse response)
+    private async Task AddItemDetailLinks(Item item, ItemDetailResponse response)
     {
         // Add image links
-        foreach (var image in response.Images)
+        for (var i = 0; i < item.Images.Count; i++)
         {
-            AddImageLinks(item, image);
+            await AddImageLinks(item, item.Images[i], response.Images[i]);
         }
     }
 
@@ -131,7 +134,7 @@ public class ItemResponseGenerator : ABaseResponseGenerator
         var response = _mapper.Map<ItemDetailResponse>(item);
 
         // Add link for detailed response
-        AddItemDetailLinks(item, response);
+        await AddItemDetailLinks(item, response);
 
         // Add links for detailed reponse
         response.Links.Add(new LinkResponse(
@@ -150,7 +153,7 @@ public class ItemResponseGenerator : ABaseResponseGenerator
         var response = _mapper.Map<ItemOwnerResponse>(item);
 
         // Add links for detailed response
-        AddItemDetailLinks(item, response);
+        await AddItemDetailLinks(item, response);
 
         // Add links for owner
         response.Links.Add(new LinkResponse(

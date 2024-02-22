@@ -223,10 +223,8 @@ public class ItemController : ACrudController<Item>
     {
         // get the item and check permissions
         var item = await _itemFacade.GetItem(id);
-
         // Save the image to the file system
         var filePath = await _fileUploadService.SaveUploadedImage(file);
-
         // Create new image
         var image = new Image()
         {
@@ -240,6 +238,9 @@ public class ItemController : ACrudController<Item>
 
         // Save the image to the database
         await _itemFacade.AddImage(item, image, filePath);
+
+        // Delete temporary file
+        _fileUploadService.CleanUp(filePath);
 
         // Map the image to response
         var response = await _imageResponseGenerator.GenerateImageDetailResponse(image);

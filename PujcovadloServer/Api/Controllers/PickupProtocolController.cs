@@ -187,6 +187,9 @@ public class PickupProtocolController : ACrudController<PickupProtocol>
         // Save the image to the database
         await _pickupProtocolFacade.AddImage(pickupProtocol, image, filePath);
 
+        // Delete temporary file
+        _fileUploadService.CleanUp(filePath);
+
         // Map the image to response
         var response = await _imageResponseGenerator.GenerateImageDetailResponse(image);
 
