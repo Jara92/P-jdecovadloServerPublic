@@ -190,7 +190,7 @@ public class ItemFacade
         image.Item = item;
 
         // Create using image facade
-        await _imageFacade.Create(image, filePath);
+        await _imageFacade.CreateImage(image, filePath);
 
         // Update item
         await _itemService.Update(item);

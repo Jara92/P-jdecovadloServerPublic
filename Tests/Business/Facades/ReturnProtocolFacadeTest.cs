@@ -29,7 +29,7 @@ public class ReturnProtocolFacadeTest
     [SetUp]
     public void Setup()
     {
-        _imageFacade = new Mock<ImageFacade>(null, null, null, null);
+        _imageFacade = new Mock<ImageFacade>(null, null, null, null, null);
         _loanService = new Mock<LoanService>(null, null);
         _returnProtocolService = new Mock<ReturnProtocolService>(null);
         _authenticateService = new Mock<IAuthenticateService>();
@@ -340,7 +340,7 @@ public class ReturnProtocolFacadeTest
         _returnProtocolService.Verify(s => s.Update(returnProtocol), Times.Never);
 
         // Verify that AddImage was not called
-        _imageFacade.Verify(o => o.Create(image, path), Times.Never);
+        _imageFacade.Verify(o => o.CreateImage(image, path), Times.Never);
     }
 
     [Test]
@@ -380,7 +380,7 @@ public class ReturnProtocolFacadeTest
         _returnProtocolService.Verify(s => s.Update(returnProtocol), Times.Once);
 
         // Verify that AddImage was not called
-        _imageFacade.Verify(o => o.Create(image, path), Times.Once);
+        _imageFacade.Verify(o => o.CreateImage(image, path), Times.Once);
     }
 
     #endregion

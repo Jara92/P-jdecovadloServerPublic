@@ -29,7 +29,7 @@ public class PickupProtocolFacadeTest
     [SetUp]
     public void Setup()
     {
-        _imageFacade = new Mock<ImageFacade>(null, null, null, null);
+        _imageFacade = new Mock<ImageFacade>(null, null, null, null, null);
         _loanService = new Mock<LoanService>(null, null);
         _pickupProtocolService = new Mock<PickupProtocolService>(null);
         _authenticateService = new Mock<IAuthenticateService>();
@@ -304,7 +304,7 @@ public class PickupProtocolFacadeTest
         _pickupProtocolService.Verify(s => s.Update(pickupProtocol), Times.Never);
 
         // Verify that AddImage was not called
-        _imageFacade.Verify(o => o.Create(image, path), Times.Never);
+        _imageFacade.Verify(o => o.CreateImage(image, path), Times.Never);
     }
 
     [Test]
@@ -344,7 +344,7 @@ public class PickupProtocolFacadeTest
         _pickupProtocolService.Verify(s => s.Update(pickupProtocol), Times.Once);
 
         // Verify that AddImage was not called
-        _imageFacade.Verify(o => o.Create(image, path), Times.Once);
+        _imageFacade.Verify(o => o.CreateImage(image, path), Times.Once);
     }
 
     #endregion

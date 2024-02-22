@@ -37,7 +37,7 @@ public class ItemFacadeTest
     [SetUp]
     public void Setup()
     {
-        _imageFacade = new Mock<ImageFacade>(null, null, null, null);
+        _imageFacade = new Mock<ImageFacade>(null, null, null, null, null);
         _itemService = new Mock<ItemService>(null);
         _loanService = new Mock<LoanService>(null, null);
         _itemCategoryService = new Mock<ItemCategoryService>(null);
@@ -516,7 +516,7 @@ public class ItemFacadeTest
         _itemService.Verify(s => s.Update(item), Times.Never);
 
         // Verify that AddImage was not called
-        _imageFacade.Verify(o => o.Create(image, path), Times.Never);
+        _imageFacade.Verify(o => o.CreateImage(image, path), Times.Never);
     }
 
     [Test]
@@ -548,7 +548,7 @@ public class ItemFacadeTest
         _itemService.Verify(s => s.Update(item), Times.Never);
 
         // Verify that AddImage was not called
-        _imageFacade.Verify(o => o.Create(image, path), Times.Never);
+        _imageFacade.Verify(o => o.CreateImage(image, path), Times.Never);
     }
 
     [Test]
@@ -578,7 +578,7 @@ public class ItemFacadeTest
         _itemService.Verify(s => s.Update(item), Times.Once);
 
         // Verify that AddImage was called
-        _imageFacade.Verify(o => o.Create(newImage, newImagePath), Times.Once);
+        _imageFacade.Verify(o => o.CreateImage(newImage, newImagePath), Times.Once);
     }
 
     #endregion

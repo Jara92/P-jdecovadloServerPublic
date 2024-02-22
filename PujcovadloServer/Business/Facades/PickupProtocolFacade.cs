@@ -146,7 +146,7 @@ public class PickupProtocolFacade
         image.PickupProtocol = pickupProtocol;
 
         // Create using image facade
-        await _imageFacade.Create(image, filePath);
+        await _imageFacade.CreateImage(image, filePath);
 
         // Update pickupProtocol
         await _pickupProtocolService.Update(pickupProtocol);

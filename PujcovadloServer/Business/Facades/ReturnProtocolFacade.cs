@@ -140,7 +140,7 @@ public class ReturnProtocolFacade
         image.ReturnProtocol = returnProtocol;
 
         // Create using image facade
-        await _imageFacade.Create(image, filePath);
+        await _imageFacade.CreateImage(image, filePath);
 
         // Update returnProtocol
         await _returnProtocolService.Update(returnProtocol);

@@ -25,7 +25,7 @@ public class ImageFacade
         _fileStorage = fileStorage;
     }
 
-    public virtual async Task<Image> Create(Image image, string filePath)
+    public virtual async Task<Image> CreateImage(Image image, string filePath)
     {
         var user = await _authenticateService.GetCurrentUser();
 
