@@ -41,21 +41,6 @@ public class ImageFacade
         return image;
     }
 
-    public async Task<byte[]> GetImageBytes(Image image)
-    {
-        // Build absolute path to the image
-        var filePath = Path.Combine(_configuration.ImagesPath, image.Path);
-
-        // Check if the file exists
-        if (File.Exists(filePath))
-        {
-            // Get all bytes of the file and return the file with the specified file contents 
-            return await File.ReadAllBytesAsync(filePath);
-        }
-
-        throw new FileNotFoundException("Image not found.");
-    }
-
     public async Task<string> GetImagePath(Image image)
     {
         return await _fileStorage.GetFilePath(_configuration.ImagesPath, image.Path);
