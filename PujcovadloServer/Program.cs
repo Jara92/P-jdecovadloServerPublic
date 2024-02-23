@@ -61,6 +61,9 @@ builder.Services.AddOpenApiDocument(options =>
 // Use controllers
 builder.Services.AddControllers();
 
+// Add support for razor pages
+builder.Services.AddRazorPages();
+
 // Development environment
 if (builder.Environment.IsDevelopment())
 {
@@ -242,9 +245,14 @@ if (app.Environment.IsProduction())
     app.UseHttpsRedirection();
 }
 
+// Define routes for admin area
+app.MapControllerRoute(
+    name: "Admin",
+    pattern: "{controller=ItemAdmin}/{action=Index}/{id?}");
 
 // Route controller actions
 app.MapControllers();
+//app.MapRazorPages();
 
 app.UseAuthentication();
 app.UseAuthorization();

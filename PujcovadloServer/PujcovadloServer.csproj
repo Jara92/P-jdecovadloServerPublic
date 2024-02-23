@@ -33,11 +33,32 @@
         <PackageReference Include="Minio" Version="6.0.2"/>
         <PackageReference Include="NSwag.AspNetCore" Version="14.0.2" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0"/>
+        <!-- Runtime recompile razor templates when debugind -->
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="3.1.0" Condition="'$(Configuration)' == 'Debug'"/>
     </ItemGroup>
 
     <ItemGroup>
       <Folder Include="Api\Middlewares\" />
       <Folder Include="Migrations\" />
+        <Folder Include="Mvc\Admin\"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <AdditionalFiles Include="Areas\Admin\Views\ItemAdmin\Create.cshtml"/>
+        <AdditionalFiles Include="Areas\Admin\Views\ItemAdmin\Delete.cshtml"/>
+        <AdditionalFiles Include="Areas\Admin\Views\ItemAdmin\Details.cshtml"/>
+        <AdditionalFiles Include="Areas\Admin\Views\ItemAdmin\Edit.cshtml"/>
+        <AdditionalFiles Include="Areas\Admin\Views\ItemAdmin\Index.cshtml"/>
+        <AdditionalFiles Include="Areas\Admin\Views\Shared\_ValidationScriptsPartial.cshtml"/>
+        <AdditionalFiles Include="Views\Item\Create.cshtml"/>
+        <AdditionalFiles Include="Views\Item\Delete.cshtml"/>
+        <AdditionalFiles Include="Views\Item\Details.cshtml"/>
+        <AdditionalFiles Include="Views\Item\Edit.cshtml"/>
+        <AdditionalFiles Include="Views\Item\Index.cshtml"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <_ContentIncludedByDefault Remove="Areas\Admin\Views\Shared\_ValidationScriptsPartial.cshtml"/>
     </ItemGroup>
 
 </Project>
