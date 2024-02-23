@@ -22,6 +22,5 @@ public class ItemResponse
 
     public IList<ImageResponse> Images { get; } = new List<ImageResponse>();
 
-    //public string? Href { get; set; }
-    public IList<LinkResponse> Links { get; private set; } = new List<LinkResponse>();
+    public IList<LinkResponse> _links { get; private set; } = new List<LinkResponse>();
 }

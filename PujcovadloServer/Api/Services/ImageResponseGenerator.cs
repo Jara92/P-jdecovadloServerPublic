@@ -34,7 +34,7 @@ public class ImageResponseGenerator : ABaseResponseGenerator
         var response = _mapper.Map<ImageResponse>(image);
 
         // Add link to the image using ItemImageController
-        response.Links.Add(new LinkResponse(
+        response._links.Add(new LinkResponse(
             _urlHelper.GetUriByAction(_httpContext, nameof(ImageController.GetImage), "Image",
                 values: new { id = image.Id }), "SELF", "GET"));
 
@@ -52,17 +52,17 @@ public class ImageResponseGenerator : ABaseResponseGenerator
     {
         // Add link to the image data
         var imageUrl = await _imageFacade.GetImagePath(image);
-        response.Links.Add(new LinkResponse(imageUrl, "DATA", "GET"));
+        response._links.Add(new LinkResponse(imageUrl, "DATA", "GET"));
 
         // Image item
         if (image.Item != null)
         {
-            response.Links.Add(new LinkResponse(
+            response._links.Add(new LinkResponse(
                 _urlHelper.GetUriByAction(_httpContext, nameof(ItemController.Get), "Item",
                     values: new { image.Item.Id }), "ITEM", "GET"));
 
             // Add delete link
-            response.Links.Add(new LinkResponse(
+            response._links.Add(new LinkResponse(
                 _urlHelper.GetUriByAction(_httpContext, nameof(ItemController.DeleteImage), "Item",
                     values: new { itemId = image.Item.Id, imageId = image.Id }), "DELETE", "DELETE"));
         }
@@ -70,12 +70,12 @@ public class ImageResponseGenerator : ABaseResponseGenerator
         // Pickup protocol
         if (image.PickupProtocol != null)
         {
-            response.Links.Add(new LinkResponse(
+            response._links.Add(new LinkResponse(
                 _urlHelper.GetUriByAction(_httpContext, nameof(PickupProtocolController.GetProtocol), "PickupProtocol",
                     values: new { loanId = image.PickupProtocol.Loan.Id }), "PICKUP_PROTOCOL", "GET"));
 
             // Add delete link
-            response.Links.Add(new LinkResponse(
+            response._links.Add(new LinkResponse(
                 _urlHelper.GetUriByAction(_httpContext, nameof(PickupProtocolController.DeleteImage), "PickupProtocol",
                     values: new { loanId = image.PickupProtocol.Loan.Id, imageId = image.Id }), "DELETE", "DELETE"));
         }
@@ -83,12 +83,12 @@ public class ImageResponseGenerator : ABaseResponseGenerator
         // Return protocol
         if (image.ReturnProtocol != null)
         {
-            response.Links.Add(new LinkResponse(
+            response._links.Add(new LinkResponse(
                 _urlHelper.GetUriByAction(_httpContext, nameof(ReturnProtocolController.GetProtocol), "ReturnProtocol",
                     values: new { loanId = image.ReturnProtocol.Loan.Id }), "RETURN_PROTOCOL", "GET"));
 
             // Add delete link
-            response.Links.Add(new LinkResponse(
+            response._links.Add(new LinkResponse(
                 _urlHelper.GetUriByAction(_httpContext, nameof(ReturnProtocolController.DeleteImage), "ReturnProtocol",
                     values: new { loanId = image.ReturnProtocol.Loan.Id, imageId = image.Id }), "DELETE", "DELETE"));
         }
@@ -114,8 +114,8 @@ public class ImageResponseGenerator : ABaseResponseGenerator
         // return response list
         return new ResponseList<ImageResponse>
         {
-            Data = responseImages,
-            Links = new List<LinkResponse>()
+            _data = responseImages,
+            _links = new List<LinkResponse>()
         };
     }
 

@@ -18,5 +18,5 @@ public class ReturnProtocolResponse
 
     public DateTime? UpdatedAt { get; set; }
 
-    public IList<LinkResponse> Links { get; private set; } = new List<LinkResponse>();
+    public IList<LinkResponse> _links { get; private set; } = new List<LinkResponse>();
 }

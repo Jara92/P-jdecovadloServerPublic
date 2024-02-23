@@ -42,14 +42,14 @@ public class ItemResponseGenerator : ABaseResponseGenerator
         var response = _mapper.Map<ItemResponse>(item);
 
         // Link to item detail
-        response.Links.Add(new LinkResponse(
+        response._links.Add(new LinkResponse(
             _urlHelper.GetUriByAction(_httpContext, nameof(ItemController.Get), "Item", values: new { item.Id }),
             "SELF", "GET"));
 
         // item delete action if has permission
         if (await _authorizationService.CanPerformOperation(item, ItemOperations.Delete))
         {
-            response.Links.Add(new LinkResponse(
+            response._links.Add(new LinkResponse(
                 _urlHelper.GetUriByAction(_httpContext, nameof(ItemController.Delete), "Item",
                     values: new { item.Id }), "DELETE", "DELETE"));
         }
@@ -57,7 +57,7 @@ public class ItemResponseGenerator : ABaseResponseGenerator
         // Link to item owner
         if (item.Owner.Profile != null)
         {
-            response.Links.Add(new LinkResponse(
+            response._links.Add(new LinkResponse(
                 _urlHelper.GetUriByAction(_httpContext, nameof(ProfileController.GetProfile), "Profile",
                     values: new { item.Owner.Profile.Id }), "OWNER", "GET"));
         }
@@ -80,14 +80,14 @@ public class ItemResponseGenerator : ABaseResponseGenerator
     private async Task AddImageLinks(Item item, Image image, ImageResponse imageResponse)
     {
         // LInk to image detail
-        imageResponse.Links.Add(new LinkResponse(
+        imageResponse._links.Add(new LinkResponse(
             _urlHelper.GetUriByAction(_httpContext, nameof(ImageController.GetImage), "Image",
                 values: new { id = imageResponse.Id }), "SELF", "GET"));
 
         var imageUrl = await _imageFacade.GetImagePath(image);
 
         // Link to image data
-        imageResponse.Links.Add(new LinkResponse(imageUrl, "DATA", "GET"));
+        imageResponse._links.Add(new LinkResponse(imageUrl, "DATA", "GET"));
     }
 
     /// <summary>
@@ -138,8 +138,8 @@ public class ItemResponseGenerator : ABaseResponseGenerator
         // return response list
         return new ResponseList<ItemResponse>()
         {
-            Data = responseItems,
-            Links = links
+            _data = responseItems,
+            _links = links
         };
     }
 
@@ -156,7 +156,7 @@ public class ItemResponseGenerator : ABaseResponseGenerator
         await AddItemDetailLinks(item, response);
 
         // Add links for detailed reponse
-        response.Links.Add(new LinkResponse(
+        response._links.Add(new LinkResponse(
             _urlHelper.GetUriByAction(_httpContext, nameof(ItemController.Index), "Item"), "LIST", "GET"));
 
         return response;
@@ -175,13 +175,13 @@ public class ItemResponseGenerator : ABaseResponseGenerator
         await AddItemDetailLinks(item, response);
 
         // Add links for owner
-        response.Links.Add(new LinkResponse(
+        response._links.Add(new LinkResponse(
             _urlHelper.GetUriByAction(_httpContext, nameof(ItemController.Index), "Item"), "LIST", "GET"));
 
         // item update action if has permission
         if (await _authorizationService.CanPerformOperation(item, ItemOperations.Update))
         {
-            response.Links.Add(new LinkResponse(
+            response._links.Add(new LinkResponse(
                 _urlHelper.GetUriByAction(_httpContext, nameof(ItemController.Update), "Item",
                     values: new { item.Id }), "UPDATE", "PUT"));
         }
@@ -190,7 +190,7 @@ public class ItemResponseGenerator : ABaseResponseGenerator
         if (await _authorizationService.CanPerformOperation(item, ItemOperations.Delete) &&
             await _itemFacade.CanDelete(item))
         {
-            response.Links.Add(new LinkResponse(
+            response._links.Add(new LinkResponse(
                 _urlHelper.GetUriByAction(_httpContext, nameof(ItemController.Delete), "Item",
                     values: new { item.Id }), "DELETE", "DELETE"));
         }

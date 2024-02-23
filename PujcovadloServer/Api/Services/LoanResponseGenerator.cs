@@ -37,7 +37,7 @@ public class LoanResponseGenerator : ABaseResponseGenerator
         var response = _mapper.Map<LoanResponse>(loan);
 
         // Add link to detail
-        response.Links.Add(new LinkResponse(GetLink(loan), "SELF", "GET"));
+        response._links.Add(new LinkResponse(GetLink(loan), "SELF", "GET"));
 
         AddCommonLinks(response, loan);
 
@@ -54,7 +54,7 @@ public class LoanResponseGenerator : ABaseResponseGenerator
         // Link to loan owner
         if (loan.Item.Owner.Profile != null)
         {
-            response.Links.Add(new LinkResponse(
+            response._links.Add(new LinkResponse(
                 _urlHelper.GetUriByAction(_httpContext, nameof(ProfileController.GetProfile), "Profile",
                     values: new { loan.Item.Owner.Profile.Id }),
                 "OWNER", "GET"));
@@ -63,14 +63,14 @@ public class LoanResponseGenerator : ABaseResponseGenerator
         // Link to loan tenant
         if (loan.Tenant.Profile != null)
         {
-            response.Links.Add(new LinkResponse(
+            response._links.Add(new LinkResponse(
                 _urlHelper.GetUriByAction(_httpContext, nameof(ProfileController.GetProfile), "Profile",
                     values: new { loan.Tenant.Profile.Id }),
                 "TENANT", "GET"));
         }
 
         // Loan item
-        response.Links.Add(new LinkResponse(
+        response._links.Add(new LinkResponse(
             _urlHelper.GetUriByAction(_httpContext, nameof(ItemController.Get), "Item",
                 values: new { loan.Item.Id }), "ITEM", "GET"));
 
@@ -105,8 +105,8 @@ public class LoanResponseGenerator : ABaseResponseGenerator
         // return response list
         return new ResponseList<LoanResponse>
         {
-            Data = responseItems,
-            Links = links
+            _data = responseItems,
+            _links = links
         };
     }
 
@@ -122,7 +122,7 @@ public class LoanResponseGenerator : ABaseResponseGenerator
         AddCommonLinks(response, loan);
 
         // Add link to all loans where the user participates
-        response.Links.Add(new LinkResponse(
+        response._links.Add(new LinkResponse(
             _urlHelper.GetUriByAction(_httpContext, nameof(LoanController.GetLoans), "Loan"),
             "LIST", "GET"));
 
@@ -130,7 +130,7 @@ public class LoanResponseGenerator : ABaseResponseGenerator
         if (await _authorizationService.CanPerformOperation(loan, LoanOperations.CreateReview) // Check permissions
             && (await _reviewFacade.CanCreateReview(loan)).CanCreate) // Check if the review can be created
         {
-            response.Links.Add(new LinkResponse(
+            response._links.Add(new LinkResponse(
                 _urlHelper.GetUriByAction(_httpContext, nameof(LoanController.CreateReview), "Loan",
                     values: new { loanId = loan.Id }), "CREATE_REVIEW", "POST"));
         }

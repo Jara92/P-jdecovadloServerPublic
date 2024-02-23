@@ -35,7 +35,7 @@ public class ReturnProtocolResponseGenerator : ABaseResponseGenerator
         var response = _mapper.Map<ReturnProtocolResponse>(protocol);
 
         // Link to loan
-        response.Links.Add(new LinkResponse(
+        response._links.Add(new LinkResponse(
             _urlHelper.GetUriByAction(_httpContext, nameof(LoanController.GetLoan), "Loan",
                 values: new { protocol.Loan.Id }), "LOAN", "GET"));
 
@@ -43,7 +43,7 @@ public class ReturnProtocolResponseGenerator : ABaseResponseGenerator
         if (await _authorizationService.CanPerformOperation(protocol,
                 ReturnProtocolOperations.Update))
         {
-            response.Links.Add(new LinkResponse(
+            response._links.Add(new LinkResponse(
                 _urlHelper.GetUriByAction(_httpContext, nameof(ReturnProtocolController.UpdateProtocol),
                     "ReturnProtocol", values: new { protocol.Id }), "UPDATE", "PUT"));
         }
@@ -53,7 +53,7 @@ public class ReturnProtocolResponseGenerator : ABaseResponseGenerator
         for (var i = 0; i < protocol.Images.Count; i++)
         {
             var imageUrl = await _imageFacade.GetImagePath(protocol.Images[i]);
-            response.Images[i].Links.Add(new LinkResponse(imageUrl, "DATA", "GET"));
+            response.Images[i]._links.Add(new LinkResponse(imageUrl, "DATA", "GET"));
         }
 
         // todo: add link for creating a new image?

@@ -26,5 +26,5 @@ public class LoanResponse
 
     public IList<ReviewResponse> Reviews { get; private set; } = new List<ReviewResponse>();
 
-    public IList<LinkResponse> Links { get; private set; } = new List<LinkResponse>();
+    public IList<LinkResponse> _links { get; private set; } = new List<LinkResponse>();
 }

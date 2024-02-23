@@ -34,7 +34,7 @@ public class ReviewResponseGenerator : ABaseResponseGenerator
         var response = _mapper.Map<ReviewResponse>(review);
 
         // Add link to detail
-        response.Links.Add(new LinkResponse(GetLink(review), "SELF", "GET"));
+        response._links.Add(new LinkResponse(GetLink(review), "SELF", "GET"));
 
         AddCommonLinks(response, review);
 
@@ -50,17 +50,17 @@ public class ReviewResponseGenerator : ABaseResponseGenerator
     {
         // TODO: uncomment when user controller is ready
         /*
-         response.Links.Add(new LinkResponse(
+         response._links.Add(new LinkResponse(
             _urlHelper.GetUriByAction(HttpContext, nameof(Get), "User", values: new { review.Item.Owner.Id }),
             "OWNER", "GET"));
 
-        response.Links.Add(new LinkResponse(
+        response._links.Add(new LinkResponse(
            _urlHelper.GetUriByAction(HttpContext, nameof(Get), "User", values: new { review.Tenant.Id }),
            "TENANT", "GET"));
         */
 
         // Review item
-        response.Links.Add(new LinkResponse(
+        response._links.Add(new LinkResponse(
             _urlHelper.GetUriByAction(_httpContext, nameof(ItemController.Get), "Item",
                 values: new { review.Loan.Item.Id }), "ITEM", "GET"));
 
@@ -95,8 +95,8 @@ public class ReviewResponseGenerator : ABaseResponseGenerator
         // return response list
         return new ResponseList<ReviewResponse>
         {
-            Data = responseItems,
-            Links = links
+            _data = responseItems,
+            _links = links
         };
     }
 
@@ -112,7 +112,7 @@ public class ReviewResponseGenerator : ABaseResponseGenerator
         AddCommonLinks(response, review);
 
         // Add link to all reviews where the user participates
-        /*response.Links.Add(new LinkResponse(
+        /*response._links.Add(new LinkResponse(
             _urlHelper.GetUriByAction(_httpContext, nameof(ReviewController.GetReviews), "CreateReview"),
             "LIST", "GET"));*/
 

@@ -34,13 +34,13 @@ public class ItemCategoryResponseGenerator : ABaseResponseGenerator
         var response = _mapper.Map<ItemCategoryResponse>(category);
 
         // Link to category detail
-        response.Links.Add(new LinkResponse(
+        response._links.Add(new LinkResponse(
             _urlHelper.GetUriByAction(_httpContext, nameof(ItemCategoryController.Get), "ItemCategory",
                 values: new { category.Id }),
             "SELF", "GET"));
 
         // Link to category categories
-        response.Links.Add(new LinkResponse(
+        response._links.Add(new LinkResponse(
             _urlHelper.GetUriByAction(_httpContext, nameof(ItemController.Index), "Item",
                 values: new { categoryId = category.Id }), "ITEMS", "GET"));
 
@@ -55,7 +55,8 @@ public class ItemCategoryResponseGenerator : ABaseResponseGenerator
     /// <param name="action">Action to used for retrieving the categories.</param>
     /// <param name="controller">Controller used for retrieving the categories.</param>
     /// <returns>ItemCategoryResponse</returns>
-    public async Task<ResponseList<ItemCategoryResponse>> GenerateResponseList(PaginatedList<ItemCategory> categories, ItemCategoryFilter filter,
+    public async Task<ResponseList<ItemCategoryResponse>> GenerateResponseList(PaginatedList<ItemCategory> categories,
+        ItemCategoryFilter filter,
         string action, string controller)
     {
         // Create empty list
@@ -74,8 +75,8 @@ public class ItemCategoryResponseGenerator : ABaseResponseGenerator
         // return response list
         return new ResponseList<ItemCategoryResponse>
         {
-            Data = responseItems,
-            Links = links
+            _data = responseItems,
+            _links = links
         };
     }
 
@@ -89,11 +90,11 @@ public class ItemCategoryResponseGenerator : ABaseResponseGenerator
         var response = _mapper.Map<ItemCategoryResponse>(category);
 
         // Add links for detailed reponse
-        response.Links.Add(new LinkResponse(
+        response._links.Add(new LinkResponse(
             _urlHelper.GetUriByAction(_httpContext, nameof(ItemController.Index), "Item"), "LIST", "GET"));
-        
+
         // Link to category categories
-        response.Links.Add(new LinkResponse(
+        response._links.Add(new LinkResponse(
             _urlHelper.GetUriByAction(_httpContext, nameof(ItemController.Index), "Item",
                 values: new { categoryId = category.Id }), "ITEMS", "GET"));
 
