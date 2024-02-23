@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authorization.Infrastructure;
 
-namespace PujcovadloServer.AuthorizationHandlers.Item;
+namespace PujcovadloServer.AuthorizationHandlers.ItemCategory;
 
 public class ItemCategoryOperations
 {

@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authorization.Infrastructure;
 
-namespace PujcovadloServer.AuthorizationHandlers.ReturnProtocol;
+namespace PujcovadloServer.AuthorizationHandlers.Review;
 
 public class ReviewOperations
 {
