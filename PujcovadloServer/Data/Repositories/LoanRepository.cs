@@ -28,11 +28,11 @@ public class LoanRepository : ACrudRepository<Loan, LoanFilter>, ILoanRepository
 
         // Filter by tenant
         if (filter.TenantId != null)
-            query = query.Where(l => l.Tenant.Id == filter.TenantId);
+            query = query.Where(l => l.TenantId == filter.TenantId);
 
         // Filter by owner
         if (filter.OwnerId != null)
-            query = query.Where(l => l.Item.Owner.Id == filter.OwnerId);
+            query = query.Where(l => l.Item.OwnerId == filter.OwnerId);
 
         return base.GetAll(query, filter);
     }
@@ -56,7 +56,7 @@ public class LoanRepository : ACrudRepository<Loan, LoanFilter>, ILoanRepository
         var query = _dbSet.AsQueryable();
 
         // Filter by user no matter if he is tenant or owner
-        query = query.Where(l => l.Tenant.Id == userId || l.Item.Owner.Id == userId);
+        query = query.Where(l => l.TenantId == userId || l.Item.OwnerId == userId);
 
         return base.GetAll(query, filter);
     }

@@ -32,7 +32,7 @@ public class ReviewRepository : ACrudRepository<Review, ReviewFilter>, IReviewRe
         query = query.Where(r => r.Author.Id != userId);
 
         // Show only reviews where the user is the target
-        query = query.Where(r => r.Loan.Item.Owner.Id == userId || r.Loan.Tenant.Id == userId);
+        query = query.Where(r => r.Loan.Item.OwnerId == userId || r.Loan.TenantId == userId);
 
         return query;
     }
@@ -47,7 +47,7 @@ public class ReviewRepository : ACrudRepository<Review, ReviewFilter>, IReviewRe
     /// <inheritdoc cref="IReviewRepository"/>
     public Task<Review?> FindByLoanAndAuthor(Loan reviewLoan, ApplicationUser reviewAuthor)
     {
-        return _dbSet.FirstOrDefaultAsync(r => r.Loan.Id == reviewLoan.Id && r.Author.Id == reviewAuthor.Id);
+        return _dbSet.FirstOrDefaultAsync(r => r.Loan.Id == reviewLoan.Id && r.AuthorId == reviewAuthor.Id);
     }
 
     /// <inheritdoc cref="IReviewRepository"/>

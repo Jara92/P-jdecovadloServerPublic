@@ -37,7 +37,7 @@ public class ItemRepository : ACrudRepository<Item, ItemFilter>, IItemRepository
 
         // Search by owner
         if (filter.OwnerId != null)
-            query = query.Where(i => i.Owner.Id == filter.OwnerId);
+            query = query.Where(i => i.OwnerId == filter.OwnerId);
 
         switch (filter.Sortby)
         {
@@ -94,6 +94,6 @@ public class ItemRepository : ACrudRepository<Item, ItemFilter>, IItemRepository
 
     public Task<int> GetPublicItemsCountByUser(string userId)
     {
-        return _dbSet.CountAsync(i => i.Owner.Id == userId && i.Status == ItemStatus.Public);
+        return _dbSet.CountAsync(i => i.OwnerId == userId && i.Status == ItemStatus.Public);
     }
 }
