@@ -21,6 +21,8 @@ public class Loan : BaseEntity
 
     public string? TenantNote { get; set; }
 
+    public string? TenantId { get; set; }
+
     public virtual ApplicationUser Tenant { get; set; } = default!;
 
     public virtual Item Item { get; set; } = default!;

@@ -16,6 +16,8 @@ public class Review : BaseEntity
 
     public virtual Loan Loan { get; set; } = default!;
 
+    public string AuthorId { get; set; }
+
     public virtual ApplicationUser Author { get; set; } = default!;
 
     public DateTime CreatedAt { get; set; } = DateTime.Now;

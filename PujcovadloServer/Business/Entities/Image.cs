@@ -21,6 +21,8 @@ public class Image : BaseEntity
 
     public string MimeType { get; set; } = default!;
 
+    public string OwnerId { get; set; }
+
     public virtual ApplicationUser Owner { get; set; } = default!;
 
     public virtual Item? Item { get; set; }

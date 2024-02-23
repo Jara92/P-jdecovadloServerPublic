@@ -41,6 +41,7 @@ public class Item : BaseEntity
 
     public virtual IList<Image> Images { get; set; } = new List<Image>();
 
+    public string OwnerId { get; set; } = default!;
     public virtual ApplicationUser Owner { get; set; } = default!;
 
     [ReadOnly(true)] public DateTime CreatedAt { get; set; } = DateTime.Now;
