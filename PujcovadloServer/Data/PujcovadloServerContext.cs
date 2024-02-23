@@ -28,6 +28,8 @@ namespace PujcovadloServer.Data
 
         public DbSet<Review> Review { get; set; } = default!;
 
+        public DbSet<Profile> Profile { get; set; } = default!;
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // https://learn.microsoft.com/en-us/ef/core/modeling/relationships/many-to-many
@@ -38,6 +40,11 @@ namespace PujcovadloServer.Data
             // Make tags name unique
             modelBuilder.Entity<ItemTag>()
                 .HasIndex(u => u.Name)
+                .IsUnique();
+
+            // User has max one profile
+            modelBuilder.Entity<Profile>()
+                .HasIndex(p => p.UserId)
                 .IsUnique();
 
             // Add Loan.PickupProtocolId foreign key

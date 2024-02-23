@@ -42,4 +42,9 @@ public class ReviewService(IReviewRepository repository)
 
         return base.Delete(entity);
     }
+
+    public Task<float?> GetAverageRatingForUser(string userId)
+    {
+        return _repository.GetAverageRatingForUser(userId);
+    }
 }

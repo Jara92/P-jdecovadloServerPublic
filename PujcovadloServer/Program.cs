@@ -17,6 +17,7 @@ using PujcovadloServer.AuthorizationHandlers.Item;
 using PujcovadloServer.AuthorizationHandlers.ItemCategory;
 using PujcovadloServer.AuthorizationHandlers.Loan;
 using PujcovadloServer.AuthorizationHandlers.PickupProtocol;
+using PujcovadloServer.AuthorizationHandlers.Profile;
 using PujcovadloServer.AuthorizationHandlers.ReturnProtocol;
 using PujcovadloServer.Business.Facades;
 using PujcovadloServer.Business.Factories.State;
@@ -152,6 +153,10 @@ builder.Services.AddScoped<IAuthorizationHandler, ReturnProtocolAdminAuthorizati
 builder.Services.AddScoped<IAuthorizationHandler, ReturnProtocolOwnerAuthorizationHandler>();
 builder.Services.AddScoped<IAuthorizationHandler, ReturnProtocolTenantAuthorizationHandler>();
 
+builder.Services.AddScoped<IAuthorizationHandler, ProfileAdminAuthorizationHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, ProfileOwnerAuthorizationHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, ProfileGuestAuthorizationHandler>();
+
 //Factories
 builder.Services.AddScoped<LoanStateFactory>();
 
@@ -164,6 +169,7 @@ builder.Services.AddScoped<ILoanRepository, LoanRepository>();
 builder.Services.AddScoped<IPickupProtocolRepository, PickupProtocolRepository>();
 builder.Services.AddScoped<IReturnProtocolRepository, ReturnProtocolRepository>();
 builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
+builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
 
 // Services
 builder.Services.AddScoped<ItemService>();
@@ -174,6 +180,7 @@ builder.Services.AddScoped<LoanService>();
 builder.Services.AddScoped<PickupProtocolService>();
 builder.Services.AddScoped<ReturnProtocolService>();
 builder.Services.AddScoped<ReviewService>();
+builder.Services.AddScoped<ProfileService>();
 
 // Facades
 builder.Services.AddScoped<ItemFacade>();
@@ -185,6 +192,7 @@ builder.Services.AddScoped<OwnerFacade>();
 builder.Services.AddScoped<PickupProtocolFacade>();
 builder.Services.AddScoped<ReturnProtocolFacade>();
 builder.Services.AddScoped<ReviewFacade>();
+builder.Services.AddScoped<ProfileFacade>();
 
 // Filters
 builder.Services.AddScoped<ExceptionFilter>();
@@ -197,6 +205,7 @@ builder.Services.AddScoped<ImageResponseGenerator>();
 builder.Services.AddScoped<PickupProtocolResponseGenerator>();
 builder.Services.AddScoped<ReturnProtocolResponseGenerator>();
 builder.Services.AddScoped<ReviewResponseGenerator>();
+builder.Services.AddScoped<ProfileResponseGenerator>();
 
 // File upload service
 builder.Services.AddScoped<FileUploadService>();

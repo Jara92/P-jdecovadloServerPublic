@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PujcovadloServer.Data;
 
@@ -10,9 +11,11 @@ using PujcovadloServer.Data;
 namespace PujcovadloServer.Migrations
 {
     [DbContext(typeof(PujcovadloServerContext))]
-    partial class PujcovadloServerContextModelSnapshot : ModelSnapshot
+    [Migration("20240222195709_AddProfile")]
+    partial class AddProfile
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -538,8 +541,7 @@ namespace PujcovadloServer.Migrations
 
                     b.HasIndex("ProfileImageId");
 
-                    b.HasIndex("UserId")
-                        .IsUnique();
+                    b.HasIndex("UserId");
 
                     b.ToTable("Profile");
                 });
@@ -769,8 +771,8 @@ namespace PujcovadloServer.Migrations
                         .HasForeignKey("ProfileImageId");
 
                     b.HasOne("PujcovadloServer.Authentication.ApplicationUser", "User")
-                        .WithOne("Profile")
-                        .HasForeignKey("PujcovadloServer.Business.Entities.Profile", "UserId")
+                        .WithMany()
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -794,11 +796,6 @@ namespace PujcovadloServer.Migrations
                     b.Navigation("Author");
 
                     b.Navigation("Loan");
-                });
-
-            modelBuilder.Entity("PujcovadloServer.Authentication.ApplicationUser", b =>
-                {
-                    b.Navigation("Profile");
                 });
 
             modelBuilder.Entity("PujcovadloServer.Business.Entities.Item", b =>

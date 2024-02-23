@@ -38,4 +38,9 @@ public class ItemService(IItemRepository repository) : ACrudService<Item, IItemR
 
         return base.Delete(entity);
     }
+
+    public async Task<int> GetPublicItemsCountByUser(string userId)
+    {
+        return await _repository.GetPublicItemsCountByUser(userId);
+    }
 }

@@ -18,17 +18,28 @@ public class ReviewRepository : ACrudRepository<Review, ReviewFilter>, IReviewRe
         _dbSet = context.Review;
     }
 
-    public Task<PaginatedList<Review>> GetAllByTargetUser(ApplicationUser user, ReviewFilter filter)
+    /// <summary>
+    /// Returns a query which filters reviews by the target user and the filter.
+    /// </summary>
+    /// <param name="userId">Target userId</param>
+    /// <param name="filter">Filter object</param>
+    /// <returns>IQueryable query</returns>
+    private IQueryable<Review> GetQueryAllByTargetUser(string userId, ReviewFilter filter)
     {
         var query = _dbSet.AsQueryable();
 
         // Dont return user's own reviews
-        query = query.Where(r => r.Author.Id != user.Id);
+        query = query.Where(r => r.Author.Id != userId);
 
         // Show only reviews where the user is the target
-        // TODO: wtf
-        // Přidta OwnerId
-        query = query.Where(r => r.Loan.Item.Owner.Id == user.Id || r.Loan.Tenant.Id == user.Id);
+        query = query.Where(r => r.Loan.Item.Owner.Id == userId || r.Loan.Tenant.Id == userId);
+
+        return query;
+    }
+
+    public Task<PaginatedList<Review>> GetAllByTargetUser(ApplicationUser user, ReviewFilter filter)
+    {
+        var query = GetQueryAllByTargetUser(user.Id, filter);
 
         return base.GetAll(query, filter);
     }
@@ -37,5 +48,15 @@ public class ReviewRepository : ACrudRepository<Review, ReviewFilter>, IReviewRe
     public Task<Review?> FindByLoanAndAuthor(Loan reviewLoan, ApplicationUser reviewAuthor)
     {
         return _dbSet.FirstOrDefaultAsync(r => r.Loan.Id == reviewLoan.Id && r.Author.Id == reviewAuthor.Id);
+    }
+
+    /// <inheritdoc cref="IReviewRepository"/>
+    public Task<float?> GetAverageRatingForUser(string userId)
+    {
+        // Filter reviews by the target user
+        var query = GetQueryAllByTargetUser(userId, new ReviewFilter());
+
+        // Return the average rating
+        return query.AverageAsync(r => (float?)r.Rating);
     }
 }

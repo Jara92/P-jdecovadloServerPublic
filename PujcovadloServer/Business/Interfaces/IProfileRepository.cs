@@ -3,7 +3,6 @@ using PujcovadloServer.Business.Filters;
 
 namespace PujcovadloServer.Business.Interfaces;
 
-public interface IItemRepository : ICrudRepository<Item, ItemFilter>
+public interface IProfileRepository : ICrudRepository<Profile, ProfileFilter>
 {
-    Task<int> GetPublicItemsCountByUser(string userId);
 }

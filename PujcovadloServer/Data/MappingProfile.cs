@@ -1,8 +1,9 @@
-using AutoMapper;
 using PujcovadloServer.Authentication;
 using PujcovadloServer.Business.Entities;
+using PujcovadloServer.Business.EntityAggregations;
 using PujcovadloServer.Requests;
 using PujcovadloServer.Responses;
+using Profile = AutoMapper.Profile;
 
 namespace PujcovadloServer.Data;
 
@@ -41,6 +42,11 @@ public class MappingProfile : Profile
 
         CreateMap<Review, ReviewResponse>();
         CreateMap<ReviewRequest, Review>();
+
+        CreateMap<PujcovadloServer.Business.Entities.Profile, ProfileResponse>();
+        CreateMap<ProfileUpdateRequest, PujcovadloServer.Business.Entities.Profile>();
+
+        CreateMap<ProfileAggregations, ProfileAggregationsResponse>();
 
         // CreateMap<ItemCategory, ItemCategoryDto>();
         //CreateMap<ItemCategoryDto, ItemCategory>();

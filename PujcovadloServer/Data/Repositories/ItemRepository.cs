@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using PujcovadloServer.Business.Entities;
+using PujcovadloServer.Business.Enums;
 using PujcovadloServer.Business.Exceptions;
 using PujcovadloServer.Business.Filters;
 using PujcovadloServer.Business.Interfaces;
@@ -89,5 +90,10 @@ public class ItemRepository : ACrudRepository<Item, ItemFilter>, IItemRepository
     {
         _context.Remove(item);
         await _context.SaveChangesAsync();
+    }
+
+    public Task<int> GetPublicItemsCountByUser(string userId)
+    {
+        return _dbSet.CountAsync(i => i.Owner.Id == userId && i.Status == ItemStatus.Public);
     }
 }

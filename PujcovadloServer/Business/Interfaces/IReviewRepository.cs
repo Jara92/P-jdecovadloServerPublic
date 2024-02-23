@@ -16,4 +16,6 @@ public interface IReviewRepository : ICrudRepository<Review, ReviewFilter>
     /// <param name="reviewAuthor"></param>
     /// <returns>Returns the review or null if the review was not found</returns>
     Task<Review?> FindByLoanAndAuthor(Loan reviewLoan, ApplicationUser reviewAuthor);
+
+    Task<float?> GetAverageRatingForUser(string userId);
 }

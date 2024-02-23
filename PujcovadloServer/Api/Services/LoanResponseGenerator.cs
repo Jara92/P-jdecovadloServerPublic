@@ -51,16 +51,23 @@ public class LoanResponseGenerator : ABaseResponseGenerator
     /// <param name="loan">Loan which is the response about.</param>
     private void AddCommonLinks(LoanResponse response, Loan loan)
     {
-        // TODO: uncomment when user controller is ready
-        /*
-         response.Links.Add(new LinkResponse(
-            _urlHelper.GetUriByAction(HttpContext, nameof(Get), "User", values: new { loan.Item.Owner.Id }),
-            "OWNER", "GET"));
+        // Link to loan owner
+        if (loan.Item.Owner.Profile != null)
+        {
+            response.Links.Add(new LinkResponse(
+                _urlHelper.GetUriByAction(_httpContext, nameof(ProfileController.GetProfile), "Profile",
+                    values: new { loan.Item.Owner.Profile.Id }),
+                "OWNER", "GET"));
+        }
 
-        response.Links.Add(new LinkResponse(
-           _urlHelper.GetUriByAction(HttpContext, nameof(Get), "User", values: new { loan.Tenant.Id }),
-           "TENANT", "GET"));
-        */
+        // Link to loan tenant
+        if (loan.Tenant.Profile != null)
+        {
+            response.Links.Add(new LinkResponse(
+                _urlHelper.GetUriByAction(_httpContext, nameof(ProfileController.GetProfile), "Profile",
+                    values: new { loan.Tenant.Profile.Id }),
+                "TENANT", "GET"));
+        }
 
         // Loan item
         response.Links.Add(new LinkResponse(
