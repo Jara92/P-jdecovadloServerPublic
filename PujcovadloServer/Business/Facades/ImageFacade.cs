@@ -46,7 +46,7 @@ public class ImageFacade
         return await _fileStorage.GetFilePath(_configuration.ImagesPath, image.Path);
     }
 
-    public async Task<Image> GetImage(int imageId)
+    public virtual async Task<Image> GetImage(int imageId)
     {
         // Get image and check that it is not null
         var image = await _imageService.Get(imageId);

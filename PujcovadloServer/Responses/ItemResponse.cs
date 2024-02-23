@@ -18,7 +18,9 @@ public class ItemResponse
 
     public UserResponse Owner { get; set; } = default!;
 
-    public virtual IList<ImageResponse> Images { get; } = new List<ImageResponse>();
+    public ImageResponse? MainImage { get; set; }
+
+    public IList<ImageResponse> Images { get; } = new List<ImageResponse>();
 
     //public string? Href { get; set; }
     public IList<LinkResponse> Links { get; private set; } = new List<LinkResponse>();

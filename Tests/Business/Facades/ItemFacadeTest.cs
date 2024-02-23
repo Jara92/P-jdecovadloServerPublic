@@ -167,7 +167,8 @@ public class ItemFacadeTest
             SellingPrice = 4000,
             RefundableDeposit = 2000,
             Categories = new List<int> { 1, 2 },
-            Tags = new List<string> { "Tag", "Tag2" }
+            Tags = new List<string> { "Tag", "Tag2" },
+            MainImageId = null
         };
 
         // Old item
@@ -181,7 +182,8 @@ public class ItemFacadeTest
             SellingPrice = 2000,
             RefundableDeposit = 1000,
             Status = ItemStatus.Public,
-            Owner = _user
+            Owner = _user,
+            MainImageId = 20
         };
 
         // old item categories
@@ -201,7 +203,8 @@ public class ItemFacadeTest
             SellingPrice = 4000,
             RefundableDeposit = 2000,
             Status = ItemStatus.Public,
-            Owner = _user
+            Owner = _user,
+            MainImageId = 20 // Main image is not changed if request.MainImageId is null
         };
 
         // expected categories
@@ -232,6 +235,220 @@ public class ItemFacadeTest
     }
 
     [Test]
+    public async Task UpdateItem_UserAuthenticatedAndInvalidMainImageIdSet_UpdatesItem()
+    {
+        var newMainImageId = 2;
+
+        // Arrange
+        var request = new ItemRequest()
+        {
+            Name = "Nový item zmena",
+            Description = "Description zmena",
+            PricePerDay = 200,
+            PurchasePrice = 2000,
+            SellingPrice = 4000,
+            RefundableDeposit = 2000,
+            Categories = new List<int> { 1, 2 },
+            Tags = new List<string> { "Tag", "Tag2" },
+            MainImageId = newMainImageId
+        };
+
+        // Old item
+        var oldItem = new Item
+        {
+            Id = 1,
+            Name = "Nový item",
+            Alias = "nov-item",
+            Description = "Description",
+            PricePerDay = 100,
+            PurchasePrice = 1000,
+            SellingPrice = 2000,
+            RefundableDeposit = 1000,
+            Status = ItemStatus.Public,
+            Owner = _user,
+            MainImageId = 1
+        };
+
+        // old item categories
+        oldItem.Categories.Add(new ItemCategory() { Id = 1 });
+
+        // old item tags
+        oldItem.Tags.Add(new ItemTag() { Name = "Tag" });
+
+        // Mock image
+        _imageFacade
+            .Setup(o => o.GetImage(newMainImageId))
+            .ThrowsAsync(new EntityNotFoundException());
+
+        // Mock category service
+        _itemCategoryService
+            .Setup(o => o.GetByIds(It.IsAny<IEnumerable<int>>()))
+            .ReturnsAsync(new List<ItemCategory> { new() { Id = 1 }, new() { Id = 2 } });
+
+        // Mock tag service
+        _itemTagService
+            .Setup(o => o.GetOrCreate(It.IsAny<List<string>>()))
+            .ReturnsAsync(new List<ItemTag> { new() { Name = "Tag" }, new() { Name = "Tag2" } });
+
+        // exception is thrown because the image does not exist
+        Assert.ThrowsAsync<EntityNotFoundException>(async () => await _itemFacade.UpdateItem(oldItem, request));
+
+        // Verify that Update was not called
+        _itemService.Verify(o => o.Update(oldItem), Times.Never);
+    }
+
+    [Test]
+    public async Task UpdateItem_UserAuthenticatedAndNewImageWhichDoesNotBelongToTheItemIsSet_UpdatesItem()
+    {
+        var newMainImageId = 2;
+
+        // Arrange
+        var request = new ItemRequest()
+        {
+            Name = "Nový item zmena",
+            Description = "Description zmena",
+            PricePerDay = 200,
+            PurchasePrice = 2000,
+            SellingPrice = 4000,
+            RefundableDeposit = 2000,
+            Categories = new List<int> { 1, 2 },
+            Tags = new List<string> { "Tag", "Tag2" },
+            MainImageId = newMainImageId
+        };
+
+        // Old item
+        var oldItem = new Item
+        {
+            Id = 1,
+            Name = "Nový item",
+            Alias = "nov-item",
+            Description = "Description",
+            PricePerDay = 100,
+            PurchasePrice = 1000,
+            SellingPrice = 2000,
+            RefundableDeposit = 1000,
+            Status = ItemStatus.Public,
+            Owner = _user,
+            MainImageId = 1
+        };
+
+        // old item categories
+        oldItem.Categories.Add(new ItemCategory() { Id = 1 });
+
+        // old item tags
+        oldItem.Tags.Add(new ItemTag() { Name = "Tag" });
+
+        // Mock image
+        _imageFacade
+            .Setup(o => o.GetImage(newMainImageId))
+            .ReturnsAsync(new Image { Id = 2, Item = new Item { Id = 20 } });
+
+        // Mock category service
+        _itemCategoryService
+            .Setup(o => o.GetByIds(It.IsAny<IEnumerable<int>>()))
+            .ReturnsAsync(new List<ItemCategory> { new() { Id = 1 }, new() { Id = 2 } });
+
+        // Mock tag service
+        _itemTagService
+            .Setup(o => o.GetOrCreate(It.IsAny<List<string>>()))
+            .ReturnsAsync(new List<ItemTag> { new() { Name = "Tag" }, new() { Name = "Tag2" } });
+
+        // exception is thrown because the image does not belong to the item
+        Assert.ThrowsAsync<ArgumentException>(async () => await _itemFacade.UpdateItem(oldItem, request));
+
+        // Verify that Update was not called
+        _itemService.Verify(o => o.Update(oldItem), Times.Never);
+    }
+
+    [Test]
+    public async Task UpdateItem_UserAuthenticatedAndNewMainImageSet_UpdatesItem()
+    {
+        var newMainImageId = 2;
+
+        // Arrange
+        var request = new ItemRequest()
+        {
+            Name = "Nový item zmena",
+            Description = "Description zmena",
+            PricePerDay = 200,
+            PurchasePrice = 2000,
+            SellingPrice = 4000,
+            RefundableDeposit = 2000,
+            Categories = new List<int> { 1, 2 },
+            Tags = new List<string> { "Tag", "Tag2" },
+            MainImageId = newMainImageId
+        };
+
+        // Old item
+        var oldItem = new Item
+        {
+            Id = 1,
+            Name = "Nový item",
+            Alias = "nov-item",
+            Description = "Description",
+            PricePerDay = 100,
+            PurchasePrice = 1000,
+            SellingPrice = 2000,
+            RefundableDeposit = 1000,
+            Status = ItemStatus.Public,
+            Owner = _user,
+            MainImageId = 1
+        };
+
+        // old item categories
+        oldItem.Categories.Add(new ItemCategory() { Id = 1 });
+
+        // old item tags
+        oldItem.Tags.Add(new ItemTag() { Name = "Tag" });
+
+        // Builde expected item
+        var expectedItem = new Item
+        {
+            Name = "Nový item zmena",
+            Alias = "nov-item-zmena",
+            Description = "Description zmena",
+            PricePerDay = 200,
+            PurchasePrice = 2000,
+            SellingPrice = 4000,
+            RefundableDeposit = 2000,
+            Status = ItemStatus.Public,
+            Owner = _user,
+            MainImage = new Image { Id = newMainImageId, Item = oldItem }
+        };
+
+        // expected categories
+        expectedItem.Categories.Add(new ItemCategory() { Id = 1 });
+        expectedItem.Categories.Add(new ItemCategory() { Id = 2 });
+
+        // expected tags
+        expectedItem.Tags.Add(new ItemTag() { Name = "Tag" });
+        expectedItem.Tags.Add(new ItemTag() { Name = "Tag2" });
+
+        // Mock image
+        _imageFacade
+            .Setup(o => o.GetImage(newMainImageId))
+            .ReturnsAsync(new Image { Id = newMainImageId, Item = oldItem });
+
+        // Mock category service
+        _itemCategoryService
+            .Setup(o => o.GetByIds(It.IsAny<IEnumerable<int>>()))
+            .ReturnsAsync(new List<ItemCategory> { new() { Id = 1 }, new() { Id = 2 } });
+
+        // Mock tag service
+        _itemTagService
+            .Setup(o => o.GetOrCreate(It.IsAny<List<string>>()))
+            .ReturnsAsync(new List<ItemTag> { new() { Name = "Tag" }, new() { Name = "Tag2" } });
+
+        // act
+        await _itemFacade.UpdateItem(oldItem, request);
+
+        AssertItem(expectedItem, oldItem);
+
+        // Verify that Update was called
+        _itemService.Verify(o => o.Update(oldItem), Times.Once);
+    }
+
+    [Test]
     public async Task UpdateItem_UserAuthenticatedAndItemWasDenied_ItemIsBeingApproved()
     {
         // Arrange
@@ -242,7 +459,8 @@ public class ItemFacadeTest
             PricePerDay = 200,
             PurchasePrice = 2000,
             SellingPrice = 4000,
-            RefundableDeposit = 2000
+            RefundableDeposit = 2000,
+            MainImageId = null
         };
 
         var oldItem = new Item
@@ -638,6 +856,7 @@ public class ItemFacadeTest
         Assert.That(actual.RefundableDeposit, Is.EqualTo(expected.RefundableDeposit).Within(_tolerance));
         Assert.That(actual.Status, Is.EqualTo(expected.Status));
         Assert.That(actual.Owner.Id, Is.EqualTo(expected.Owner.Id));
+        Assert.That(actual.MainImage?.Id, Is.EqualTo(expected.MainImage?.Id));
 
         // assert categories
         Assert.That(actual.Categories.Count, Is.EqualTo(expected.Categories.Count));

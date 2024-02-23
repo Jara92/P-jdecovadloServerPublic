@@ -36,6 +36,9 @@ public class Item : BaseEntity
 
     public virtual ICollection<ItemTag> Tags { get; } = new List<ItemTag>();
 
+    public int? MainImageId { get; set; }
+    public virtual Image? MainImage { get; set; }
+
     public virtual IList<Image> Images { get; set; } = new List<Image>();
 
     public virtual ApplicationUser Owner { get; set; } = default!;

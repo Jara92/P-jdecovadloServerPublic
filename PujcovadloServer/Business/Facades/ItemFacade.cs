@@ -86,8 +86,6 @@ public class ItemFacade
         // Update tags
         item.Tags.Clear();
         item.Tags.AddRange(tags);
-
-        // Todo: update images
     }
 
     /// <summary>
@@ -123,8 +121,29 @@ public class ItemFacade
     {
         await FillItemRequest(item, request);
 
+        await UpdateMainImage(item, request);
+
         // Update the item
         await _itemService.Update(item);
+    }
+
+    private async Task UpdateMainImage(Item item, ItemRequest request)
+    {
+        // Update main image
+        if (request.MainImageId != null)
+        {
+            // Get the image by id using the image facade
+            var mainImage = await _imageFacade.GetImage(request.MainImageId.Value);
+
+            // Throw exception if the main image does not belong to the item
+            if (mainImage.Item == null || mainImage.Item.Id != item.Id)
+            {
+                throw new ArgumentException("Main image does not belong to the item");
+            }
+
+            // Set the main image
+            item.MainImage = mainImage;
+        }
     }
 
     /// <summary>

@@ -69,6 +69,14 @@ namespace PujcovadloServer.Data
                 .HasOne<ReturnProtocol>(i => i.ReturnProtocol)
                 .WithMany(p => p.Images);
 
+            // Add item main image foreign key
+            modelBuilder.Entity<Item>()
+                .HasOne(i => i.MainImage)
+                .WithOne()
+                .HasForeignKey<Item>(i => i.MainImageId)
+                .OnDelete(DeleteBehavior
+                    .SetNull); // Optional: SetNull means if the main image is deleted, set the MainImageId to null
+
             base.OnModelCreating(modelBuilder);
         }
 

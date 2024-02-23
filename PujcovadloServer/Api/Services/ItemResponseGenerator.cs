@@ -54,8 +54,21 @@ public class ItemResponseGenerator : ABaseResponseGenerator
                     values: new { item.Id }), "DELETE", "DELETE"));
         }
 
-        // TODO: add link to owner
+        // Link to item owner
+        if (item.Owner.Profile != null)
+        {
+            response.Links.Add(new LinkResponse(
+                _urlHelper.GetUriByAction(_httpContext, nameof(ProfileController.GetProfile), "Profile",
+                    values: new { item.Owner.Profile.Id }), "OWNER", "GET"));
+        }
 
+        // Main image link
+        if (item.MainImage != null && response.MainImage != null)
+        {
+            await AddImageLinks(item, item.MainImage, response.MainImage);
+        }
+
+        // Image links
         for (var i = 0; i < item.Images.Count; i++)
         {
             await AddImageLinks(item, item.Images[i], response.Images[i]);
@@ -84,7 +97,13 @@ public class ItemResponseGenerator : ABaseResponseGenerator
     /// <param name="response">Response for the links to be added.</param>
     private async Task AddItemDetailLinks(Item item, ItemDetailResponse response)
     {
-        // Add image links
+        // Main image link
+        if (item.MainImage != null && response.MainImage != null)
+        {
+            await AddImageLinks(item, item.MainImage, response.MainImage);
+        }
+
+        // Image links
         for (var i = 0; i < item.Images.Count; i++)
         {
             await AddImageLinks(item, item.Images[i], response.Images[i]);

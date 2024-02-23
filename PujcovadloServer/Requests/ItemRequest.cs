@@ -28,4 +28,6 @@ public class ItemRequest : EntityRequest
     [MaxLength(5)] public virtual ICollection<int> Categories { get; set; } = new List<int>();
 
     [MaxLength(10)] public virtual ICollection<string> Tags { get; set; } = new List<string>();
+
+    public int? MainImageId { get; set; }
 }
