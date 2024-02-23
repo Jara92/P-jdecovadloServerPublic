@@ -48,6 +48,8 @@ public class MappingProfile : Profile
 
         CreateMap<ProfileAggregations, ProfileAggregationsResponse>();
 
+        CreateMap<ApplicationUser, UserResponse>();
+
         // CreateMap<ItemCategory, ItemCategoryDto>();
         //CreateMap<ItemCategoryDto, ItemCategory>();
     }
