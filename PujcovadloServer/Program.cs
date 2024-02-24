@@ -8,8 +8,6 @@ using Microsoft.IdentityModel.Tokens;
 using Minio;
 using NSwag;
 using PujcovadloServer;
-using PujcovadloServer.Api.Filters;
-using PujcovadloServer.Api.Services;
 using PujcovadloServer.Areas.Api.Filters;
 using PujcovadloServer.Areas.Api.Services;
 using PujcovadloServer.Authentication;
@@ -250,10 +248,15 @@ if (app.Environment.IsProduction())
 // Define routes for admin area
 app.MapControllerRoute(
     name: "Admin",
-    pattern: "{controller=ItemAdmin}/{action=Index}/{id?}");
+    pattern: "admin/{controller=Item}/{action=Index}/{id?}");
+
+// Define routes for api area
+app.MapControllerRoute(
+    name: "Api",
+    pattern: "api/{controller=Item}/{action=Index}/{id?}");
 
 // Route controller actions
-app.MapControllers();
+//app.MapControllers();
 //app.MapRazorPages();
 
 app.UseAuthentication();

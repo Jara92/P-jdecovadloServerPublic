@@ -10,16 +10,18 @@ namespace PujcovadloServer.Areas.Admin.Controllers;
 [Route("admin/")]
 [Area("Admin")]
 [AllowAnonymous]
-public class AuthenticateAdminController : Controller
+public class AuthenticateController : Controller
 {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly SignInManager<ApplicationUser> _signInManager;
+    private readonly LinkGenerator _urlHelper;
 
-    public AuthenticateAdminController(UserManager<ApplicationUser> userManager,
-        SignInManager<ApplicationUser> signInManager)
+    public AuthenticateController(UserManager<ApplicationUser> userManager,
+        SignInManager<ApplicationUser> signInManager, LinkGenerator urlHelper)
     {
         _userManager = userManager;
         _signInManager = signInManager;
+        _urlHelper = urlHelper;
     }
 
     [HttpGet("login")]
@@ -50,7 +52,7 @@ public class AuthenticateAdminController : Controller
             if (!await _userManager.IsInRoleAsync(user, UserRoles.Admin))
             {
                 TempData["Errors"] = new List<String>() { "You are not authorized to access this page." };
-                return RedirectToAction(nameof(Login), "AuthenticateAdmin");
+                return RedirectToAction(nameof(Login), "Authenticate");
             }
         }
 
@@ -60,7 +62,7 @@ public class AuthenticateAdminController : Controller
 
         if (result.Succeeded)
         {
-            return RedirectToAction("Index", "ItemAdmin");
+            return RedirectToAction("Index", "Item");
         }
 
         if (result.IsLockedOut)
