@@ -10,6 +10,8 @@ using NSwag;
 using PujcovadloServer;
 using PujcovadloServer.Api.Filters;
 using PujcovadloServer.Api.Services;
+using PujcovadloServer.Areas.Api.Filters;
+using PujcovadloServer.Areas.Api.Services;
 using PujcovadloServer.Authentication;
 using PujcovadloServer.AuthorizationHandlers;
 using PujcovadloServer.AuthorizationHandlers.Image;

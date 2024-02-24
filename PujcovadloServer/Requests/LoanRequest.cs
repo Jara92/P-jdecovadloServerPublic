@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using PujcovadloServer.Api.Attributes;
+using PujcovadloServer.Areas.Api.Attributes;
 using PujcovadloServer.Business.Enums;
 
 namespace PujcovadloServer.Requests;

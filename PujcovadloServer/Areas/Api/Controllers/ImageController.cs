@@ -1,14 +1,15 @@
 using Microsoft.AspNetCore.Mvc;
-using PujcovadloServer.Api.Filters;
-using PujcovadloServer.Api.Services;
+using PujcovadloServer.Areas.Api.Filters;
+using PujcovadloServer.Areas.Api.Services;
 using PujcovadloServer.AuthorizationHandlers;
 using PujcovadloServer.AuthorizationHandlers.Item;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Facades;
 using PujcovadloServer.Responses;
 
-namespace PujcovadloServer.Api.Controllers;
+namespace PujcovadloServer.Areas.Api.Controllers;
 
+[Area("Api")]
 [ApiController]
 [Route("api/images")]
 [ServiceFilter(typeof(ExceptionFilter))]

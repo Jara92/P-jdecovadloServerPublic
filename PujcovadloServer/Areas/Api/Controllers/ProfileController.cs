@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using PujcovadloServer.Api.Filters;
-using PujcovadloServer.Api.Services;
+using PujcovadloServer.Areas.Api.Filters;
+using PujcovadloServer.Areas.Api.Services;
 using PujcovadloServer.AuthorizationHandlers;
 using PujcovadloServer.AuthorizationHandlers.Profile;
 using PujcovadloServer.Business.Facades;
@@ -8,8 +8,9 @@ using PujcovadloServer.Business.Filters;
 using PujcovadloServer.Requests;
 using PujcovadloServer.Responses;
 
-namespace PujcovadloServer.Api.Controllers;
+namespace PujcovadloServer.Areas.Api.Controllers;
 
+[Area("Api")]
 [ApiController]
 [Route("api/profiles")]
 [ServiceFilter(typeof(ExceptionFilter))]

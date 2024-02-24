@@ -1,4 +1,4 @@
-namespace PujcovadloServer.Api.Services;
+namespace PujcovadloServer.Areas.Api.Services;
 
 public class FileUploadService
 {

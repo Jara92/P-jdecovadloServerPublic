@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using PujcovadloServer.Requests;
 
-namespace PujcovadloServer.Api.Attributes;
+namespace PujcovadloServer.Areas.Api.Attributes;
 
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
 public class LoanDateTimeRangeAttribute : ValidationAttribute

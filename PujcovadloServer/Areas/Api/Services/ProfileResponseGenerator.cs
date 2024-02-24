@@ -1,11 +1,11 @@
 using AutoMapper;
-using PujcovadloServer.Api.Controllers;
+using PujcovadloServer.Areas.Api.Controllers;
 using PujcovadloServer.AuthorizationHandlers;
 using PujcovadloServer.Business.EntityAggregations;
 using PujcovadloServer.Responses;
 using Profile = PujcovadloServer.Business.Entities.Profile;
 
-namespace PujcovadloServer.Api.Services;
+namespace PujcovadloServer.Areas.Api.Services;
 
 public class ProfileResponseGenerator : ABaseResponseGenerator
 {

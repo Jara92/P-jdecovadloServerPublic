@@ -1,23 +1,23 @@
 using AutoMapper;
-using PujcovadloServer.Api.Controllers;
+using PujcovadloServer.Areas.Api.Controllers;
 using PujcovadloServer.AuthorizationHandlers;
-using PujcovadloServer.AuthorizationHandlers.ReturnProtocol;
+using PujcovadloServer.AuthorizationHandlers.PickupProtocol;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Facades;
 using PujcovadloServer.Responses;
 
-namespace PujcovadloServer.Api.Services;
+namespace PujcovadloServer.Areas.Api.Services;
 
 /// <summary>
-/// This class generates responses for ReturnProtocol entity.
+/// This class generates responses for PickupProtocol entity.
 /// Generates pagination and HATEOAS links for the responses.
 /// </summary>
-public class ReturnProtocolResponseGenerator : ABaseResponseGenerator
+public class PickupProtocolResponseGenerator : ABaseResponseGenerator
 {
     private readonly IMapper _mapper;
     private readonly ImageFacade _imageFacade;
 
-    public ReturnProtocolResponseGenerator(ImageFacade imageFacade, IMapper mapper, LinkGenerator urlHelper,
+    public PickupProtocolResponseGenerator(ImageFacade imageFacade, IMapper mapper, LinkGenerator urlHelper,
         IHttpContextAccessor httpContextAccessor, AuthorizationService authorizationService) :
         base(httpContextAccessor, urlHelper, authorizationService)
     {
@@ -26,13 +26,13 @@ public class ReturnProtocolResponseGenerator : ABaseResponseGenerator
     }
 
     /// <summary>
-    /// generates ReturnProtocolResponse with detailed information about the protocol.
+    /// generates PickupProtocolResponse with detailed information about the protocol.
     /// </summary>
-    /// <param name="protocol">ReturnProtocol to be converted to a response.</param>
-    /// <returns>ReturnProtocolResponse which represents the protocol</returns>
-    public async Task<ReturnProtocolResponse> GenerateReturnProtocolDetailResponse(ReturnProtocol protocol)
+    /// <param name="protocol">PickupProtocol to be converted to a response.</param>
+    /// <returns>PickupProtocolResponse which represents the protocol</returns>
+    public async Task<PickupProtocolResponse> GeneratePickupProtocolDetailResponse(PickupProtocol protocol)
     {
-        var response = _mapper.Map<ReturnProtocolResponse>(protocol);
+        var response = _mapper.Map<PickupProtocolResponse>(protocol);
 
         // Link to loan
         response._links.Add(new LinkResponse(
@@ -41,14 +41,13 @@ public class ReturnProtocolResponseGenerator : ABaseResponseGenerator
 
         // Add update link if user has permission
         if (await _authorizationService.CanPerformOperation(protocol,
-                ReturnProtocolOperations.Update))
+                PickupProtocolOperations.Update))
         {
             response._links.Add(new LinkResponse(
-                _urlHelper.GetUriByAction(_httpContext, nameof(ReturnProtocolController.UpdateProtocol),
-                    "ReturnProtocol", values: new { protocol.Id }), "UPDATE", "PUT"));
+                _urlHelper.GetUriByAction(_httpContext, nameof(PickupProtocolController.UpdateProtocol),
+                    "PickupProtocol", values: new { protocol.Id }), "UPDATE", "PUT"));
         }
 
-        // Images link
         // Image links
         for (var i = 0; i < protocol.Images.Count; i++)
         {

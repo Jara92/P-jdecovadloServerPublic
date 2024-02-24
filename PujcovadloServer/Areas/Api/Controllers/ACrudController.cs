@@ -5,7 +5,7 @@ using PujcovadloServer.Business.Filters;
 using PujcovadloServer.Lib;
 using PujcovadloServer.Responses;
 
-namespace PujcovadloServer.Api.Controllers;
+namespace PujcovadloServer.Areas.Api.Controllers;
 
 public abstract class ACrudController<T> : ControllerBase where T : BaseEntity
 {

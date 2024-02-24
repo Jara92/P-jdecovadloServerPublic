@@ -5,21 +5,21 @@ using PujcovadloServer.Authentication;
 using PujcovadloServer.Authentication.Exceptions;
 using PujcovadloServer.Business.Services.Interfaces;
 
-namespace PujcovadloServer.Api.Controllers;
+namespace PujcovadloServer.Areas.Api.Controllers;
 
+[Area("Api")]
 [Route("api/[controller]")]
 [ApiController]
 [AllowAnonymous]
 public class AuthenticateController : ControllerBase
 {
-    
     private readonly IAuthenticateService _authenticateService;
-    
+
     public AuthenticateController(IAuthenticateService authenticateService)
     {
         _authenticateService = authenticateService;
     }
-    
+
     /// <summary>
     /// Performs login and returns JWT token.
     /// </summary>

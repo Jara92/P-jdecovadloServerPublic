@@ -3,7 +3,7 @@ using PujcovadloServer.Business.Filters;
 using PujcovadloServer.Lib;
 using PujcovadloServer.Responses;
 
-namespace PujcovadloServer.Api.Services;
+namespace PujcovadloServer.Areas.Api.Services;
 
 public abstract class ABaseResponseGenerator
 {
@@ -11,8 +11,9 @@ public abstract class ABaseResponseGenerator
     protected readonly IHttpContextAccessor _httpContextAccessor;
     protected readonly AuthorizationService _authorizationService;
     protected HttpContext _httpContext;
-    
-    public ABaseResponseGenerator(IHttpContextAccessor httpContextAccessor, LinkGenerator urlHelper, AuthorizationService authorizationService)
+
+    public ABaseResponseGenerator(IHttpContextAccessor httpContextAccessor, LinkGenerator urlHelper,
+        AuthorizationService authorizationService)
     {
         _urlHelper = urlHelper;
         _httpContextAccessor = httpContextAccessor;
@@ -20,7 +21,7 @@ public abstract class ABaseResponseGenerator
 
         _httpContext = _httpContextAccessor.HttpContext;
     }
-    
+
     /// <summary>
     /// Generates pagination links for input list using input filter, action and controller.
     /// </summary>
@@ -29,7 +30,8 @@ public abstract class ABaseResponseGenerator
     /// <param name="action">Pagination action.</param>
     /// <param name="controller">Pagination controller</param>
     /// <returns></returns>
-    protected List<LinkResponse> GeneratePaginationLinks(IPaginatedList list, BaseFilter filter, string action, string controller)
+    protected List<LinkResponse> GeneratePaginationLinks(IPaginatedList list, BaseFilter filter, string action,
+        string controller)
     {
         var links = new List<LinkResponse>();
 
@@ -50,7 +52,8 @@ public abstract class ABaseResponseGenerator
             previousPageFilter.Page = list.PageIndex - 1;
 
             links.Add(new LinkResponse(
-                _urlHelper.GetUriByAction(_httpContext, action, controller, values: previousPageFilter), "PREVIOUS", "GET"));
+                _urlHelper.GetUriByAction(_httpContext, action, controller, values: previousPageFilter), "PREVIOUS",
+                "GET"));
         }
 
         return links;

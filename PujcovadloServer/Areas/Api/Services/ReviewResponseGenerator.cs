@@ -1,12 +1,12 @@
 using AutoMapper;
-using PujcovadloServer.Api.Controllers;
+using PujcovadloServer.Areas.Api.Controllers;
 using PujcovadloServer.AuthorizationHandlers;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Filters;
 using PujcovadloServer.Lib;
 using PujcovadloServer.Responses;
 
-namespace PujcovadloServer.Api.Services;
+namespace PujcovadloServer.Areas.Api.Services;
 
 /// <summary>
 /// This class generates responses for Review entity.

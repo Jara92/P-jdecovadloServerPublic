@@ -6,7 +6,7 @@ using PujcovadloServer.AuthorizationHandlers.Exceptions;
 using PujcovadloServer.Business.Exceptions;
 using PujcovadloServer.Responses;
 
-namespace PujcovadloServer.Api.Filters;
+namespace PujcovadloServer.Areas.Api.Filters;
 
 public class ExceptionFilter : ExceptionFilterAttribute
 {

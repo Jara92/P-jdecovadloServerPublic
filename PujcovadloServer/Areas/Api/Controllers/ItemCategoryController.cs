@@ -1,8 +1,8 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PujcovadloServer.Api.Filters;
-using PujcovadloServer.Api.Services;
+using PujcovadloServer.Areas.Api.Filters;
+using PujcovadloServer.Areas.Api.Services;
 using PujcovadloServer.AuthorizationHandlers;
 using PujcovadloServer.AuthorizationHandlers.ItemCategory;
 using PujcovadloServer.Business.Entities;
@@ -11,8 +11,9 @@ using PujcovadloServer.Business.Filters;
 using PujcovadloServer.Business.Services;
 using PujcovadloServer.Responses;
 
-namespace PujcovadloServer.Api.Controllers;
+namespace PujcovadloServer.Areas.Api.Controllers;
 
+[Area("Api")]
 [ApiController]
 [Route("api/item-categories")]
 [ServiceFilter(typeof(ExceptionFilter))]
