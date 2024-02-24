@@ -1,3 +1,6 @@
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -39,6 +42,8 @@ public class AuthenticateController : Controller
     /*[ValidateAntiForgeryToken]*/
     public async Task<IActionResult> PerformLogin(LoginRequest request)
     {
+        /*if (ModelState.IsValid)
+        {*/
         if (_signInManager.IsSignedIn(User))
         {
             // todo: 
@@ -60,9 +65,56 @@ public class AuthenticateController : Controller
         // To enable password failures to trigger account lockout, change to shouldLockout: true
         var result = await _signInManager.PasswordSignInAsync(request.Username, request.Password, false, false);
 
-        if (result.Succeeded)
+        if (result.Succeeded && user != null)
         {
-            return RedirectToAction("Index", "Item");
+            // Get user roles
+            var userRoles = await _userManager.GetRolesAsync(user);
+
+            // Create claims
+            var authClaims = new List<Claim>
+            {
+                new Claim(ClaimTypes.PrimarySid, user.Id),
+                new Claim(ClaimTypes.Name, user.UserName),
+            };
+
+            // Add user roles to claims
+            foreach (var userRole in userRoles)
+            {
+                authClaims.Add(new Claim(ClaimTypes.Role, userRole));
+            }
+
+            var claimsIdentity = new ClaimsIdentity(authClaims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var authProperties = new AuthenticationProperties
+            {
+                AllowRefresh = true,
+                //       // Refreshing the authentication session should be allowed.
+
+                //       //ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(10),
+                //       // The time at which the authentication ticket expires. A 
+                //       // value set here overrides the ExpireTimeSpan option of 
+                //       // CookieAuthenticationOptions set with AddCookie.
+
+                //       //IsPersistent = true,
+                //       // Whether the authentication session is persisted across 
+                //       // multiple requests. When used with cookies, controls
+                //       // whether the cookie's lifetime is absolute (matching the
+                //       // lifetime of the authentication ticket) or session-based.
+
+                //       //IssuedUtc = <DateTimeOffset>,
+                //       // The time at which the authentication ticket was issued.
+
+                //       //RedirectUri = <string>
+                //       // The full path or absolute URI to be used as an http 
+                //       // redirect response value.
+            };
+
+            await HttpContext.SignInAsync(
+                "Admin",
+                new ClaimsPrincipal(claimsIdentity),
+                authProperties
+            );
+
+            return RedirectToAction(nameof(HomeController.Dashboard), "Home");
         }
 
         if (result.IsLockedOut)
@@ -76,14 +128,19 @@ public class AuthenticateController : Controller
         }
 
         ModelState.AddModelError("", "Invalid login attempt.");
+        /*
+        }
+        */
+
         return View("Login");
     }
 
     [HttpGet("logout")]
-    [Authorize]
     public async Task<IActionResult> Logout()
     {
-        await _signInManager.SignOutAsync();
+        // TODO: WTF
+        // await _signInManager.SignOutAsync();
+        await HttpContext.SignOutAsync("Admin");
 
         return RedirectToAction(nameof(Login));
     }

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PujcovadloServer.Business.Entities;
+using PujcovadloServer.Business.Enums;
 using PujcovadloServer.Business.Filters;
 using PujcovadloServer.Business.Services;
 
@@ -8,8 +9,8 @@ namespace PujcovadloServer.Areas.Admin.Controllers;
 
 [Controller]
 [Route("admin/items")]
-[AllowAnonymous]
 [Area("Admin")]
+[Authorize(Roles = UserRoles.Admin, AuthenticationSchemes = "Admin")]
 public class ItemController : Controller
 {
     private readonly ItemService _itemService;
@@ -20,7 +21,6 @@ public class ItemController : Controller
     }
 
     [HttpGet]
-    [AllowAnonymous]
     public async Task<IActionResult> Index()
     {
         ViewData["Items"] = await _itemService.GetAll(new ItemFilter());

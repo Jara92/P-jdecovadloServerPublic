@@ -82,6 +82,41 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<PujcovadloServerContext>()
     .AddDefaultTokenProviders();
 
+// builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+// .AddEntityFrameworkStores<ApplicationDbContext>();
+
+builder.Services.Configure<IdentityOptions>(options =>
+{
+    // Password settings.
+    options.Password.RequireDigit = true;
+    options.Password.RequireLowercase = true;
+    options.Password.RequireNonAlphanumeric = true;
+    options.Password.RequireUppercase = true;
+    options.Password.RequiredLength = 6;
+    options.Password.RequiredUniqueChars = 1;
+
+    // Lockout settings.
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+    options.Lockout.MaxFailedAccessAttempts = 5;
+    options.Lockout.AllowedForNewUsers = true;
+
+    // User settings.
+    options.User.AllowedUserNameCharacters =
+        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._";
+    options.User.RequireUniqueEmail = false;
+});
+
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    // Cookie settings
+    options.Cookie.HttpOnly = true;
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+
+    options.LoginPath = "/admin/login";
+    options.AccessDeniedPath = "/401";
+    options.SlidingExpiration = true;
+});
 
 // Adding Authentication
 builder.Services.AddAuthentication(options =>
@@ -104,6 +139,14 @@ builder.Services.AddAuthentication(options =>
             ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
         };
+    }).AddCookie("Admin", options =>
+    {
+        options.Cookie.Name = "PujcovadloCookie";
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+        options.SlidingExpiration = true;
+        options.LoginPath = "/admin/login"; // Cesta k přihlašovací stránce
+        options.LogoutPath = "/admin/logout";
+        options.AccessDeniedPath = "/403";
     });
 
 // Minio object storage configuration
@@ -245,6 +288,9 @@ if (app.Environment.IsProduction())
     app.UseHttpsRedirection();
 }
 
+app.UseAuthentication();
+app.UseAuthorization();
+
 // Define routes for admin area
 app.MapControllerRoute(
     name: "Admin",
@@ -259,8 +305,12 @@ app.MapControllerRoute(
 //app.MapControllers();
 //app.MapRazorPages();
 
-app.UseAuthentication();
-app.UseAuthorization();
+var cookiePolicyOptions = new CookiePolicyOptions
+{
+    MinimumSameSitePolicy = SameSiteMode.Strict,
+};
+
+app.UseCookiePolicy(cookiePolicyOptions);
 
 app.Run();
 
