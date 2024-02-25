@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Minio;
 using NSwag;
@@ -288,9 +289,6 @@ if (app.Environment.IsProduction())
     app.UseHttpsRedirection();
 }
 
-app.UseAuthentication();
-app.UseAuthorization();
-
 // Define routes for admin area
 app.MapControllerRoute(
     name: "Admin",
@@ -311,6 +309,25 @@ var cookiePolicyOptions = new CookiePolicyOptions
 };
 
 app.UseCookiePolicy(cookiePolicyOptions);
+
+// Add static files to the request pipeline (see https://learn.microsoft.com/en-us/aspnet/core/fundamentals/static-files?view=aspnetcore-8.0)
+// https://stackoverflow.com/questions/60433142/how-to-use-css-files-or-js-in-area-on-asp-net-core
+/*app.UseStaticFiles(new StaticFileOptions()
+{
+    FileProvider = new
+        PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(),
+            "Areas/Admin/wwwroot/assets")),
+    RequestPath = new PathString("/assets/admin")
+});*/
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+        Path.Combine(builder.Environment.ContentRootPath, "Areas/Admin/wwwroot")),
+    RequestPath = "/assets/admin"
+});
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.Run();
 
