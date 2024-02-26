@@ -1,5 +1,5 @@
 namespace PujcovadloServer;
 
-public class SharedResource
+public class GlobalResources
 {
 }

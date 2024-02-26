@@ -47,9 +47,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <AdditionalFiles Include="Areas\Admin\Views\Item\Create.cshtml"/>
         <AdditionalFiles Include="Areas\Admin\Views\Item\Delete.cshtml"/>
-        <AdditionalFiles Include="Areas\Admin\Views\Item\Details.cshtml"/>
         <AdditionalFiles Include="Areas\Admin\Views\Item\Edit.cshtml"/>
         <AdditionalFiles Include="Areas\Admin\Views\Item\Index.cshtml"/>
         <AdditionalFiles Include="Areas\Admin\Views\Shared\_ValidationScriptsPartial.cshtml"/>
@@ -85,6 +83,22 @@
             <Generator>ResXFileCodeGenerator</Generator>
             <LastGenOutput>Index.cs-CZ.Designer.cs</LastGenOutput>
         </EmbeddedResource>
+        <EmbeddedResource Update="Resources\Areas\Admin\Views\Item\Edit.cs-CZ.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>Edit.cs-CZ.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+        <EmbeddedResource Update="Resources\Business\Enums\ItemStatus.cs-CZ.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>ItemStatus.cs-CZ.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+        <EmbeddedResource Update="Resources\Global.cs-CZ.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>Global.cs-CZ.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+        <EmbeddedResource Update="Resources\GlobalResources.cs-CZ.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>GlobalResources.cs-CZ.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
     </ItemGroup>
 
     <ItemGroup>
@@ -112,6 +126,26 @@
             <DesignTime>True</DesignTime>
             <AutoGen>True</AutoGen>
             <DependentUpon>Index.cs-CZ.resx</DependentUpon>
+        </Compile>
+        <Compile Update="Resources\Areas\Admin\Views\Item\Edit.cs-CZ.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>Edit.cs-CZ.resx</DependentUpon>
+        </Compile>
+        <Compile Update="Resources\Business\Enums\ItemStatus.cs-CZ.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>ItemStatus.cs-CZ.resx</DependentUpon>
+        </Compile>
+        <Compile Update="Resources\Global.cs-CZ.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>Global.cs-CZ.resx</DependentUpon>
+        </Compile>
+        <Compile Update="Resources\GlobalResources.cs-CZ.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>GlobalResources.cs-CZ.resx</DependentUpon>
         </Compile>
     </ItemGroup>
 

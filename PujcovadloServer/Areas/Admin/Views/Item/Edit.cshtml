@@ -1,87 +1,182 @@
+@using PujcovadloServer.Business.Enums
 @model PujcovadloServer.Business.Entities.Item
+@inject IStringLocalizer<ItemStatus> StatusLocalizer
 
 @{
     Layout = "_Layout";
-    ViewData["Title"] = @Localizer["Edit item"] + ": " + Model.Name;
+    ViewData["Title"] = Localizer["Editing item"].Value + ": " + Model.Name;
 }
 
-<h4>@Model.Name</h4>
-<hr/>
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id"/>
-            <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control"/>
-                <span asp-validation-for="Name" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Alias" class="control-label"></label>
-                <input asp-for="Alias" class="form-control"/>
-                <span asp-validation-for="Alias" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control"/>
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Status" class="control-label"></label>
-                <select asp-for="Status" class="form-control"></select>
-                <span asp-validation-for="Status" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Parameters" class="control-label"></label>
-                <input asp-for="Parameters" class="form-control"/>
-                <span asp-validation-for="Parameters" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="PricePerDay" class="control-label"></label>
-                <input asp-for="PricePerDay" class="form-control"/>
-                <span asp-validation-for="PricePerDay" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="RefundableDeposit" class="control-label"></label>
-                <input asp-for="RefundableDeposit" class="form-control"/>
-                <span asp-validation-for="RefundableDeposit" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="PurchasePrice" class="control-label"></label>
-                <input asp-for="PurchasePrice" class="form-control"/>
-                <span asp-validation-for="PurchasePrice" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="SellingPrice" class="control-label"></label>
-                <input asp-for="SellingPrice" class="form-control"/>
-                <span asp-validation-for="SellingPrice" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CreatedAt" class="control-label"></label>
-                <input asp-for="CreatedAt" class="form-control"/>
-                <span asp-validation-for="CreatedAt" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="UpdatedAt" class="control-label"></label>
-                <input asp-for="UpdatedAt" class="form-control"/>
-                <span asp-validation-for="UpdatedAt" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ApprovedAt" class="control-label"></label>
-                <input asp-for="ApprovedAt" class="form-control"/>
-                <span asp-validation-for="ApprovedAt" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary"/>
-            </div>
-        </form>
-    </div>
-</div>
+<form asp-action="Edit">
+    <input type="hidden" asp-for="Id"/>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+    <div class="container-fluid">
+        <div class="btn-toolbar mb-md-4 mb-sm-2">
+            <div class="btn-group me-2">
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i>
+                    @GlobalLocalizer["Back"]
+                </a>
+            </div>
+
+            <div class="btn-group me-2">
+                <button type="submit" class="btn btn-primary">@GlobalLocalizer["Save changes"]</button>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12 m-2">
+                <div class="card card-primary card-outline mb-4">
+                    <div class="card-header">
+                        <div class="card-title">#@Model.Id @Model.Name</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-12 col-lg-6">
+                                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                                <div class="form-group mb-3">
+                                    <label asp-for="Name" class="form-label"></label>
+                                    <input asp-for="Name" class="form-control"/>
+                                    <span asp-validation-for="Name" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label asp-for="Alias" class="form-label"></label>
+                                    <input asp-for="Alias" class="form-control"/>
+                                    <span asp-validation-for="Alias" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label asp-for="Status" class="control-label"></label>
+                                    @Html.DropDownListFor(model => model.Status,
+                                        Enum.GetValues(typeof(ItemStatus))
+                                            .Cast<ItemStatus>()
+                                            .Select(e => new SelectListItem
+                                            {
+                                                Text = StatusLocalizer[e.ToString()],
+                                                Value = e.ToString()
+                                            }),
+                                        "Select Status",
+                                        new { @class = "form-select" })
+                                    <span asp-validation-for="Status" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12 col-lg-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="Description" class="control-label"></label>
+                                    <textarea class="form-control" id="Description" name="Description" rows="4">@Model.Description</textarea>
+                                    <span asp-validation-for="Description" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label asp-for="Parameters" class="control-label"></label>
+                                    <textarea class="form-control" id="Parameters" name="Parameters" rows="4">@Model.Parameters</textarea>
+                                    <span asp-validation-for="Parameters" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card card-primary card-outline mb-4">
+                    <div class="card-header">
+                        <div class="card-title">@Localizer["Item price"]</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-12">
+
+                                <div class="form-group mb-3">
+                                    <label asp-for="PricePerDay" class="form-label"></label>
+                                    <div class="input-group">
+                                        <input asp-for="PricePerDay" type="number" min="0" class="form-control"/>
+                                        <span class="input-group-text"> Kč</span>
+                                    </div>
+                                    <span asp-validation-for="PricePerDay" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label asp-for="RefundableDeposit" class="form-label"></label>
+                                    <div class="input-group">
+                                        <input asp-for="RefundableDeposit" type="number" min="0" class="form-control"/>
+                                        <span class="input-group-text"> Kč</span>
+                                    </div>
+                                    <span asp-validation-for="RefundableDeposit" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label asp-for="PurchasePrice" class="form-label"></label>
+                                    <div class="input-group">
+                                        <input asp-for="PurchasePrice" type="number" min="0" class="form-control"/>
+                                        <span class="input-group-text"> Kč</span>
+                                    </div>
+                                    <span asp-validation-for="PurchasePrice" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label asp-for="SellingPrice" class="form-label"></label>
+                                    <div class="input-group">
+                                        <input asp-for="SellingPrice" type="number" min="0" class="form-control"/>
+                                        <span class="input-group-text"> Kč</span>
+                                    </div>
+                                    <span asp-validation-for="SellingPrice" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card card-primary card-outline mb-4">
+                    <div class="card-header">
+                        <div class="card-title">@Localizer["Item dates"]</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-12">
+
+                                <div class="form-group mb-3">
+                                    <label asp-for="CreatedAt" class="control-label"></label>
+                                    <input asp-for="CreatedAt" class="form-control"/>
+                                    <span asp-validation-for="CreatedAt" class="text-danger"></span>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label asp-for="UpdatedAt" class="control-label"></label>
+                                    <input asp-for="UpdatedAt" class="form-control"/>
+                                    <span asp-validation-for="UpdatedAt" class="text-danger"></span>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label asp-for="ApprovedAt" class="control-label"></label>
+                                    <input asp-for="ApprovedAt" class="form-control"/>
+                                    <span asp-validation-for="ApprovedAt" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card card-primary card-outline mb-4">
+                    <div class="card-header">
+                        <div class="card-title">@Localizer["Item images"]</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-12">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
 
 @section Scripts {
     @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }

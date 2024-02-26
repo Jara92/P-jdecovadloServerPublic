@@ -11,7 +11,8 @@ public class Item : BaseEntity
     [Required]
     [Column(TypeName = "VARCHAR")]
     [StringLength(64, MinimumLength = 6)]
-    [RegularExpression(@"^[A-Z]+[a-zA-Z]+[0-9]*$")]
+    // TODO: Add RegularExpression
+    /*[RegularExpression(@"^[A-Z]+[a-zA-Z]+[0-9]*$")]*/
     [DisplayName("Name")]
     public string Name { get; set; } = default!;
 
