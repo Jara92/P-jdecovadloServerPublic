@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using PujcovadloServer.Authentication;
 using PujcovadloServer.Business.Enums;
 
@@ -18,13 +19,16 @@ public class AuthenticateController : Controller
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly LinkGenerator _urlHelper;
+    private readonly IStringLocalizer<AuthenticateController> _localizer;
 
     public AuthenticateController(UserManager<ApplicationUser> userManager,
-        SignInManager<ApplicationUser> signInManager, LinkGenerator urlHelper)
+        SignInManager<ApplicationUser> signInManager, LinkGenerator urlHelper,
+        IStringLocalizer<AuthenticateController> localizer)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _urlHelper = urlHelper;
+        _localizer = localizer;
     }
 
     [HttpGet("login")]
@@ -42,6 +46,12 @@ public class AuthenticateController : Controller
     /*[ValidateAntiForgeryToken]*/
     public async Task<IActionResult> PerformLogin(LoginRequest request)
     {
+        // back to login page if model is not valid
+        if (!ModelState.IsValid)
+        {
+            return View("Login");
+        }
+
         /*if (ModelState.IsValid)
         {*/
         if (_signInManager.IsSignedIn(User))
@@ -127,11 +137,10 @@ public class AuthenticateController : Controller
             // todo
         }
 
-        ModelState.AddModelError("", "Invalid login attempt.");
-        /*
-        }
-        */
+        // Add error message
+        ModelState.AddModelError("", _localizer["Invalid username or password."]);
 
+        // Back to login page.
         return View("Login");
     }
 

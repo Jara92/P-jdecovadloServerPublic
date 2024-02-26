@@ -2,7 +2,7 @@
 
 @{
     Layout = "_Layout";
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Admin login";
 }
 
 <section class="vh-100">
@@ -18,13 +18,10 @@
                 <div class="d-flex align-items-center h-custom-2 px-5 ms-xl-4 mt-5 pt-5 pt-xl-0 mt-xl-n5">
 
                     <form asp-action="PerformLogin" style="width: 23rem;">
+
                         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-                        <h3 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Log in</h3>
-
-                        <a asp-action="Create" asp-controller="Item" asp-area="Admin">Create item</a>
-                        <a asp-action="Get" asp-controller="Item" asp-area="Admin" asp-route-id="1">Get item</a>
-                        <span>@Html.Raw(ViewData["TheLink"])</span>
+                        <h3 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">@Localizer["Log in"]</h3>
 
                         <div class="form-outline mb-4">
                             <label asp-for="Username" class="form-label"></label>
@@ -39,11 +36,11 @@
                         </div>
 
                         <div class="pt-1 mb-4">
-                            <button class="btn btn-info btn-lg btn-block login-button" type="submit">Login</button>
+                            <button class="btn btn-info btn-lg btn-block login-button" type="submit">@Localizer["Do login"]</button>
                         </div>
 
                         <p class="small mb-5 pb-lg-2">
-                            <a class="text-muted" href="#!">Forgotten password?</a>
+                            <a class="text-muted" href="#!">@Localizer["Forgotten password?"]</a>
                         </p>
 
                     </form>

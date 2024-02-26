@@ -3,8 +3,11 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Minio;
 using NSwag;
@@ -166,6 +169,33 @@ builder.Services.AddAuthorization(options =>
         .Build();
 });
 
+// Localization
+builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+
+builder.Services.Configure<RequestLocalizationOptions>(options =>
+{
+    var supportedCultures = new[] { "cs-CZ", "en-US" };
+    options.SetDefaultCulture(supportedCultures[0])
+        .AddSupportedCultures(supportedCultures)
+        .AddSupportedUICultures(supportedCultures);
+
+    options.DefaultRequestCulture = new RequestCulture(culture: "cs-CZ", uiCulture: "cs-CZ");
+});
+
+builder.Services.AddMvc()
+    // Add support for finding localized views, based on file name suffix, e.g. Index.fr.cshtml
+    .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
+    // Add support for localizing strings in data annotations (e.g. validation messages) via the
+    // IStringLocalizer abstractions.
+    /*.AddDataAnnotationsLocalization(options => {
+        // Shared resource is used for data annotations localization
+        // FIXME: this is not working with class based localization resources
+        options.DataAnnotationLocalizerProvider = (type, factory) =>
+            factory.Create(typeof(SharedResource));
+    })*/
+    // Support for class based localization resources
+    .AddDataAnnotationsLocalization();
+
 // FileStorage
 builder.Services.AddScoped<IFileStorage, MinioFileStorage>();
 
@@ -271,6 +301,9 @@ builder.Services.AddSingleton<IMapper>(config.CreateMapper());
 
 var app = builder.Build();
 
+var locOptions = app.Services.GetService<IOptions<RequestLocalizationOptions>>();
+app.UseRequestLocalization(locOptions.Value);
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -312,13 +345,6 @@ app.UseCookiePolicy(cookiePolicyOptions);
 
 // Add static files to the request pipeline (see https://learn.microsoft.com/en-us/aspnet/core/fundamentals/static-files?view=aspnetcore-8.0)
 // https://stackoverflow.com/questions/60433142/how-to-use-css-files-or-js-in-area-on-asp-net-core
-/*app.UseStaticFiles(new StaticFileOptions()
-{
-    FileProvider = new
-        PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(),
-            "Areas/Admin/wwwroot/assets")),
-    RequestPath = new PathString("/assets/admin")
-});*/
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(

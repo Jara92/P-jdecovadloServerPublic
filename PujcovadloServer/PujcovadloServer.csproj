@@ -8,6 +8,7 @@
         <NoWarn>$(NoWarn);1591</NoWarn>
         <InvariantGlobalization>true</InvariantGlobalization>
         <RootNamespace>PujcovadloServer</RootNamespace>
+        <AssemblyName>PujcovadloServer</AssemblyName>
     </PropertyGroup>
 
     <ItemGroup>
@@ -29,12 +30,14 @@
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
+        <PackageReference Include="Microsoft.Extensions.Localization" Version="8.0.1"/>
         <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.0" />
         <PackageReference Include="Minio" Version="6.0.2"/>
         <PackageReference Include="NSwag.AspNetCore" Version="14.0.2" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0"/>
         <!-- Runtime recompile razor templates when debugind -->
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="3.1.0" Condition="'$(Configuration)' == 'Debug'"/>
+        <PackageReference Include="System.Globalization.Extensions" Version="4.3.0"/>
     </ItemGroup>
 
     <ItemGroup>
@@ -60,5 +63,43 @@
     <ItemGroup>
         <_ContentIncludedByDefault Remove="Areas\Admin\Views\Shared\_ValidationScriptsPartial.cshtml"/>
     </ItemGroup>
+
+    <ItemGroup>
+        <EmbeddedResource Update="Resources\Areas\Admin\Controllers\AuthenticateController.cs-CZ.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>AuthenticateController.cs-CZ.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+        <EmbeddedResource Update="Resources\Areas\Admin\Views\Authenticate\Login.cs-CZ.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>Login.cs-CZ.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+        <EmbeddedResource Update="Resources\Authentication\LoginRequest.cs-CZ.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>LoginRequest.cs-CZ.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Update="Resources\Areas\Admin\Controllers\AuthenticateController.cs-CZ.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>AuthenticateController.cs-CZ.resx</DependentUpon>
+        </Compile>
+        <Compile Update="Resources\Areas\Admin\Views\Authenticate\Login.cs-CZ.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>Login.cs-CZ.resx</DependentUpon>
+        </Compile>
+        <Compile Update="Resources\Authentication\LoginRequest.cs-CZ.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>LoginRequest.cs-CZ.resx</DependentUpon>
+        </Compile>
+    </ItemGroup>
+
+    <!-- Turn of Invariant mode -->
+    <PropertyGroup>
+        <InvariantGlobalization>false</InvariantGlobalization>
+    </PropertyGroup>
 
 </Project>
