@@ -3,9 +3,9 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Půjčovadlo.cz | @ViewData["Title"] ?? ''</title><!--begin::Primary Meta Tags-->
+    <title>Půjčovadlo.cz | @ViewData["Title"]</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="title" content="Půjčovadlo.cz | @ViewData["Title"] ?? '' ">
+    <meta name="title" content="Půjčovadlo.cz | @ViewData["Title"]">
     <meta name="author" content="Bc. Jaroslav Fikar">
     <meta name="description" content="Půjčovadlo.cz je moderní platforma sdílené ekonomiky pro každého.">
     <meta name="keywords" content="pujcovadlo,sdilenaekonomika">
@@ -40,7 +40,32 @@
     @* Vertical sidebar navigation menu *@
     <partial name="_SidebarMenu"/>
 
-    @RenderBody()
+    <main class="app-main">
+        <div class="app-content-header">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h3 class="mb-0">@ViewData["Title"]</h3>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-end">
+                            <li class="breadcrumb-item">
+                                <a href="#">@Localizer["Home"]</a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">
+                                @ViewData["Title"]
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @* Main application content *@
+        <div class="app-content">
+            @RenderBody()
+        </div>
+    </main>
 
     @* Page footer *@
     <partial name="_Footer"/>

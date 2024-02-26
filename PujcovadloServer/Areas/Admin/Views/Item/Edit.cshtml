@@ -1,13 +1,11 @@
 @model PujcovadloServer.Business.Entities.Item
 
 @{
-    ViewData["Title"] = "Edit";
+    Layout = "_Layout";
+    ViewData["Title"] = @Localizer["Edit item"] + ": " + Model.Name;
 }
-@RenderSection("Scripts", false)
 
-<h1>Edit</h1>
-
-<h4>Item</h4>
+<h4>@Model.Name</h4>
 <hr/>
 <div class="row">
     <div class="col-md-4">

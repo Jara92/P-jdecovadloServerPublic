@@ -77,6 +77,14 @@
             <Generator>ResXFileCodeGenerator</Generator>
             <LastGenOutput>LoginRequest.cs-CZ.Designer.cs</LastGenOutput>
         </EmbeddedResource>
+        <EmbeddedResource Update="Resources\Areas\Admin\Views\Shared\_SidebarMenu.cs-CZ.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>_SidebarMenu.cs-CZ.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+        <EmbeddedResource Update="Resources\Areas\Admin\Views\Item\Index.cs-CZ.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>Index.cs-CZ.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
     </ItemGroup>
 
     <ItemGroup>
@@ -94,6 +102,16 @@
             <DesignTime>True</DesignTime>
             <AutoGen>True</AutoGen>
             <DependentUpon>LoginRequest.cs-CZ.resx</DependentUpon>
+        </Compile>
+        <Compile Update="Resources\Areas\Admin\Views\Shared\_SidebarMenu.cs-CZ.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>_SidebarMenu.cs-CZ.resx</DependentUpon>
+        </Compile>
+        <Compile Update="Resources\Areas\Admin\Views\Item\Index.cs-CZ.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>Index.cs-CZ.resx</DependentUpon>
         </Compile>
     </ItemGroup>
 
