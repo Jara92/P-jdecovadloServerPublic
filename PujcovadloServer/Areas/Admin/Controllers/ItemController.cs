@@ -25,8 +25,9 @@ public class ItemController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> Index(ItemFilter filter)
+    public async Task<IActionResult> Index([FromQuery] ItemFilter filter)
     {
+        ViewData["Filter"] = filter;
         ViewData["Items"] = await _itemFacade.GetItems(filter);
 
         return View();

@@ -70,6 +70,13 @@
                 </div>
             }
 
+            @if (IsSectionDefined("Searchbar"))
+            {
+                <div class="searchbar mb-md-4 mb-sm-2">
+                    @RenderSection("Searchbar", required: false)
+                </div>
+            }
+
             @RenderBody()
         </div>
     </main>
