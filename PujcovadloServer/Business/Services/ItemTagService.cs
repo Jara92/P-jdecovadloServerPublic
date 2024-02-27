@@ -1,6 +1,7 @@
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Filters;
 using PujcovadloServer.Business.Interfaces;
+using PujcovadloServer.Business.Objects;
 
 namespace PujcovadloServer.Business.Services;
 
@@ -38,5 +39,15 @@ public class ItemTagService(IItemTagRepository repository)
         }
 
         return tags;
+    }
+
+    public Task<IList<ItemTagOption>> GetAllAsOptions()
+    {
+        return _repository.GetAllAsOptions();
+    }
+
+    public Task<IEnumerable<ItemTag>> GetByIds(ICollection<int> requestTags)
+    {
+        return _repository.GetByIds(requestTags);
     }
 }

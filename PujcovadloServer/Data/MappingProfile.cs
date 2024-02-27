@@ -50,6 +50,13 @@ public class MappingProfile : Profile
 
         CreateMap<ApplicationUser, UserResponse>();
 
+        CreateMap<Item, Areas.Admin.Requests.ItemRequest>()
+            .ForMember(r => r.Categories, opt => opt.MapFrom(i => i.Categories.Select(c => c.Id)))
+            .ForMember(r => r.Tags, opt => opt.MapFrom(i => i.Tags.Select(t => t.Id)));
+        CreateMap<Areas.Admin.Requests.ItemRequest, Item>()
+            .ForMember(r => r.Categories, opt => opt.Ignore())
+            .ForMember(r => r.Tags, opt => opt.Ignore());
+
         // CreateMap<ItemCategory, ItemCategoryDto>();
         //CreateMap<ItemCategoryDto, ItemCategory>();
     }

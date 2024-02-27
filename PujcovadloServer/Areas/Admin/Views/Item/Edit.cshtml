@@ -1,5 +1,7 @@
 @using PujcovadloServer.Business.Enums
-@model PujcovadloServer.Business.Entities.Item
+@using PujcovadloServer.Business.Objects
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model PujcovadloServer.Areas.Admin.Requests.ItemRequest
 @inject IStringLocalizer<ItemStatus> StatusLocalizer
 
 @{
@@ -48,6 +50,20 @@
                                 </div>
 
                                 <div class="form-group mb-3">
+                                    <label asp-for="OwnerId" class="control-label"></label>
+                                    @Html.DropDownListFor(model => model.OwnerId,
+                                        (ViewData["Users"] as List<ApplicationUserOption>)
+                                        .Select(c => new SelectListItem
+                                        {
+                                            Text = c.FirstName + " " + c.LastName,
+                                            Value = c.Id
+                                        }),
+                                        "Select Owner",
+                                        new { @class = "form-select" })
+                                    <span asp-validation-for="OwnerId" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group mb-3">
                                     <label asp-for="Status" class="control-label"></label>
                                     @Html.DropDownListFor(model => model.Status,
                                         Enum.GetValues(typeof(ItemStatus))
@@ -60,6 +76,19 @@
                                         "Select Status",
                                         new { @class = "form-select" })
                                     <span asp-validation-for="Status" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label asp-for="Categories" class="control-label"></label>
+                                    @Html.ListBoxFor(model => model.Categories,
+                                        (ViewData["Categories"] as List<ItemCategoryOption>)
+                                        .Select(c => new SelectListItem
+                                        {
+                                            Text = c.Name,
+                                            Value = c.Id.ToString()
+                                        }),
+                                        new { @class = "form-select", multiple = "multiple" })
+                                    <span asp-validation-for="Categories" class="text-danger"></span>
                                 </div>
                             </div>
 
@@ -74,6 +103,19 @@
                                     <label asp-for="Parameters" class="control-label"></label>
                                     <textarea class="form-control" id="Parameters" name="Parameters" rows="4">@Model.Parameters</textarea>
                                     <span asp-validation-for="Parameters" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label asp-for="Tags" class="control-label"></label>
+                                    @Html.ListBoxFor(model => model.Tags,
+                                        (ViewData["Tags"] as List<ItemTagOption>)
+                                        .Select(c => new SelectListItem
+                                        {
+                                            Text = c.Name,
+                                            Value = c.Id.ToString()
+                                        }),
+                                        new { @class = "form-select", multiple = "multiple" })
+                                    <span asp-validation-for="Tags" class="text-danger"></span>
                                 </div>
                             </div>
                         </div>

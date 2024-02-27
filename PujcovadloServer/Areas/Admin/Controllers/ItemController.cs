@@ -1,5 +1,8 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NuGet.Packaging;
+using PujcovadloServer.Areas.Admin.Requests;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Enums;
 using PujcovadloServer.Business.Filters;
@@ -14,10 +17,20 @@ namespace PujcovadloServer.Areas.Admin.Controllers;
 public class ItemController : Controller
 {
     private readonly ItemService _itemService;
+    private readonly ItemCategoryService _itemCategoryService;
+    private readonly ItemTagService _itemTagService;
+    private readonly ApplicationUserService _userService;
+    private readonly IMapper _mapper;
 
-    public ItemController(ItemService itemService)
+    public ItemController(ItemService itemService, ItemCategoryService itemCategoryService,
+        ItemTagService itemTagService,
+        ApplicationUserService userService, IMapper mapper)
     {
         _itemService = itemService;
+        _itemCategoryService = itemCategoryService;
+        _itemTagService = itemTagService;
+        _userService = userService;
+        _mapper = mapper;
     }
 
     [HttpGet]
@@ -37,25 +50,55 @@ public class ItemController : Controller
             return NotFound();
         }
 
-        return View(item);
+        var model = _mapper.Map<Item, ItemRequest>(item);
+
+        ViewData["Users"] = await _userService.GetAllAsOptions(new ApplicationUserFilter());
+        ViewData["Categories"] = await _itemCategoryService.GetAllOptions();
+        ViewData["Tags"] = await _itemTagService.GetAllAsOptions();
+
+        return View(model);
     }
 
     [HttpPost("edit/{id}")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int id, Item item)
+    public async Task<IActionResult> Edit(int id, ItemRequest request)
     {
-        if (id != item.Id)
+        var item = await _itemService.Get(id);
+
+        if (item == null || item.Id != id)
         {
             return NotFound();
         }
 
+        //item.Owner = await _userService.Get(item.Owner.Id);
+        //item.OwnerId = item.Owner.Id;
+
         if (ModelState.IsValid)
         {
+            _mapper.Map(request, item);
+
+            // sync categories
+            item.Categories.Clear();
+            item.Categories.AddRange(await _itemCategoryService.GetByIds(request.Categories));
+
+            // sync tags
+            item.Tags.Clear();
+            item.Tags.AddRange(await _itemTagService.GetByIds(request.Tags));
+
             await _itemService.Update(item);
-            return RedirectToAction(nameof(Index));
+
+            // TODO: FLASH MESSAGE
+        }
+        else
+        {
+            // TODO: FLASH MESSAGE
         }
 
-        return View(item);
+        ViewData["Users"] = await _userService.GetAllAsOptions(new ApplicationUserFilter());
+        ViewData["Categories"] = await _itemCategoryService.GetAllOptions();
+        ViewData["Tags"] = await _itemTagService.GetAllAsOptions();
+
+        return View(request);
     }
 
     [HttpGet("delete/{id}")]
