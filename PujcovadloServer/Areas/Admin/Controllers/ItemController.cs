@@ -88,10 +88,9 @@ public class ItemController : Controller
 
     [HttpPost("delete/{id}")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Delete(int id, ItemRequest request)
+    public async Task<IActionResult> DoDelete(int id)
     {
         var item = await _itemFacade.GetItem(id);
-
 
         // TODO: display flash message (https://github.com/lurumad/core-flash)
 
