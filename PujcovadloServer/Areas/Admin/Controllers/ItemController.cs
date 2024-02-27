@@ -1,12 +1,12 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PujcovadloServer.Areas.Admin.Business.Filters;
 using PujcovadloServer.Areas.Admin.Facades;
 using PujcovadloServer.Areas.Admin.Requests;
 using PujcovadloServer.Areas.Admin.ViewModels;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Enums;
-using PujcovadloServer.Business.Filters;
 using X.PagedList;
 
 namespace PujcovadloServer.Areas.Admin.Controllers;
