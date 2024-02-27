@@ -182,6 +182,9 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
     options.DefaultRequestCulture = new RequestCulture(culture: "cs-CZ", uiCulture: "cs-CZ");
 });
 
+// Support for flash messages
+builder.Services.AddFlashes();
+
 builder.Services.AddMvc()
     // Add support for finding localized views, based on file name suffix, e.g. Index.fr.cshtml
     .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)

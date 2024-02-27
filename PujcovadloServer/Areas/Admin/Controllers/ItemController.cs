@@ -1,7 +1,10 @@
 using AutoMapper;
+using Core.Flash2;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using PujcovadloServer.Areas.Admin.Business.Filters;
+using PujcovadloServer.Areas.Admin.Enums;
 using PujcovadloServer.Areas.Admin.Facades;
 using PujcovadloServer.Areas.Admin.Requests;
 using PujcovadloServer.Areas.Admin.ViewModels;
@@ -19,11 +22,16 @@ public class ItemController : Controller
 {
     private readonly ItemFacade _itemFacade;
     private readonly IMapper _mapper;
+    private readonly IFlasher _flasher;
+    private readonly IStringLocalizer<ItemController> _localizer;
 
-    public ItemController(ItemFacade itemFacade, IMapper mapper)
+    public ItemController(ItemFacade itemFacade, IMapper mapper, IFlasher flasher,
+        IStringLocalizer<ItemController> localizer)
     {
         _itemFacade = itemFacade;
         _mapper = mapper;
+        _flasher = flasher;
+        _localizer = localizer;
     }
 
     [HttpGet]
@@ -98,11 +106,11 @@ public class ItemController : Controller
             // update the item
             await _itemFacade.UpdateItem(item, request);
 
-            // TODO: FLASH MESSAGE
+            _flasher.Flash(FlashType.Success, _localizer["Item has been updated."]);
         }
         else
         {
-            // TODO: FLASH MESSAGE
+            _flasher.Flash(FlashType.Error, _localizer["Item cannot be updated because of errors."]);
         }
 
         await PrepareViewData();
@@ -124,9 +132,9 @@ public class ItemController : Controller
     {
         var item = await _itemFacade.GetItem(id);
 
-        // TODO: display flash message (https://github.com/lurumad/core-flash)
-
         await _itemFacade.Delete(item);
+
+        _flasher.Flash(FlashType.Success, _localizer["Item was deleted."]);
 
         return RedirectToAction(nameof(Index));
     }
