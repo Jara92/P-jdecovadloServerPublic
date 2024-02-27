@@ -247,6 +247,7 @@ builder.Services.AddScoped<IPickupProtocolRepository, PickupProtocolRepository>(
 builder.Services.AddScoped<IReturnProtocolRepository, ReturnProtocolRepository>();
 builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
+builder.Services.AddScoped<IApplicationUserRepository, ApplicationUserRepository>();
 
 // Services
 builder.Services.AddScoped<ItemService>();
@@ -258,6 +259,7 @@ builder.Services.AddScoped<PickupProtocolService>();
 builder.Services.AddScoped<ReturnProtocolService>();
 builder.Services.AddScoped<ReviewService>();
 builder.Services.AddScoped<ProfileService>();
+builder.Services.AddScoped<ApplicationUserService>();
 
 // Facades
 builder.Services.AddScoped<ItemFacade>();
