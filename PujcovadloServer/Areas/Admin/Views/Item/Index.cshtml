@@ -1,40 +1,48 @@
+@using X.PagedList.Mvc.Core
 @using PujcovadloServer.Business.Enums
-@using PujcovadloServer.Business.Filters
 @using Microsoft.AspNetCore.Mvc.TagHelpers
-@model IEnumerable<PujcovadloServer.Business.Entities.Item>
+@model PujcovadloServer.Areas.Admin.ViewModels.ItemViewModel
 @inject IStringLocalizer<ItemStatus> StatusLocalizer
 
 @{
     Layout = "_Layout";
     ViewData["Title"] = @Localizer["Items"];
-    var filter = ViewData["Filter"] as ItemFilter;
+    var firstItem = Model.Items.FirstOrDefault();
 }
 
 @section Searchbar
 {
     <form asp-action="Index" method="get">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
         <div class="row">
             <div class="col-md-4">
-                <div class="input-group">
-                    <input type="text" class="form-control" name="filter.search" value="@filter.Search" placeholder="@Localizer["Search"]"/>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fa fa-search"></i>
-                    </button>
+                <div class="form-group">
+                    <div class="input-group">
+                        <input type="text" class="form-control" asp-for="Filter.Search" value="@Model.Filter.Search" placeholder="@Localizer["Search"]"/>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+                    <span asp-validation-for="Filter.Search" class="text-danger"></span>
                 </div>
             </div>
 
             <div class="col-md-2">
-                <label for="status" class="control-label d-none"></label>
-                @Html.DropDownListFor(model => filter.Status,
-                    Enum.GetValues(typeof(ItemStatus))
-                        .Cast<ItemStatus>()
-                        .Select(e => new SelectListItem
-                        {
-                            Text = StatusLocalizer[e.ToString()],
-                            Value = e.ToString()
-                        }),
-                    "Select Status",
-                    new { @class = "form-select", @id = "status" })
+                <div class="form-group">
+                    <label asp-for="Filter.Status" class="control-label d-none"></label>
+                    @Html.DropDownListFor(model => model.Filter.Status,
+                        Enum.GetValues(typeof(ItemStatus))
+                            .Cast<ItemStatus>()
+                            .Select(e => new SelectListItem
+                            {
+                                Text = StatusLocalizer[e.ToString()],
+                                Value = e.ToString()
+                            }),
+                        "Select Status",
+                        new { @class = "form-select", @id = "status" })
+                    <span asp-validation-for="Filter.Status" class="text-danger"></span>
+                </div>
             </div>
         </div>
     </form>
@@ -44,42 +52,45 @@
     <div class="card-body">
         <table class="table">
             <thead>
-            <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.Name)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Alias)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Status)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.PricePerDay)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.RefundableDeposit)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.SellingPrice)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.CreatedAt)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.UpdatedAt)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.ApprovedAt)
-                </th>
-                <th>
-                    @Localizer["Actions"]
-                </th>
-            </tr>
+            @if (firstItem != null)
+            {
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => firstItem.Name)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => firstItem.Alias)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => firstItem.Status)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => firstItem.PricePerDay)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => firstItem.RefundableDeposit)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => firstItem.SellingPrice)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => firstItem.CreatedAt)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => firstItem.UpdatedAt)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => firstItem.ApprovedAt)
+                    </th>
+                    <th>
+                        @Localizer["Actions"]
+                    </th>
+                </tr>
+            }
             </thead>
 
             <tbody>
-            @foreach (var item in ViewData["Items"] as IEnumerable<PujcovadloServer.Business.Entities.Item>)
+            @foreach (var item in Model.Items)
             {
                 <tr class="align-middle">
                     <td>
@@ -119,22 +130,22 @@
         </table>
     </div> <!-- /.card-body -->
     <div class="card-footer clearfix">
-        <ul class="pagination pagination-sm m-0 float-end">
-            <li class="page-item">
-                <a class="page-link" href="#">&laquo;</a>
-            </li>
-            <li class="page-item">
-                <a class="page-link" href="#">1</a>
-            </li>
-            <li class="page-item">
-                <a class="page-link" href="#">2</a>
-            </li>
-            <li class="page-item">
-                <a class="page-link" href="#">3</a>
-            </li>
-            <li class="page-item">
-                <a class="page-link" href="#">&raquo;</a>
-            </li>
-        </ul>
+        <!-- output a paging control that lets the user navigation to the previous page, next page, etc -->
+        @Html.PagedListPager(Model.Items, page =>
+            {
+                // Update the page number in the filter
+                Model.Filter.Page = page;
+
+                // Generate the URL for the page
+                return Url.Action("Index", Model.Filter);
+            },
+            new PagedListRenderOptions
+            {
+                ContainerDivClasses = new[] { "pagination pagination-sm m-0 float-end" },
+                LiElementClasses = new[] { "page-item" },
+                PageClasses = new[] { "page-link" },
+                LinkToPreviousPageFormat = "<",
+                LinkToNextPageFormat = ">",
+            })
     </div>
 </div>

@@ -6,11 +6,13 @@ public class PaginatedList<T> : List<T>, IPaginatedList
 {
     public int PageIndex { get; protected set; }
     public int TotalPages { get; protected set; }
+    public int TotalCount { get; protected set; }
 
     public PaginatedList(List<T> items, int count, int pageIndex, int pageSize)
     {
         PageIndex = pageIndex;
         TotalPages = (int)Math.Ceiling(count / (double)pageSize);
+        TotalCount = count;
 
         this.AddRange(items);
     }

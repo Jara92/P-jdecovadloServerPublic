@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PujcovadloServer.Areas.Admin.Facades;
 using PujcovadloServer.Areas.Admin.Requests;
+using PujcovadloServer.Areas.Admin.ViewModels;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Enums;
 using PujcovadloServer.Business.Filters;
+using X.PagedList;
 
 namespace PujcovadloServer.Areas.Admin.Controllers;
 
@@ -27,10 +29,39 @@ public class ItemController : Controller
     [HttpGet]
     public async Task<IActionResult> Index([FromQuery] ItemFilter filter)
     {
-        ViewData["Filter"] = filter;
-        ViewData["Items"] = await _itemFacade.GetItems(filter);
+        var model = new ItemViewModel();
 
-        return View();
+        // If model state is valid, get items by the filter
+        if (ModelState.IsValid)
+        {
+            // Get items by filter
+            var items = await _itemFacade.GetItems(filter);
+
+            // Create paged list
+            var usersAsIPagedList =
+                new StaticPagedList<Item>(items, items.PageIndex, filter.PageSize, items.TotalCount);
+
+            // Set view data
+            model.Items = usersAsIPagedList;
+        }
+        // If model state is not valid, get use default filter isntead
+        else
+        {
+            var tmpFilter = new ItemFilter();
+            var items = await _itemFacade.GetItems(tmpFilter);
+
+            // Create paged list
+            var usersAsIPagedList =
+                new StaticPagedList<Item>(items, items.PageIndex, tmpFilter.PageSize, items.TotalCount);
+
+            // Set view data
+            model.Items = usersAsIPagedList;
+        }
+
+        // Show real filter
+        model.Filter = filter;
+
+        return View(model);
     }
 
     private async Task PrepareViewData()
