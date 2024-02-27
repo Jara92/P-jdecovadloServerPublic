@@ -18,11 +18,11 @@
     </div>
 
     <div class="btn-group me-2">
-        <button type="submit" class="btn btn-primary">@GlobalLocalizer["Save changes"]</button>
+        <button type="submit" form="item-form" class="btn btn-primary">@GlobalLocalizer["Save changes"]</button>
     </div>
 }
 
-<form asp-action="Edit">
+<form asp-action="Edit" id="item-form">
     <input type="hidden" asp-for="Id"/>
 
     <div class="container-fluid">
