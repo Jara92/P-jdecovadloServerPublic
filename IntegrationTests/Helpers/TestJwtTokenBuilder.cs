@@ -13,7 +13,7 @@ public class TestJwtTokenBuilder
 
     public TestJwtTokenBuilder WithUserId(string userId)
     {
-        Claims.Add(new Claim(ClaimTypes.Sid, userId));
+        Claims.Add(new Claim(ClaimTypes.PrimarySid, userId));
         return this;
     }
 

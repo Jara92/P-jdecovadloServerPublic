@@ -1,4 +1,3 @@
-using PujcovadloServer.Authentication;
 using PujcovadloServer.Business.Enums;
 using PujcovadloServer.Data;
 
@@ -10,19 +9,22 @@ public static class Utilities
     {
         db.Database.EnsureCreated();
 
-        var user1 = new ApplicationUser()
-        {
-            Id = "1", UserName = "User1", Email = "tester@exmaple.com", EmailConfirmed = true, FirstName = "Tester",
-            LastName = "Testovac"
-        };
-
-        db.Users.Add(user1);
+        // Add users
+        db.Users.Add(UserHelper.User);
+        db.Users.Add(UserHelper.Owner);
+        db.Users.Add(UserHelper.Tenant);
 
         // Add data
         db.Item.Add(new PujcovadloServer.Business.Entities.Item
         {
             Id = 1, Name = "Item1", Description = "Description1", Status = ItemStatus.Public,
-            Parameters = "Parameters1", Owner = user1, PricePerDay = 100
+            Parameters = "Parameters1", Owner = UserHelper.Owner, OwnerId = UserHelper.OwnerId, PricePerDay = 100
+        });
+
+        db.Item.Add(new PujcovadloServer.Business.Entities.Item
+        {
+            Id = 2, Name = "Item1", Description = "Description1", Status = ItemStatus.Approving,
+            Parameters = "Parameters1", Owner = UserHelper.Owner, OwnerId = UserHelper.OwnerId, PricePerDay = 100
         });
 
         db.SaveChanges();
@@ -34,5 +36,10 @@ public static class Utilities
         db.Database.EnsureDeleted();
 
         InitializeDbForTests(db);
+    }
+
+    public static void DeleteDbForTests(PujcovadloServerContext db)
+    {
+        db.Database.EnsureDeleted();
     }
 }

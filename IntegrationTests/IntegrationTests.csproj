@@ -28,7 +28,6 @@
     <ItemGroup>
         <Folder Include="AuthTests\"/>
         <Folder Include="BasicTests\"/>
-        <Folder Include="IntegrationTests\"/>
     </ItemGroup>
 
 </Project>
