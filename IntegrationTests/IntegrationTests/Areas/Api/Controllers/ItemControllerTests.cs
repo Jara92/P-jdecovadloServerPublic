@@ -8,6 +8,7 @@ using NUnit.Framework;
 using PujcovadloServer;
 using PujcovadloServer.Data;
 using Xunit;
+using Xunit.Abstractions;
 using Assert = NUnit.Framework.Assert;
 
 namespace IntegrationTests.IntegrationTests.Areas.Api.Controllers;
@@ -17,11 +18,13 @@ public class ItemControllerTests : IClassFixture<CustomWebApplicationFactory<Pro
     private readonly WebApplicationFactory<Program> _application;
     private readonly HttpClient _client;
     private readonly PujcovadloServerContext _db;
+    private readonly ITestOutputHelper _output;
 
-    public ItemControllerTests(CustomWebApplicationFactory<Program> factory)
+    public ItemControllerTests(CustomWebApplicationFactory<Program> factory, ITestOutputHelper output)
     {
         _application = factory;
         _client = _application.CreateClient();
+        _output = output;
 
         // Arrange
         using (var scope = _application.Services.CreateScope())
