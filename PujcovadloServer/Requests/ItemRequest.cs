@@ -17,7 +17,7 @@ public class ItemRequest : EntityRequest
     [StringLength(256, MinimumLength = 0)]
     public string Parameters { get; set; } = "";
 
-    [Required] [Price(0, 1000000)] public float PricePerDay { get; set; }
+    [Required] [Price(0, 1000000)] public float? PricePerDay { get; set; }
 
     [Price(0, 10000000)] public float? RefundableDeposit { get; set; }
 
@@ -25,9 +25,9 @@ public class ItemRequest : EntityRequest
 
     [Price(0, 10000000)] public float? PurchasePrice { get; set; }
 
-    [MaxLength(5)] public virtual ICollection<int> Categories { get; set; } = new List<int>();
+    [MaxLength(5)] public virtual IList<int> Categories { get; set; } = new List<int>();
 
-    [MaxLength(10)] public virtual ICollection<string> Tags { get; set; } = new List<string>();
+    [MaxLength(10)] public virtual IList<string> Tags { get; set; } = new List<string>();
 
     public int? MainImageId { get; set; }
 }

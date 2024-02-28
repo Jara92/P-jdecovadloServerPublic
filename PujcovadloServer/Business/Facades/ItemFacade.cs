@@ -66,9 +66,10 @@ public class ItemFacade
         item.Name = request.Name;
         item.Alias = UrlHelper.CreateUrlStub(item.Name);
         item.Description = request.Description;
+        item.Parameters = request.Parameters;
 
         // update prices
-        item.PricePerDay = request.PricePerDay;
+        item.PricePerDay = request.PricePerDay.Value;
         item.RefundableDeposit = request.RefundableDeposit;
         item.PurchasePrice = request.PurchasePrice;
         item.SellingPrice = request.SellingPrice;

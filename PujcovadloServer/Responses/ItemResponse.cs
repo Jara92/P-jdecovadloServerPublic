@@ -20,7 +20,7 @@ public class ItemResponse
 
     public ImageResponse? MainImage { get; set; }
 
-    public IList<ImageResponse> Images { get; } = new List<ImageResponse>();
+    public IList<ImageResponse> Images { get; set; } = new List<ImageResponse>();
 
-    public IList<LinkResponse> _links { get; private set; } = new List<LinkResponse>();
+    public IList<LinkResponse> _links { get; set; } = new List<LinkResponse>();
 }
