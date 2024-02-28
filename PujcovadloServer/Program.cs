@@ -277,7 +277,7 @@ builder.Services.AddScoped<ReviewFacade>();
 builder.Services.AddScoped<ProfileFacade>();
 
 // Admin facades
-builder.Services.AddScoped<PujcovadloServer.Areas.Admin.Facades.ItemFacade>();
+builder.Services.AddScoped<PujcovadloServer.Areas.Admin.Business.Facades.ItemFacade>();
 
 // Filters
 builder.Services.AddScoped<ExceptionFilter>();

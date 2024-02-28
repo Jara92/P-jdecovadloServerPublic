@@ -8,7 +8,7 @@ using PujcovadloServer.Business.Objects;
 using PujcovadloServer.Business.Services;
 using PujcovadloServer.Lib;
 
-namespace PujcovadloServer.Areas.Admin.Facades;
+namespace PujcovadloServer.Areas.Admin.Business.Facades;
 
 public class ItemFacade
 {
