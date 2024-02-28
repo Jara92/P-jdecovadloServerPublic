@@ -20,9 +20,6 @@
                 <div class="form-group">
                     <div class="input-group">
                         <input type="text" class="form-control" asp-for="Filter.Search" value="@Model.Filter.Search" placeholder="@Localizer["Search"]"/>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fa fa-search"></i>
-                        </button>
                     </div>
                     <span asp-validation-for="Filter.Search" class="text-danger"></span>
                 </div>
@@ -43,6 +40,15 @@
                         new { @class = "form-select", @id = "status" })
                     <span asp-validation-for="Filter.Status" class="text-danger"></span>
                 </div>
+            </div>
+
+            <div class="col-md-4">
+            </div>
+
+            <div class="col-md-2 d-flex justify-content-end">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fa fa-search"></i> @GlobalLocalizer["Search"]
+                </button>
             </div>
         </div>
     </form>
