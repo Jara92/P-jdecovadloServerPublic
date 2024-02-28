@@ -7,10 +7,12 @@ namespace PujcovadloServer.Data;
 public class MinioFileStorage : IFileStorage
 {
     private readonly IMinioClient _minioClient;
+    private readonly PujcovadloServerConfiguration _configuration;
 
-    public MinioFileStorage(IMinioClient client)
+    public MinioFileStorage(IMinioClient client, PujcovadloServerConfiguration configuration)
     {
         _minioClient = client;
+        _configuration = configuration;
     }
 
     /// <inheritdoc cref="IFileStorage"/>
@@ -37,9 +39,9 @@ public class MinioFileStorage : IFileStorage
             .WithFileName(filePath)
             .WithContentType(mimeType);
 
-        await _minioClient.PutObjectAsync(putObjectArgs).ConfigureAwait(false);
+        var result = await _minioClient.PutObjectAsync(putObjectArgs).ConfigureAwait(false);
 
-        return newFileName;
+        return result.ObjectName;
     }
 
     /// <inheritdoc cref="IFileStorage"/>
@@ -54,19 +56,11 @@ public class MinioFileStorage : IFileStorage
     }
 
     /// <inheritdoc cref="IFileStorage"/>
-    public async Task<string> GetFilePath(string directory, string fileName)
+    public Task<string> GetFilePublicUrl(string directory, string fileName)
     {
-        // Get object URL
-        PresignedGetObjectArgs args = new PresignedGetObjectArgs()
-            .WithBucket(directory)
-            .WithObject(fileName)
-            .WithExpiry(60 * 60 * 24); // 24 hours todo: make it configurable
+        var endpoint = _configuration.MinioEndpoint;
+        var protocol = _configuration.MinioUseSSL ? "https" : "http";
 
-        var url = await _minioClient.PresignedGetObjectAsync(args);
-
-        // If the URL is null, throw an exception
-        if (url == null) throw new Exception(); // TODO: custom exception
-
-        return url;
+        return Task.FromResult($"{protocol}://{endpoint}/{directory}/{fileName}");
     }
 }

@@ -26,5 +26,5 @@ public interface IFileStorage
     /// <param name="directory">File directory</param>
     /// <param name="fileName">Name of the file</param>
     /// <returns>Path to the file.</returns>
-    public Task<string> GetFilePath(string directory, string fileName);
+    public Task<string> GetFilePublicUrl(string directory, string fileName);
 }

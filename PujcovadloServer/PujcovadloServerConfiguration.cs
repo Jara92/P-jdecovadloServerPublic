@@ -48,4 +48,14 @@ public class PujcovadloServerConfiguration
     /// </summary>
     public string[] AllowedImageMimeTypes =>
         _configuration.GetSection("Business:AllowedImageMimeTypes").Get<string[]>() ?? Array.Empty<string>();
+
+    /// <summary>
+    /// Enpoint of minio object storage.
+    /// </summary>
+    public string MinioEndpoint => _configuration.GetValue<string>("Minio:Endpoint");
+
+    /// <summary>
+    /// Connect to minio storage using SSL?
+    /// </summary>
+    public bool MinioUseSSL => _configuration.GetValue("Minio:UseSSL", false);
 }

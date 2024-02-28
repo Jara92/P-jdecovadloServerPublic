@@ -43,7 +43,7 @@ public class ImageFacade
 
     public async Task<string> GetImagePath(Image image)
     {
-        return await _fileStorage.GetFilePath(_configuration.ImagesPath, image.Path);
+        return await _fileStorage.GetFilePublicUrl(_configuration.ImagesPath, image.Path);
     }
 
     public virtual async Task<Image> GetImage(int imageId)
