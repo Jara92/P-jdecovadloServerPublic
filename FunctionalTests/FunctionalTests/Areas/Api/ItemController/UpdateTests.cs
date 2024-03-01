@@ -384,4 +384,46 @@ public class UpdateTests : IClassFixture<CustomWebApplicationFactory<Program>>
         // Check http status
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
     }
+
+    [Fact]
+    public async Task Update_ItemDoesNotExist_NotFound()
+    {
+        UserHelper.SetAuthorizationHeader(_client, UserHelper.OwnerToken);
+
+        // Set invalid data
+        _itemRequest.Id = 90;
+
+        // Perform the action
+        var response = await _client.PutAsJsonAsync("/api/items/" + _itemRequest.Id, _itemRequest);
+
+        // Check http status
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
+    }
+
+    [Fact]
+    public async Task Update_ItemIsDeleted_NotFound()
+    {
+        UserHelper.SetAuthorizationHeader(_client, UserHelper.OwnerToken);
+
+        // Set invalid data
+        _itemRequest.Id = _data.ItemDeleted.Id;
+
+        // Perform the action
+        var response = await _client.PutAsJsonAsync("/api/items/" + _itemRequest.Id, _itemRequest);
+
+        // Check http status
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
+    }
+
+    [Fact]
+    public async Task Update_DifferentQueryIdThanBodyId_BadRequest()
+    {
+        UserHelper.SetAuthorizationHeader(_client, UserHelper.OwnerToken);
+
+        // Perform the action
+        var response = await _client.PutAsJsonAsync("/api/items/" + 90, _itemRequest);
+
+        // Check http status
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
+    }
 }

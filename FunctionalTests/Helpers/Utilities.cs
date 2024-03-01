@@ -27,6 +27,8 @@ public static class Utilities
         // Add data
         db.Item.Add(data.Item1);
         db.Item.Add(data.Item2);
+        db.Item.Add(data.ItemDeleted);
+        db.Item.Add(data.ItemWithRunningLoans);
 
         // Add images
         db.Image.Add(data.Item1Image1);
@@ -39,6 +41,11 @@ public static class Utilities
         data.Item2.MainImage = data.Item2Image1;
 
         db.Update(data.Item2);
+        db.SaveChanges();
+
+        // Add loans
+        db.Loan.Add(data.Loan1);
+
         db.SaveChanges();
     }
 

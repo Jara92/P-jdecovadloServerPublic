@@ -36,7 +36,8 @@ public class ItemService(IItemRepository repository) : ACrudService<Item, IItemR
         entity.DeletedAt = DateTime.Now;
         entity.Status = ItemStatus.Deleted;
 
-        return base.Delete(entity);
+        // Just update the item
+        return base.Update(entity);
     }
 
     public async Task<int> GetPublicItemsCountByUser(string userId)

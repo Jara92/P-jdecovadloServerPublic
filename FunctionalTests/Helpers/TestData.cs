@@ -16,6 +16,10 @@ public class TestData
 
     public Item Item2;
 
+    public Item ItemDeleted;
+
+    public Item ItemWithRunningLoans;
+
     public Image Item1Image1;
 
     public Image Item1Image2;
@@ -23,6 +27,8 @@ public class TestData
     public Image Item2Image1;
 
     public Image Item2Image2;
+
+    public Loan Loan1;
 
     public TestData()
     {
@@ -52,6 +58,20 @@ public class TestData
             MainImage = null, MainImageId = null
         };
 
+        ItemDeleted = new()
+        {
+            Id = 3, Name = "Item deleted", Description = "Description1", Status = ItemStatus.Deleted,
+            Parameters = "Parameters2", Owner = UserHelper.Owner, OwnerId = UserHelper.OwnerId, PricePerDay = 100,
+            MainImage = null, MainImageId = null, DeletedAt = DateTime.Today.AddDays(-2)
+        };
+
+        ItemWithRunningLoans = new()
+        {
+            Id = 4, Name = "Item with running loans", Description = "Description1", Status = ItemStatus.Public,
+            Parameters = "Parameters2", Owner = UserHelper.Owner, OwnerId = UserHelper.OwnerId, PricePerDay = 100,
+            MainImage = null, MainImageId = null
+        };
+
         Item1Image1 = new()
         {
             Id = 10, Item = Item1, Owner = Item1.Owner, Name = "Nazev image 1", Extension = ".png",
@@ -76,7 +96,10 @@ public class TestData
             MimeType = "image/png", Path = "random.png", OwnerId = Item1.OwnerId
         };
 
-        // Set main image
-        //Item2.MainImageId = Item2Image1.Id;
+        Loan1 = new()
+        {
+            Id = 1, Item = ItemWithRunningLoans, Tenant = UserHelper.Tenant, TenantId = UserHelper.TenantId,
+            From = DateTime.Today.AddDays(-1), To = DateTime.Today.AddDays(1), Status = LoanStatus.Active
+        };
     }
 }
