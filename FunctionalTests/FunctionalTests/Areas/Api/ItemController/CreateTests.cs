@@ -21,6 +21,7 @@ public class CreateTests : IClassFixture<CustomWebApplicationFactory<Program>>
     private readonly HttpClient _client;
     private readonly PujcovadloServerContext _db;
     private readonly ITestOutputHelper _output;
+    private TestData _data;
 
     private readonly ItemRequest _itemRequest;
 
@@ -29,6 +30,7 @@ public class CreateTests : IClassFixture<CustomWebApplicationFactory<Program>>
         _application = factory;
         _client = _application.CreateClient();
         _output = output;
+        _data = new TestData();
 
         // Arrange
         using (var scope = _application.Services.CreateScope())
@@ -36,7 +38,7 @@ public class CreateTests : IClassFixture<CustomWebApplicationFactory<Program>>
             var scopedServices = scope.ServiceProvider;
             _db = scopedServices.GetRequiredService<PujcovadloServerContext>();
 
-            Utilities.ReinitializeDbForTests(_db);
+            Utilities.ReinitializeDbForTests(_db, _data);
         }
 
         // Define example item request which is valid
@@ -197,7 +199,7 @@ public class CreateTests : IClassFixture<CustomWebApplicationFactory<Program>>
         UserHelper.SetAuthorizationHeader(_client, UserHelper.OwnerToken);
 
         // Add some tags which already exist in database
-        _itemRequest.Tags = new List<string> { TestData.ItemTagVrtackaNarex.Name, TestData.ItemTagVrtackaBosch.Name };
+        _itemRequest.Tags = new List<string> { _data.ItemTagVrtackaNarex.Name, _data.ItemTagVrtackaBosch.Name };
 
         // Add some new tags which are not in database yet
         _itemRequest.Tags.AddRange(new[] { "NewTag" });

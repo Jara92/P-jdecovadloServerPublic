@@ -1,11 +1,13 @@
+using Microsoft.EntityFrameworkCore;
 using PujcovadloServer.Data;
 
 namespace FunctionalTests.Helpers;
 
 public static class Utilities
 {
-    public static void InitializeDbForTests(PujcovadloServerContext db)
+    public static void InitializeDbForTests(PujcovadloServerContext db, TestData data)
     {
+        db.Database.Migrate();
         db.Database.EnsureCreated();
 
         // Add users
@@ -14,13 +16,13 @@ public static class Utilities
         db.Users.Add(UserHelper.Tenant);
 
         // Add item categories
-        db.ItemCategory.Add(TestData.ItemCategoryVrtacky);
-        db.ItemCategory.Add(TestData.ItemCategoryPneumatickeVrtacky);
-        db.ItemCategory.Add(TestData.ItemCategoryKladiva);
+        db.ItemCategory.Add(data.ItemCategoryVrtacky);
+        db.ItemCategory.Add(data.ItemCategoryPneumatickeVrtacky);
+        db.ItemCategory.Add(data.ItemCategoryKladiva);
 
         // Add item tags
-        db.ItemTag.Add(TestData.ItemTagVrtackaNarex);
-        db.ItemTag.Add(TestData.ItemTagVrtackaBosch);
+        db.ItemTag.Add(data.ItemTagVrtackaNarex);
+        db.ItemTag.Add(data.ItemTagVrtackaBosch);
 
         // Add data
         db.Item.Add(TestData.Item1);
@@ -29,12 +31,13 @@ public static class Utilities
         db.SaveChanges();
     }
 
-    public static void ReinitializeDbForTests(PujcovadloServerContext db)
+    public static void ReinitializeDbForTests(PujcovadloServerContext db, TestData data)
     {
         // Remove all data from the database
         db.Database.EnsureDeleted();
 
-        InitializeDbForTests(db);
+
+        InitializeDbForTests(db, data);
     }
 
     public static void DeleteDbForTests(PujcovadloServerContext db)

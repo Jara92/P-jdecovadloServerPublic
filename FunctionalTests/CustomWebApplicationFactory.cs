@@ -44,6 +44,8 @@ public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProg
             {
                 var connection = container.GetRequiredService<DbConnection>();
                 options.UseSqlite(connection);
+                options.UseLazyLoadingProxies();
+                options.EnableSensitiveDataLogging();
             });
 
             // Add FakeJwtBearer

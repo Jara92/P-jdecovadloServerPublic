@@ -5,27 +5,78 @@ namespace FunctionalTests.Helpers;
 
 public class TestData
 {
-    public static ItemCategory ItemCategoryVrtacky =
-        new() { Id = 1, Name = "Vrtacky", Description = "Vrtacky description" };
+    public ItemCategory ItemCategoryVrtacky;
+    public ItemCategory ItemCategoryPneumatickeVrtacky;
+    public ItemCategory ItemCategoryKladiva;
 
-    public static ItemCategory ItemCategoryPneumatickeVrtacky = new()
-        { Id = 2, Name = "Vrtacky", Parent = ItemCategoryVrtacky, Description = "Pneumaticke vrtacky description" };
+    public ItemTag ItemTagVrtackaNarex;
+    public ItemTag ItemTagVrtackaBosch;
 
-    public static ItemCategory ItemCategoryKladiva =
-        new() { Id = 3, Name = "Kladiva", Description = "Kladiva description" };
+    public Item Item1;
 
-    public static ItemTag ItemTagVrtackaNarex = new() { Id = 1, Name = "Vrtačka Narex" };
-    public static ItemTag ItemTagVrtackaBosch = new() { Id = 2, Name = "Vrtačka Bosh" };
+    public Item Item2;
 
-    public static Item Item1 = new()
+    public Image Item1Image1;
+
+    public Image Item1Image2;
+
+    public Image Item2Image1;
+
+    public Image Item2Image2;
+
+    public TestData()
     {
-        Id = 1, Name = "Item1", Description = "Description1", Status = ItemStatus.Public,
-        Parameters = "Parameters1", Owner = UserHelper.Owner, OwnerId = UserHelper.OwnerId, PricePerDay = 100
-    };
+        ItemCategoryVrtacky =
+            new() { Id = 1, Name = "Vrtacky", Description = "Vrtacky description" };
 
-    public static Item Item2 = new()
-    {
-        Id = 2, Name = "Item2", Description = "Description1", Status = ItemStatus.Approving,
-        Parameters = "Parameters2", Owner = UserHelper.Owner, OwnerId = UserHelper.OwnerId, PricePerDay = 100
-    };
+        ItemCategoryPneumatickeVrtacky = new()
+            { Id = 2, Name = "Vrtacky", Parent = ItemCategoryVrtacky, Description = "Pneumaticke vrtacky description" };
+
+        ItemCategoryKladiva =
+            new() { Id = 3, Name = "Kladiva", Description = "Kladiva description" };
+
+        ItemTagVrtackaNarex = new() { Id = 1, Name = "Vrtačka Narex" };
+        ItemTagVrtackaBosch = new() { Id = 2, Name = "Vrtačka Bosh" };
+
+        Item1 = new()
+        {
+            Id = 1, Name = "Item1", Description = "Description1", Status = ItemStatus.Public,
+            Parameters = "Parameters1", Owner = UserHelper.Owner, OwnerId = UserHelper.OwnerId, PricePerDay = 100,
+            MainImage = null, MainImageId = null
+        };
+
+        Item2 = new()
+        {
+            Id = 2, Name = "Item2", Description = "Description1", Status = ItemStatus.Approving,
+            Parameters = "Parameters2", Owner = UserHelper.Owner, OwnerId = UserHelper.OwnerId, PricePerDay = 100,
+            MainImage = null, MainImageId = null
+        };
+
+        Item1Image1 = new()
+        {
+            Id = 10, Item = Item1, Owner = Item1.Owner, Name = "Nazev image 1", Extension = ".png",
+            MimeType = "image/png", Path = "random.png", OwnerId = Item1.OwnerId
+        };
+
+        Item1Image2 = new()
+        {
+            Id = 2, Item = Item1, Owner = Item1.Owner, Name = "Nazev image 2", Extension = ".png",
+            MimeType = "image/png", Path = "random.png", OwnerId = Item1.OwnerId
+        };
+
+        Item2Image1 = new()
+        {
+            Id = 3, Item = Item2, Owner = Item2.Owner, Name = "Nazev image 1", Extension = ".png",
+            MimeType = "image/png", Path = "random.png", OwnerId = Item1.OwnerId
+        };
+
+        Item2Image2 = new()
+        {
+            Id = 4, Item = Item2, Owner = Item2.Owner, Name = "Nazev image 2", Extension = ".png",
+            MimeType = "image/png", Path = "random.png", OwnerId = Item1.OwnerId
+        };
+
+        // Set main image
+        //Item2.MainImageId = Item2Image1.Id;
+    }
 }
