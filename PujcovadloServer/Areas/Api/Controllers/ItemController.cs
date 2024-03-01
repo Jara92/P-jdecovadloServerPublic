@@ -161,30 +161,6 @@ public class ItemController : ACrudController<Item>
     }
 
     /// <summary>
-    /// Returns item's categories.
-    /// </summary>
-    /// <param name="id">Item's id</param>
-    /// <returns>All categories related to the item.</returns>
-    /// <response code="200">Returns all categories related to the item.</response>
-    /// <response code="404">If the item was not found.</response>
-    [HttpGet("{id}/categories")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<List<ItemCategoryResponse>>> GetCategories(int id)
-    {
-        // Get item
-        var item = await _itemFacade.GetItem(id);
-
-        await _authorizationService.CheckPermissions(item, ItemOperations.Read);
-
-        // Get categories
-        // TODO: user response generator instead but not paginated.
-        var categoriesResponse = _mapper.Map<List<ItemCategoryResponse>>(item.Categories);
-
-        return Ok(categoriesResponse);
-    }
-
-    /// <summary>
     /// Returns all images of the given item.
     /// </summary>
     /// <param name="id">Item id.</param>
