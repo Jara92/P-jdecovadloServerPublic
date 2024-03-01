@@ -25,6 +25,7 @@ public class ItemController : ACrudController<Item>
     private readonly ItemResponseGenerator _itemResponseGenerator;
     private readonly ImageResponseGenerator _imageResponseGenerator;
     private readonly FileUploadService _fileUploadService;
+    private readonly AuthorizationService _authorizationService;
 
     public ItemController(ItemFacade itemFacade, IMapper mapper, LinkGenerator urlHelper,
         ItemResponseGenerator itemResponseGenerator, ImageResponseGenerator imageResponseGenerator,
@@ -36,6 +37,7 @@ public class ItemController : ACrudController<Item>
         _itemResponseGenerator = itemResponseGenerator;
         _imageResponseGenerator = imageResponseGenerator;
         _fileUploadService = fileUploadService;
+        _authorizationService = authorizationService;
     }
 
     /// <summary>
