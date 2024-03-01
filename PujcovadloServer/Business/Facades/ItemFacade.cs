@@ -203,6 +203,11 @@ public class ItemFacade
         return item;
     }
 
+    public Task<Item?> GetItemOrNull(int id)
+    {
+        return _itemService.Get(id);
+    }
+
     /// <summary>
     /// Adds a new image to the item
     /// </summary>

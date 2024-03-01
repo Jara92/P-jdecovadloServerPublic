@@ -18,6 +18,10 @@ public class TestData
 
     public Item ItemDeleted;
 
+    public Item ItemApproving;
+
+    public Item ItemDenied;
+
     public Item ItemWithRunningLoans;
 
     public Image Item1Image1;
@@ -68,6 +72,20 @@ public class TestData
         ItemWithRunningLoans = new()
         {
             Id = 4, Name = "Item with running loans", Description = "Description1", Status = ItemStatus.Public,
+            Parameters = "Parameters2", Owner = UserHelper.Owner, OwnerId = UserHelper.OwnerId, PricePerDay = 100,
+            MainImage = null, MainImageId = null
+        };
+
+        ItemApproving = new()
+        {
+            Id = 5, Name = "Item approving", Description = "Description1", Status = ItemStatus.Approving,
+            Parameters = "Parameters2", Owner = UserHelper.Owner, OwnerId = UserHelper.OwnerId, PricePerDay = 100,
+            MainImage = null, MainImageId = null
+        };
+
+        ItemDenied = new()
+        {
+            Id = 6, Name = "Item denied", Description = "Description1", Status = ItemStatus.Denied,
             Parameters = "Parameters2", Owner = UserHelper.Owner, OwnerId = UserHelper.OwnerId, PricePerDay = 100,
             MainImage = null, MainImageId = null
         };

@@ -28,6 +28,8 @@ public static class Utilities
         db.Item.Add(data.Item1);
         db.Item.Add(data.Item2);
         db.Item.Add(data.ItemDeleted);
+        db.Item.Add(data.ItemApproving);
+        db.Item.Add(data.ItemDenied);
         db.Item.Add(data.ItemWithRunningLoans);
 
         // Add images

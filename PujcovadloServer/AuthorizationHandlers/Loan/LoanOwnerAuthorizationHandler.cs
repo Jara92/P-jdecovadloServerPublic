@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
-using PujcovadloServer.AuthorizationHandlers.Item;
 using PujcovadloServer.Business.Services.Interfaces;
 
 namespace PujcovadloServer.AuthorizationHandlers.Loan;
@@ -22,7 +21,7 @@ public class
         var userId = _authenticateService.TryGetCurrentUserId();
 
         // Fail if user is not authenticated or not the owner
-        if (userId == null || resource.Item.Owner.Id != userId)
+        if (userId == null || resource.Item == null || resource.Item.Owner.Id != userId)
         {
             return Task.CompletedTask;
         }

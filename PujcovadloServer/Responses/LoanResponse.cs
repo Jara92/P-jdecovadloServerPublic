@@ -20,6 +20,8 @@ public class LoanResponse
 
     public float? RefundableDeposit { get; set; }
 
+    public string? TenantNote { get; set; }
+
     public UserResponse Tenant { get; set; } = default!;
 
     public ItemResponse Item { get; set; } = default!;

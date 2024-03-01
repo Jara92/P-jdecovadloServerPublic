@@ -120,7 +120,7 @@ public class TenantFacadeTest
         _itemService.Setup(o => o.Get(request.ItemId, true)).ReturnsAsync((Item)null);
 
         // Must throw EntityNotFoundException because the item was not found
-        Assert.ThrowsAsync<EntityNotFoundException>(async () => await _tenantFasade.CreateLoan(request));
+        Assert.ThrowsAsync<ArgumentException>(async () => await _tenantFasade.CreateLoan(request));
 
         // Verify that GetCurrentUser was called
         _authenticateService.Verify(o => o.GetCurrentUser(), Times.Once);

@@ -95,7 +95,9 @@ public class LoanController : ACrudController<Loan>
         await _authorizationService.CheckPermissions(new Loan(), LoanOperations.Create);
 
         // Check if the item exists and that it can be used for a new loan
-        var item = await _itemFacade.GetItem(request.ItemId);
+        var item = await _itemFacade.GetItemOrNull(request.ItemId);
+        if (item == null) throw new ArgumentException("Item with id {request.ItemId} was not found.");
+
         await _authorizationService.CheckPermissions(item, ItemOperations.Read);
 
         // Create the loan

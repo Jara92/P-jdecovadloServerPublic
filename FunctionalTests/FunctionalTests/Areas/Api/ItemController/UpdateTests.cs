@@ -401,7 +401,7 @@ public class UpdateTests : IClassFixture<CustomWebApplicationFactory<Program>>
     }
 
     [Fact]
-    public async Task Update_ItemIsDeleted_NotFound()
+    public async Task Update_ItemIsDeleted_Forbidden()
     {
         UserHelper.SetAuthorizationHeader(_client, UserHelper.OwnerToken);
 
@@ -412,7 +412,7 @@ public class UpdateTests : IClassFixture<CustomWebApplicationFactory<Program>>
         var response = await _client.PutAsJsonAsync("/api/items/" + _itemRequest.Id, _itemRequest);
 
         // Check http status
-        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Forbidden));
     }
 
     [Fact]

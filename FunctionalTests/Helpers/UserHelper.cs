@@ -32,7 +32,7 @@ public static class UserHelper
     };
 
     public static string OwnerToken => new TestJwtTokenBuilder().WithRole(UserRoles.Owner)
-        .WithEmail("owner@example.com")
+        .WithRole(UserRoles.Tenant).WithEmail("owner@example.com")
         .WithUserName("owner").WithUserId(OwnerId).Build();
 
     public static string Owner2Id = "4";

@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
-using PujcovadloServer.AuthorizationHandlers.Item;
 using PujcovadloServer.Business.Enums;
 using PujcovadloServer.Business.Services.Interfaces;
 
@@ -26,23 +25,23 @@ public class
             return Task.CompletedTask;
         }
 
+        // Tenant can create new loans
+        if (requirement.Name == LoanOperations.Constants.CreateOperationName)
+        {
+            context.Succeed(requirement);
+        }
+
         // Get current user id
         var userId = _authenticateService.TryGetCurrentUserId();
 
         // Fail if user is not authenticated or not the tenant of the loan
-        if (userId == null || resource.Tenant.Id != userId)
+        if (userId == null || resource.Tenant == null || resource.Tenant.Id != userId)
         {
             return Task.CompletedTask;
         }
 
         // Tenant can read his loans
         if (requirement.Name == LoanOperations.Constants.ReadOperationName)
-        {
-            context.Succeed(requirement);
-        }
-
-        // Tenant can create new loans
-        if (requirement.Name == LoanOperations.Constants.CreateOperationName)
         {
             context.Succeed(requirement);
         }
