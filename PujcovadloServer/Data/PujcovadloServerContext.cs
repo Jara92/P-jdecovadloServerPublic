@@ -69,6 +69,11 @@ namespace PujcovadloServer.Data
                 .HasOne<ReturnProtocol>(i => i.ReturnProtocol)
                 .WithMany(p => p.Images);
 
+            // Add Image.Item foreign key
+            modelBuilder.Entity<Image>()
+                .HasOne<Item>(i => i.Item)
+                .WithMany(p => p.Images);
+
             // Add item main image foreign key
             modelBuilder.Entity<Item>()
                 .HasOne(i => i.MainImage)

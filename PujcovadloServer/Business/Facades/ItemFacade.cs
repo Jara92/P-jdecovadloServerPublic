@@ -130,11 +130,15 @@ public class ItemFacade
 
     private async Task UpdateMainImage(Item item, ItemRequest request)
     {
-        // Update main image
+        // Main image is defined
         if (request.MainImageId != null)
         {
             // Get the image by id using the image facade
-            var mainImage = await _imageFacade.GetImage(request.MainImageId.Value);
+            var mainImage = await _imageFacade.GetImageOrNull(request.MainImageId.Value);
+
+            // Throw exception if the image does not exist
+            if (mainImage == null)
+                throw new ArgumentException("Main image id is invalid.");
 
             // Throw exception if the main image does not belong to the item
             if (mainImage.Item == null || mainImage.Item.Id != item.Id)
@@ -144,6 +148,12 @@ public class ItemFacade
 
             // Set the main image
             item.MainImage = mainImage;
+        }
+        // Main image is not defined
+        else
+        {
+            item.MainImage = null;
+            item.MainImageId = null;
         }
     }
 
@@ -250,6 +260,10 @@ public class ItemFacade
         {
             throw new OperationNotAllowedException("Image does not belong to any item");
         }
+
+        // Make main image null if the image is the main image
+        if (image.Item.MainImageId == image.Id)
+            image.Item.MainImage = null;
 
         // Delete the image
         await _imageFacade.DeleteImage(image);

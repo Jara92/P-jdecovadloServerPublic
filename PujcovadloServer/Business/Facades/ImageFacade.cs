@@ -55,6 +55,11 @@ public class ImageFacade
         return image;
     }
 
+    public virtual Task<Image?> GetImageOrNull(int imageId)
+    {
+        return _imageService.Get(imageId);
+    }
+
     public async Task<Image> GetImage(string name)
     {
         var image = await _imageService.GetByPath(name);

@@ -25,9 +25,20 @@ public static class Utilities
         db.ItemTag.Add(data.ItemTagVrtackaBosch);
 
         // Add data
-        db.Item.Add(TestData.Item1);
-        db.Item.Add(TestData.Item2);
+        db.Item.Add(data.Item1);
+        db.Item.Add(data.Item2);
 
+        // Add images
+        db.Image.Add(data.Item1Image1);
+        db.Image.Add(data.Item1Image2);
+        db.Image.Add(data.Item2Image1);
+        db.Image.Add(data.Item2Image2);
+        db.SaveChanges();
+
+        // Set main images now to avoid circular references exception
+        data.Item2.MainImage = data.Item2Image1;
+
+        db.Update(data.Item2);
         db.SaveChanges();
     }
 

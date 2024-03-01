@@ -51,6 +51,10 @@ public class ExceptionFilter : ExceptionFilterAttribute
         {
             context.Result = new BadRequestResult();
         }
+        else if (context.Exception is ArgumentException)
+        {
+            context.Result = new BadRequestResult();
+        }
         else if (context.Exception is OperationNotAllowedException)
         {
             var details = new ExceptionResponse

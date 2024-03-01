@@ -35,6 +35,18 @@ public static class UserHelper
         .WithEmail("owner@example.com")
         .WithUserName("owner").WithUserId(OwnerId).Build();
 
+    public static string Owner2Id = "4";
+
+    public static ApplicationUser Owner2 = new()
+    {
+        Id = Owner2Id, UserName = "Owner2", Email = "owner2@exmaple.com",
+        EmailConfirmed = true, FirstName = "Owner2", LastName = "Testovac"
+    };
+
+    public static string Owner2Token => new TestJwtTokenBuilder().WithRole(UserRoles.Owner)
+        .WithEmail("owner2@example.com")
+        .WithUserName("owner2").WithUserId(Owner2Id).Build();
+
     public static string TenantId = "3";
 
     public static ApplicationUser Tenant = new()

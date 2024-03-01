@@ -291,7 +291,7 @@ public class ItemFacadeTest
             .ReturnsAsync(new List<ItemTag> { new() { Name = "Tag" }, new() { Name = "Tag2" } });
 
         // exception is thrown because the image does not exist
-        Assert.ThrowsAsync<EntityNotFoundException>(async () => await _itemFacade.UpdateItem(oldItem, request));
+        Assert.ThrowsAsync<ArgumentException>(async () => await _itemFacade.UpdateItem(oldItem, request));
 
         // Verify that Update was not called
         _itemService.Verify(o => o.Update(oldItem), Times.Never);
@@ -426,7 +426,7 @@ public class ItemFacadeTest
 
         // Mock image
         _imageFacade
-            .Setup(o => o.GetImage(newMainImageId))
+            .Setup(o => o.GetImageOrNull(newMainImageId))
             .ReturnsAsync(new Image { Id = newMainImageId, Item = oldItem });
 
         // Mock category service
