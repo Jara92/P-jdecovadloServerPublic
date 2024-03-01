@@ -24,6 +24,8 @@ public class TestData
 
     public Item ItemWithRunningLoans;
 
+    public Item ItemWithoutRunningLoans;
+
     public Image Item1Image1;
 
     public Image Item1Image2;
@@ -33,6 +35,28 @@ public class TestData
     public Image Item2Image2;
 
     public Loan Loan1;
+
+    public Loan LoanInquired;
+
+    public Loan LoanCancelled;
+
+    public Loan LoanAccepted;
+
+    public Loan LoanAcceptedWithPickupProtocol;
+
+    public Loan LoanDenied;
+
+    public Loan LoanPreparedForPickup;
+
+    public Loan LoanPickupDenied;
+
+    public Loan LoanActive;
+
+    public Loan LoanPreparedForReturn;
+
+    public Loan LoanReturnDenied;
+
+    public Loan LoanReturned;
 
     public TestData()
     {
@@ -90,6 +114,13 @@ public class TestData
             MainImage = null, MainImageId = null
         };
 
+        ItemWithoutRunningLoans = new()
+        {
+            Id = 7, Name = "Item without running loans", Description = "Description1", Status = ItemStatus.Public,
+            Parameters = "Parameters2", Owner = UserHelper.Owner, OwnerId = UserHelper.OwnerId, PricePerDay = 100,
+            MainImage = null, MainImageId = null
+        };
+
         Item1Image1 = new()
         {
             Id = 10, Item = Item1, Owner = Item1.Owner, Name = "Nazev image 1", Extension = ".png",
@@ -118,6 +149,73 @@ public class TestData
         {
             Id = 1, Item = ItemWithRunningLoans, Tenant = UserHelper.Tenant, TenantId = UserHelper.TenantId,
             From = DateTime.Today.AddDays(-1), To = DateTime.Today.AddDays(1), Status = LoanStatus.Active
+        };
+
+        LoanInquired = new()
+        {
+            Id = 2, Item = Item1, Tenant = UserHelper.Tenant, TenantId = UserHelper.TenantId,
+            From = DateTime.Today.AddDays(1), To = DateTime.Today.AddDays(3), Status = LoanStatus.Inquired
+        };
+
+        LoanCancelled = new()
+        {
+            Id = 3, Item = Item1, Tenant = UserHelper.Tenant, TenantId = UserHelper.TenantId,
+            From = DateTime.Today.AddDays(1), To = DateTime.Today.AddDays(3), Status = LoanStatus.Cancelled
+        };
+
+        LoanAccepted = new()
+        {
+            Id = 4, Item = Item1, Tenant = UserHelper.Tenant, TenantId = UserHelper.TenantId,
+            From = DateTime.Today.AddDays(1), To = DateTime.Today.AddDays(3), Status = LoanStatus.Accepted
+        };
+
+        LoanDenied = new()
+        {
+            Id = 5, Item = Item1, Tenant = UserHelper.Tenant, TenantId = UserHelper.TenantId,
+            From = DateTime.Today.AddDays(1), To = DateTime.Today.AddDays(3), Status = LoanStatus.Denied
+        };
+
+        LoanPreparedForPickup = new()
+        {
+            Id = 6, Item = Item1, Tenant = UserHelper.Tenant, TenantId = UserHelper.TenantId,
+            From = DateTime.Today.AddDays(1), To = DateTime.Today.AddDays(3), Status = LoanStatus.PreparedForPickup
+        };
+
+        LoanPickupDenied = new()
+        {
+            Id = 7, Item = Item1, Tenant = UserHelper.Tenant, TenantId = UserHelper.TenantId,
+            From = DateTime.Today.AddDays(1), To = DateTime.Today.AddDays(3), Status = LoanStatus.PickupDenied
+        };
+
+        LoanActive = new()
+        {
+            Id = 8, Item = Item1, Tenant = UserHelper.Tenant, TenantId = UserHelper.TenantId,
+            From = DateTime.Today.AddDays(1), To = DateTime.Today.AddDays(3), Status = LoanStatus.Active
+        };
+
+        LoanPreparedForReturn = new()
+        {
+            Id = 9, Item = Item1, Tenant = UserHelper.Tenant, TenantId = UserHelper.TenantId,
+            From = DateTime.Today.AddDays(1), To = DateTime.Today.AddDays(3), Status = LoanStatus.PreparedForReturn
+        };
+
+        LoanReturnDenied = new()
+        {
+            Id = 10, Item = Item1, Tenant = UserHelper.Tenant, TenantId = UserHelper.TenantId,
+            From = DateTime.Today.AddDays(1), To = DateTime.Today.AddDays(3), Status = LoanStatus.ReturnDenied
+        };
+
+        LoanReturned = new()
+        {
+            Id = 11, Item = Item1, Tenant = UserHelper.Tenant, TenantId = UserHelper.TenantId,
+            From = DateTime.Today.AddDays(1), To = DateTime.Today.AddDays(3), Status = LoanStatus.Returned
+        };
+
+        LoanAcceptedWithPickupProtocol = new()
+        {
+            Id = 12, Item = Item1, Tenant = UserHelper.Tenant, TenantId = UserHelper.TenantId,
+            From = DateTime.Today.AddDays(1), To = DateTime.Today.AddDays(3), Status = LoanStatus.Accepted,
+            PickupProtocol = new PickupProtocol { Id = 1, Description = "All ok" }
         };
     }
 }

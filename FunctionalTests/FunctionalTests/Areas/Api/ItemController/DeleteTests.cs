@@ -94,7 +94,7 @@ public class DeleteTests : IClassFixture<CustomWebApplicationFactory<Program>>
         UserHelper.SetAuthorizationHeader(_client, UserHelper.OwnerToken);
 
         // Perform the action
-        var response = await _client.DeleteAsync("/api/items/" + _data.Item1.Id);
+        var response = await _client.DeleteAsync("/api/items/" + _data.ItemWithoutRunningLoans.Id);
 
         // Check http status
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NoContent));

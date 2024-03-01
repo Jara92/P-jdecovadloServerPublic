@@ -31,6 +31,7 @@ public static class Utilities
         db.Item.Add(data.ItemApproving);
         db.Item.Add(data.ItemDenied);
         db.Item.Add(data.ItemWithRunningLoans);
+        db.Item.Add(data.ItemWithoutRunningLoans);
 
         // Add images
         db.Image.Add(data.Item1Image1);
@@ -47,6 +48,17 @@ public static class Utilities
 
         // Add loans
         db.Loan.Add(data.Loan1);
+        db.Loan.Add(data.LoanInquired);
+        db.Loan.Add(data.LoanCancelled);
+        db.Loan.Add(data.LoanAccepted);
+        db.Loan.Add(data.LoanAcceptedWithPickupProtocol);
+        db.Loan.Add(data.LoanDenied);
+        db.Loan.Add(data.LoanPreparedForPickup);
+        db.Loan.Add(data.LoanPickupDenied);
+        db.Loan.Add(data.LoanActive);
+        db.Loan.Add(data.LoanPreparedForReturn);
+        db.Loan.Add(data.LoanReturnDenied);
+        db.Loan.Add(data.LoanReturned);
 
         db.SaveChanges();
     }

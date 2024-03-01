@@ -67,7 +67,9 @@ public class LoanController : ACrudController<Loan>
 
         await _loanFacade.UpdateLoan(loan, request);
 
-        return Ok();
+        var response = await _responseGenerator.GenerateLoanDetailResponse(loan);
+
+        return Ok(response);
     }
 
     [HttpGet("{id}")]
