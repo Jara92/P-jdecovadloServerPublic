@@ -19,12 +19,14 @@ public class ItemControllerTests : IClassFixture<CustomWebApplicationFactory<Pro
     private readonly HttpClient _client;
     private readonly PujcovadloServerContext _db;
     private readonly ITestOutputHelper _output;
+    private readonly TestData _data;
 
     public ItemControllerTests(CustomWebApplicationFactory<Program> factory, ITestOutputHelper output)
     {
         _application = factory;
         _client = _application.CreateClient();
         _output = output;
+        _data = new TestData();
 
         // Arrange
         using (var scope = _application.Services.CreateScope())
@@ -32,7 +34,7 @@ public class ItemControllerTests : IClassFixture<CustomWebApplicationFactory<Pro
             var scopedServices = scope.ServiceProvider;
             _db = scopedServices.GetRequiredService<PujcovadloServerContext>();
 
-            Utilities.ReinitializeDbForTests(_db);
+            Utilities.ReinitializeDbForTests(_db, _data);
         }
     }
 

@@ -13,7 +13,7 @@ using Xunit;
 using Xunit.Abstractions;
 using Assert = NUnit.Framework.Assert;
 
-namespace FunctionalTests.FunctionalTests.Areas.Api.ItemController;
+namespace FunctionalTests.FunctionalTests.Areas.Api.Item;
 
 public class CreateTests : IClassFixture<CustomWebApplicationFactory<Program>>
 {

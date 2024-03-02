@@ -12,7 +12,7 @@ using Xunit;
 using Xunit.Abstractions;
 using Assert = NUnit.Framework.Assert;
 
-namespace FunctionalTests.FunctionalTests.Areas.Api.LoanController;
+namespace FunctionalTests.FunctionalTests.Areas.Api.Loan;
 
 public class LoanLifeCycleScenarioTests : IClassFixture<CustomWebApplicationFactory<Program>>
 {

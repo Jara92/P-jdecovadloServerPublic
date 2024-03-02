@@ -1,5 +1,5 @@
 using System.Net;
-using FunctionalTests.Helpers;
+using IntegrationTests.Helpers;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
@@ -11,7 +11,7 @@ using Xunit;
 using Xunit.Abstractions;
 using Assert = NUnit.Framework.Assert;
 
-namespace FunctionalTests.FunctionalTests.Areas.Api.LoanController;
+namespace IntegrationTests.IntegrationTests.Areas.Api.Controllers.LoanController;
 
 public class DeniedLoanActionsTests : IClassFixture<CustomWebApplicationFactory<Program>>
 {

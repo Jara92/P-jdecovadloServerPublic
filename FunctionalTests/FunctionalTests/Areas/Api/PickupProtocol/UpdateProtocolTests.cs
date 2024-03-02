@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using PujcovadloServer;
-using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Data;
 using PujcovadloServer.Requests;
 using PujcovadloServer.Responses;
@@ -12,7 +11,7 @@ using Xunit;
 using Xunit.Abstractions;
 using Assert = NUnit.Framework.Assert;
 
-namespace FunctionalTests.FunctionalTests.Areas.Api.PickupProtocolController;
+namespace FunctionalTests.FunctionalTests.Areas.Api.PickupProtocol;
 
 public class UpdateProtocolTests : IClassFixture<CustomWebApplicationFactory<Program>>
 {
@@ -187,7 +186,7 @@ public class UpdateProtocolTests : IClassFixture<CustomWebApplicationFactory<Pro
     {
         UserHelper.SetAuthorizationHeader(_client, UserHelper.OwnerToken);
 
-        var loansWhichStatusDoesNotAllowToUpdateTheProtocol = new List<Loan>
+        var loansWhichStatusDoesNotAllowToUpdateTheProtocol = new List<PujcovadloServer.Business.Entities.Loan>
         {
             _data.LoanInquired,
             _data.LoanCancelled,

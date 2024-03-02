@@ -1,5 +1,5 @@
 using System.Net;
-using FunctionalTests.Helpers;
+using IntegrationTests.Helpers;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
@@ -12,9 +12,9 @@ using Xunit;
 using Xunit.Abstractions;
 using Assert = NUnit.Framework.Assert;
 
-namespace FunctionalTests.FunctionalTests.Areas.Api.LoanController;
+namespace IntegrationTests.IntegrationTests.Areas.Api.Controllers.LoanController;
 
-public class ActiveLoanActionsTests : IClassFixture<CustomWebApplicationFactory<Program>>
+public class PreparedForPickupLoanActionsTests : IClassFixture<CustomWebApplicationFactory<Program>>
 {
     private readonly WebApplicationFactory<Program> _application;
     private readonly HttpClient _client;
@@ -25,7 +25,7 @@ public class ActiveLoanActionsTests : IClassFixture<CustomWebApplicationFactory<
 
     private readonly string _apiPath = "/api/loans/";
 
-    public ActiveLoanActionsTests(CustomWebApplicationFactory<Program> factory, ITestOutputHelper output)
+    public PreparedForPickupLoanActionsTests(CustomWebApplicationFactory<Program> factory, ITestOutputHelper output)
     {
         _application = factory;
         _client = _application.CreateClient();
@@ -49,51 +49,13 @@ public class ActiveLoanActionsTests : IClassFixture<CustomWebApplicationFactory<
     }
 
     [Fact]
-    public async Task PrepareForReturn_OwnerPreparesTheLoanForReturnButNoReturnProtocolSet_UnprocessableEntity()
+    public async Task Activate_TenantActivatesTheLoan_Ok()
     {
-        UserHelper.SetAuthorizationHeader(_client, UserHelper.OwnerToken);
-
-        // Set return protocol to null
-        _data.LoanActive.ReturnProtocol = null;
+        UserHelper.SetAuthorizationHeader(_client, UserHelper.TenantToken);
 
         // Set loan id and new status
-        _loanUpdateRequest.Id = _data.LoanActive.Id;
-        _loanUpdateRequest.Status = LoanStatus.PreparedForReturn;
-
-        // Perform the action
-        var response = await _client.PutAsJsonAsync($"{_apiPath}{_loanUpdateRequest.Id}", _loanUpdateRequest);
-
-        // Check http status
-        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.UnprocessableEntity));
-    }
-
-    [Fact]
-    public async Task PrepareForReturn_OwnerPreparesTheLoanForReturnButThereWasNoPickupProtocol_UnprocessableEntity()
-    {
-        UserHelper.SetAuthorizationHeader(_client, UserHelper.OwnerToken);
-
-        // make sure pickup protocol is null
-        _data.LoanActive.PickupProtocol = null;
-
-        // Set loan id and new status
-        _loanUpdateRequest.Id = _data.LoanActive.Id;
-        _loanUpdateRequest.Status = LoanStatus.PreparedForReturn;
-
-        // Perform the action
-        var response = await _client.PutAsJsonAsync($"{_apiPath}{_loanUpdateRequest.Id}", _loanUpdateRequest);
-
-        // Check http status
-        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.UnprocessableEntity));
-    }
-
-    [Fact]
-    public async Task PrepareForReturn_OwnerPreparesTheLoanForReturn_Ok()
-    {
-        UserHelper.SetAuthorizationHeader(_client, UserHelper.OwnerToken);
-
-        // Set loan id and new status
-        _loanUpdateRequest.Id = _data.LoanActiveHasBothProtocols.Id;
-        _loanUpdateRequest.Status = LoanStatus.PreparedForReturn;
+        _loanUpdateRequest.Id = _data.LoanPreparedForPickup.Id;
+        _loanUpdateRequest.Status = LoanStatus.Active;
 
         // Perform the action
         var response = await _client.PutAsJsonAsync($"{_apiPath}{_loanUpdateRequest.Id}", _loanUpdateRequest);
@@ -107,17 +69,13 @@ public class ActiveLoanActionsTests : IClassFixture<CustomWebApplicationFactory<
     }
 
     [Fact]
-    public async Task Return_OwnerReturnsTheLoan_Ok()
+    public async Task DenyPickup_TenantDeniesToPickupTheLoan_Ok()
     {
-        UserHelper.SetAuthorizationHeader(_client, UserHelper.OwnerToken);
-
-        // Make sure the protocols are not set
-        _data.LoanActive.PickupProtocol = null;
-        _data.LoanActive.ReturnProtocol = null;
+        UserHelper.SetAuthorizationHeader(_client, UserHelper.TenantToken);
 
         // Set loan id and new status
-        _loanUpdateRequest.Id = _data.LoanActive.Id;
-        _loanUpdateRequest.Status = LoanStatus.Returned;
+        _loanUpdateRequest.Id = _data.LoanPreparedForPickup.Id;
+        _loanUpdateRequest.Status = LoanStatus.PickupDenied;
 
         // Perform the action
         var response = await _client.PutAsJsonAsync($"{_apiPath}{_loanUpdateRequest.Id}", _loanUpdateRequest);
@@ -131,19 +89,43 @@ public class ActiveLoanActionsTests : IClassFixture<CustomWebApplicationFactory<
     }
 
     [Fact]
-    public async Task Return_OwnerReturnsTheLoanButItHasPickupProtocolSet_UnprocessableEntity()
+    public async Task Cancel_OwnerCancelsTheLoan_Ok()
     {
         UserHelper.SetAuthorizationHeader(_client, UserHelper.OwnerToken);
 
         // Set loan id and new status
-        _loanUpdateRequest.Id = _data.LoanActiveHasBothProtocols.Id;
-        _loanUpdateRequest.Status = LoanStatus.Returned;
+        _loanUpdateRequest.Id = _data.LoanPreparedForPickup.Id;
+        _loanUpdateRequest.Status = LoanStatus.Cancelled;
 
         // Perform the action
         var response = await _client.PutAsJsonAsync($"{_apiPath}{_loanUpdateRequest.Id}", _loanUpdateRequest);
 
-        // Should fail because loan has a pickup protocol set and it cannot be returned directly
-        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.UnprocessableEntity));
+        // Check http status
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+
+        // Check if the loan status was updated
+        var updatedLoan = await response.Content.ReadAsAsync<LoanResponse>();
+        Assert.That(updatedLoan.Status, Is.EqualTo(_loanUpdateRequest.Status));
+    }
+
+    [Fact]
+    public async Task Cancel_TenantCancelsTheLoan_Ok()
+    {
+        UserHelper.SetAuthorizationHeader(_client, UserHelper.TenantToken);
+
+        // Set loan id and new status
+        _loanUpdateRequest.Id = _data.LoanPreparedForPickup.Id;
+        _loanUpdateRequest.Status = LoanStatus.Cancelled;
+
+        // Perform the action
+        var response = await _client.PutAsJsonAsync($"{_apiPath}{_loanUpdateRequest.Id}", _loanUpdateRequest);
+
+        // Check http status
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+
+        // Check if the loan status was updated
+        var updatedLoan = await response.Content.ReadAsAsync<LoanResponse>();
+        Assert.That(updatedLoan.Status, Is.EqualTo(_loanUpdateRequest.Status));
     }
 
     [Fact]
@@ -152,17 +134,18 @@ public class ActiveLoanActionsTests : IClassFixture<CustomWebApplicationFactory<
         UserHelper.SetAuthorizationHeader(_client, UserHelper.OwnerToken);
 
         // Set loan id and new status
-        _loanUpdateRequest.Id = _data.LoanActiveHasBothProtocols.Id;
+        _loanUpdateRequest.Id = _data.LoanPreparedForPickup.Id;
 
         var disallowedStatuses = new List<LoanStatus>
         {
             LoanStatus.Inquired,
-            LoanStatus.Cancelled,
             LoanStatus.Accepted,
             LoanStatus.Denied,
-            LoanStatus.PreparedForPickup,
+            LoanStatus.Active,
             LoanStatus.PickupDenied,
-            LoanStatus.ReturnDenied
+            LoanStatus.PreparedForReturn,
+            LoanStatus.ReturnDenied,
+            LoanStatus.Returned,
         };
 
         foreach (var status in disallowedStatuses)
@@ -183,16 +166,13 @@ public class ActiveLoanActionsTests : IClassFixture<CustomWebApplicationFactory<
         UserHelper.SetAuthorizationHeader(_client, UserHelper.TenantToken);
 
         // Set loan id and new status
-        _loanUpdateRequest.Id = _data.LoanActiveHasBothProtocols.Id;
+        _loanUpdateRequest.Id = _data.LoanPreparedForPickup.Id;
 
         var disallowedStatuses = new List<LoanStatus>
         {
             LoanStatus.Inquired,
-            LoanStatus.Cancelled,
             LoanStatus.Accepted,
             LoanStatus.Denied,
-            LoanStatus.PreparedForPickup,
-            LoanStatus.PickupDenied,
             LoanStatus.PreparedForReturn,
             LoanStatus.ReturnDenied,
             LoanStatus.Returned,
