@@ -189,7 +189,8 @@ public class TestData
         LoanPickupDenied = new()
         {
             Id = 7, Item = Item1, Tenant = UserHelper.Tenant, TenantId = UserHelper.TenantId,
-            From = DateTime.Today.AddDays(1), To = DateTime.Today.AddDays(3), Status = LoanStatus.PickupDenied
+            From = DateTime.Today.AddDays(1), To = DateTime.Today.AddDays(3), Status = LoanStatus.PickupDenied,
+            PickupProtocol = new PickupProtocol { Id = 6, Description = "All ok" }
         };
 
         LoanActive = new()
@@ -222,7 +223,18 @@ public class TestData
         {
             Id = 12, Item = Item1, Tenant = UserHelper.Tenant, TenantId = UserHelper.TenantId,
             From = DateTime.Today.AddDays(1), To = DateTime.Today.AddDays(3), Status = LoanStatus.Accepted,
-            PickupProtocol = new PickupProtocol { Id = 1, Description = "All ok" }
+            PickupProtocol = new PickupProtocol
+            {
+                Id = 1, Description = "All ok",
+                Images = new List<Image>()
+                {
+                    new()
+                    {
+                        Name = "test1", Extension = ".jpg", Path = "test1.jpg", OwnerId = UserHelper.OwnerId,
+                        Owner = UserHelper.Owner, MimeType = "image/jpeg",
+                    }
+                }
+            }
         };
 
         LoanActiveHasBothProtocols = new()

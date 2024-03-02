@@ -59,6 +59,18 @@ public static class UserHelper
         .WithEmail("tenant@example.com")
         .WithUserName("tenant").WithUserId(TenantId).Build();
 
+    public static string Tenant2Id = "5";
+
+    public static ApplicationUser Tenant2 = new()
+    {
+        Id = Tenant2Id, UserName = "Tenant2", Email = "tenant2@exmaple.com",
+        EmailConfirmed = true, FirstName = "Tenant2", LastName = "Testovac"
+    };
+
+    public static string Tenant2Token => new TestJwtTokenBuilder().WithRole(UserRoles.Tenant)
+        .WithEmail("tenant2@example.com")
+        .WithUserName("tenant2").WithUserId(Tenant2Id).Build();
+
     public static void SetAuthorizationHeader(HttpClient client, string token)
     {
         client.DefaultRequestHeaders.Authorization =

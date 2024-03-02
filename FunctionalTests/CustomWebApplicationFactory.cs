@@ -1,5 +1,6 @@
 using System.Data.Common;
 using FunctionalTests.Helpers;
+using FunctionalTests.Mocks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -8,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using PujcovadloServer.Business.Interfaces;
 using PujcovadloServer.Data;
 
 namespace FunctionalTests;
@@ -47,6 +49,15 @@ public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProg
                 options.UseLazyLoadingProxies();
                 options.EnableSensitiveDataLogging();
             });
+
+            // Remove the apps filestorage 
+            var fileStorage = services.SingleOrDefault(
+                d => d.ServiceType == typeof(IFileStorage));
+
+            services.Remove(fileStorage);
+
+            // Add filestorage mock
+            services.AddScoped<IFileStorage, MockFileStorage>();
 
             // Add FakeJwtBearer
             services.Configure<JwtBearerOptions>(

@@ -22,6 +22,8 @@ public class LoanLifeCycleScenarioTests : IClassFixture<CustomWebApplicationFact
     private TestData _data;
 
     private readonly string _apiPath = "/api/loans/";
+    private readonly string _apiPathPickupProtocol = "pickup-protocol";
+    private readonly string _apiPathReturnProtocol = "return-protocol";
 
     public LoanLifeCycleScenarioTests(CustomWebApplicationFactory<Program> factory, ITestOutputHelper output)
     {
@@ -201,10 +203,28 @@ public class LoanLifeCycleScenarioTests : IClassFixture<CustomWebApplicationFact
         await UpdateStatus(ownersLoan.Id, LoanStatus.PreparedForPickup, HttpStatusCode.UnprocessableEntity);
 
         // Owner prepares the pickup protocol
-        await UpdatePickupProtocol(ownersLoan.Id, "All ok, not broken", ownersLoan.RefundableDeposit);
+        await UpdatePickupProtocol(ownersLoan.Id, "All ok, not broken", ownersLoan.RefundableDeposit,
+            HttpStatusCode.Created);
+        var image1 = await AddImage(_apiPathPickupProtocol, ownersLoan.Id, "FunctionalTests/data/images/img1.jpg");
+        var image2 = await AddImage(_apiPathPickupProtocol, ownersLoan.Id, "FunctionalTests/data/images/img2.jpg");
+
+        // Owner gets the images
+        var images = await GetImages(_apiPathPickupProtocol, ownersLoan.Id);
+        Assert.That(images._data, Has.Count.EqualTo(2));
 
         // Owner prepares the loan to be picked up by changing the status
         ownersLoan = await UpdateStatus(ownersLoan.Id, LoanStatus.PreparedForPickup);
+
+        // Owner tries to udpate the protocol again but he cannot
+        await UpdatePickupProtocol(ownersLoan.Id, "All ok, not broken", ownersLoan.RefundableDeposit,
+            HttpStatusCode.UnprocessableEntity);
+
+        // Owner tries to add more images but he cannot
+        await AddImage(_apiPathPickupProtocol, ownersLoan.Id, "FunctionalTests/data/images/img1.jpg",
+            expectedStatusCode: HttpStatusCode.UnprocessableEntity);
+
+        // Owner tries to delete an image but he cannot
+        await DeleteImage(_apiPathPickupProtocol, ownersLoan.Id, image1.Id, HttpStatusCode.UnprocessableEntity);
 
         // tenant reads the loan
         UserHelper.SetAuthorizationHeader(_client, UserHelper.TenantToken);
@@ -227,6 +247,13 @@ public class LoanLifeCycleScenarioTests : IClassFixture<CustomWebApplicationFact
         await UpdatePickupProtocol(ownersLoan.Id, "Item is a bit broken",
             ownerPickupProtocol.AcceptedRefundableDeposit);
 
+        // Owner adds more images
+        var image3 = await AddImage(_apiPathPickupProtocol, ownersLoan.Id, "FunctionalTests/data/images/img2.jpg");
+
+        // Owner gets the images
+        images = await GetImages(_apiPathPickupProtocol, ownersLoan.Id);
+        Assert.That(images._data, Has.Count.EqualTo(3));
+
         // Owner prepares the loan to be picked up by changing the status
         ownersLoan = await UpdateStatus(ownersLoan.Id, LoanStatus.PreparedForPickup);
 
@@ -240,10 +267,21 @@ public class LoanLifeCycleScenarioTests : IClassFixture<CustomWebApplicationFact
         // Tenant agrees with the protocol
         tenantsLoan = await UpdateStatus(tenantsLoan.Id, LoanStatus.Active);
 
-        // The loan is being active now until the loan.To date is reached
+        // The loan is being active now until the loan.To date is reached //
+
+        // Owner tries to udpate the protocol again but he cannot
+        UserHelper.SetAuthorizationHeader(_client, UserHelper.OwnerToken);
+        await UpdatePickupProtocol(ownersLoan.Id, "Not broken, all ok", ownersLoan.RefundableDeposit,
+            HttpStatusCode.UnprocessableEntity);
+
+        // Owner tries to add more images but he cannot
+        await AddImage(_apiPathPickupProtocol, ownersLoan.Id, "FunctionalTests/data/images/img1.jpg",
+            expectedStatusCode: HttpStatusCode.UnprocessableEntity);
+
+        // Owner tries to delete an image but he cannot
+        await DeleteImage(_apiPathPickupProtocol, ownersLoan.Id, image1.Id, HttpStatusCode.UnprocessableEntity);
 
         // Owner gets the loan
-        UserHelper.SetAuthorizationHeader(_client, UserHelper.OwnerToken);
         ownersLoan = await GetLoan(ownersLoan.Id);
 
         // Owner prepares the loan for return but forgets to set the protocol
@@ -388,7 +426,8 @@ public class LoanLifeCycleScenarioTests : IClassFixture<CustomWebApplicationFact
         return review;
     }
 
-    private async Task UpdatePickupProtocol(int loanId, string description, float? acceptedDeposit)
+    private async Task UpdatePickupProtocol(int loanId, string description, float? acceptedDeposit,
+        HttpStatusCode expectedStatusCode = HttpStatusCode.NoContent)
     {
         var request = new PickupProtocolRequest
         {
@@ -400,7 +439,7 @@ public class LoanLifeCycleScenarioTests : IClassFixture<CustomWebApplicationFact
         var response = await _client.PutAsJsonAsync($"{_apiPath}{loanId}/pickup-protocol", request);
 
         // Check status
-        response.EnsureSuccessStatusCode();
+        Assert.That(response.StatusCode, Is.EqualTo(expectedStatusCode));
     }
 
     private async Task<PickupProtocolResponse> GetPickupProtocol(int loanId)
@@ -444,6 +483,48 @@ public class LoanLifeCycleScenarioTests : IClassFixture<CustomWebApplicationFact
         var protocol = await response.Content.ReadAsAsync<ReturnProtocolResponse>();
 
         return protocol;
+    }
+
+    private async Task<ImageResponse> AddImage(string protocol, int loanId, string path, string mimeType = "image/jpeg",
+        HttpStatusCode expectedStatusCode = HttpStatusCode.Created)
+    {
+        var content = FileUploadHelper.CreateFileUploadForm(path, mimeType);
+
+        // perform the action
+        var response = await _client.PostAsync($"{_apiPath}{loanId}/{protocol}/images", content);
+
+        // Check http status
+        Assert.That(response.StatusCode, Is.EqualTo(expectedStatusCode));
+
+        // Get the response
+        var responseImage = await response.Content.ReadAsAsync<ImageResponse>();
+
+        return responseImage;
+    }
+
+    private async Task DeleteImage(string protocol, int loanId, int imageId,
+        HttpStatusCode expectedStatusCode = HttpStatusCode.NoContent)
+    {
+        // perform the action
+        var response = await _client.DeleteAsync($"{_apiPath}{loanId}/{protocol}/images/{imageId}");
+
+        // Check http status
+        Assert.That(response.StatusCode, Is.EqualTo(expectedStatusCode));
+    }
+
+    private async Task<ResponseList<ImageResponse>> GetImages(string protocol, int loanId,
+        HttpStatusCode expectedStatusCode = HttpStatusCode.OK)
+    {
+        // perform the action
+        var response = await _client.GetAsync($"{_apiPath}{loanId}/{protocol}/images");
+
+        // Check http status
+        Assert.That(response.StatusCode, Is.EqualTo(expectedStatusCode));
+
+        // Get the response
+        var responseImages = await response.Content.ReadAsAsync<ResponseList<ImageResponse>>();
+
+        return responseImages;
     }
 
     #endregion
