@@ -268,7 +268,10 @@ public class ItemFacade
 
         // Make main image null if the image is the main image
         if (image.Item.MainImageId == image.Id)
+        {
             image.Item.MainImage = null;
+            image.Item.MainImageId = null;
+        }
 
         // Delete the image
         await _imageFacade.DeleteImage(image);
