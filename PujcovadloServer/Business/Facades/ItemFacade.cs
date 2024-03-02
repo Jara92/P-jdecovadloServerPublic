@@ -124,6 +124,10 @@ public class ItemFacade
 
         await UpdateMainImage(item, request);
 
+        // If item was denied and the request changes the status to approving
+        if (item.Status == ItemStatus.Denied && request.Status == ItemStatus.Approving)
+            item.Status = ItemStatus.Approving;
+
         // Update the item
         await _itemService.Update(item);
     }

@@ -36,31 +36,6 @@ public class TestData
 
     public Loan Loan1;
 
-    public Loan LoanInquired;
-
-    public Loan LoanCancelled;
-
-    public Loan LoanAccepted;
-
-    public Loan LoanAcceptedWithPickupProtocol;
-
-    public Loan LoanDenied;
-
-    public Loan LoanPreparedForPickup;
-
-    public Loan LoanPickupDenied;
-
-    public Loan LoanActive;
-
-    public Loan LoanActiveHasBothProtocols;
-
-    public Loan LoanPreparedForReturn;
-
-    public Loan LoanPreparedForReturnHasBothProtocols;
-
-    public Loan LoanReturnDenied;
-
-    public Loan LoanReturned;
 
     public TestData()
     {
@@ -151,106 +126,8 @@ public class TestData
 
         Loan1 = new()
         {
-            Id = 1, Item = ItemWithRunningLoans, Tenant = UserHelper.Tenant, TenantId = UserHelper.TenantId,
+            Item = ItemWithRunningLoans, Tenant = UserHelper.Tenant, TenantId = UserHelper.TenantId,
             From = DateTime.Today.AddDays(-1), To = DateTime.Today.AddDays(1), Status = LoanStatus.Active
-        };
-
-        LoanInquired = new()
-        {
-            Id = 2, Item = Item1, Tenant = UserHelper.Tenant, TenantId = UserHelper.TenantId,
-            From = DateTime.Today.AddDays(1), To = DateTime.Today.AddDays(3), Status = LoanStatus.Inquired
-        };
-
-        LoanCancelled = new()
-        {
-            Id = 3, Item = Item1, Tenant = UserHelper.Tenant, TenantId = UserHelper.TenantId,
-            From = DateTime.Today.AddDays(1), To = DateTime.Today.AddDays(3), Status = LoanStatus.Cancelled
-        };
-
-        LoanAccepted = new()
-        {
-            Id = 4, Item = Item1, Tenant = UserHelper.Tenant, TenantId = UserHelper.TenantId,
-            From = DateTime.Today.AddDays(1), To = DateTime.Today.AddDays(3), Status = LoanStatus.Accepted
-        };
-
-        LoanDenied = new()
-        {
-            Id = 5, Item = Item1, Tenant = UserHelper.Tenant, TenantId = UserHelper.TenantId,
-            From = DateTime.Today.AddDays(1), To = DateTime.Today.AddDays(3), Status = LoanStatus.Denied
-        };
-
-        LoanPreparedForPickup = new()
-        {
-            Id = 6, Item = Item1, Tenant = UserHelper.Tenant, TenantId = UserHelper.TenantId,
-            From = DateTime.Today.AddDays(1), To = DateTime.Today.AddDays(3), Status = LoanStatus.PreparedForPickup,
-            PickupProtocol = new PickupProtocol { Id = 2, Description = "All ok" }
-        };
-
-        LoanPickupDenied = new()
-        {
-            Id = 7, Item = Item1, Tenant = UserHelper.Tenant, TenantId = UserHelper.TenantId,
-            From = DateTime.Today.AddDays(1), To = DateTime.Today.AddDays(3), Status = LoanStatus.PickupDenied,
-            PickupProtocol = new PickupProtocol { Id = 6, Description = "All ok" }
-        };
-
-        LoanActive = new()
-        {
-            Id = 8, Item = Item1, Tenant = UserHelper.Tenant, TenantId = UserHelper.TenantId,
-            From = DateTime.Today.AddDays(1), To = DateTime.Today.AddDays(3), Status = LoanStatus.Active
-        };
-
-        LoanPreparedForReturn = new()
-        {
-            Id = 9, Item = Item1, Tenant = UserHelper.Tenant, TenantId = UserHelper.TenantId,
-            From = DateTime.Today.AddDays(1), To = DateTime.Today.AddDays(3), Status = LoanStatus.PreparedForReturn
-        };
-
-        LoanReturnDenied = new()
-        {
-            Id = 10, Item = Item1, Tenant = UserHelper.Tenant, TenantId = UserHelper.TenantId,
-            From = DateTime.Today.AddDays(1), To = DateTime.Today.AddDays(3), Status = LoanStatus.ReturnDenied,
-            PickupProtocol = new PickupProtocol() { Id = 5, Description = "All ok" },
-            ReturnProtocol = new ReturnProtocol { Id = 5, Description = "All ok" }
-        };
-
-        LoanReturned = new()
-        {
-            Id = 11, Item = Item1, Tenant = UserHelper.Tenant, TenantId = UserHelper.TenantId,
-            From = DateTime.Today.AddDays(1), To = DateTime.Today.AddDays(3), Status = LoanStatus.Returned
-        };
-
-        LoanAcceptedWithPickupProtocol = new()
-        {
-            Id = 12, Item = Item1, Tenant = UserHelper.Tenant, TenantId = UserHelper.TenantId,
-            From = DateTime.Today.AddDays(1), To = DateTime.Today.AddDays(3), Status = LoanStatus.Accepted,
-            PickupProtocol = new PickupProtocol
-            {
-                Id = 1, Description = "All ok",
-                Images = new List<Image>()
-                {
-                    new()
-                    {
-                        Name = "test1", Extension = ".jpg", Path = "test1.jpg", OwnerId = UserHelper.OwnerId,
-                        Owner = UserHelper.Owner, MimeType = "image/jpeg",
-                    }
-                }
-            }
-        };
-
-        LoanActiveHasBothProtocols = new()
-        {
-            Id = 13, Item = Item1, Tenant = UserHelper.Tenant, TenantId = UserHelper.TenantId,
-            From = DateTime.Today.AddDays(1), To = DateTime.Today.AddDays(3), Status = LoanStatus.Active,
-            PickupProtocol = new PickupProtocol { Id = 3, Description = "All ok" },
-            ReturnProtocol = new ReturnProtocol { Id = 3, Description = "All ok" }
-        };
-
-        LoanPreparedForReturnHasBothProtocols = new()
-        {
-            Id = 14, Item = Item1, Tenant = UserHelper.Tenant, TenantId = UserHelper.TenantId,
-            From = DateTime.Today.AddDays(1), To = DateTime.Today.AddDays(3), Status = LoanStatus.PreparedForReturn,
-            PickupProtocol = new PickupProtocol { Id = 4, Description = "All ok" },
-            ReturnProtocol = new ReturnProtocol { Id = 4, Description = "All ok" }
         };
     }
 }

@@ -161,7 +161,7 @@ public class UpdateTests : IClassFixture<CustomWebApplicationFactory<Program>>
         var loanResponse = await response.Content.ReadAsAsync<LoanResponse>();
 
         // Tenant note should not be updated
-        Assert.That(loanResponse.TenantNote, Is.EqualTo(_data.LoanInquired.TenantNote));
+        Assert.That(loanResponse.TenantNote, Is.EqualTo(_data.Loan1.TenantNote));
     }
 
     [Fact]
@@ -184,6 +184,6 @@ public class UpdateTests : IClassFixture<CustomWebApplicationFactory<Program>>
         var loanResponse = await response.Content.ReadAsAsync<LoanResponse>();
 
         // Tenant note should not be updated
-        Assert.That(loanResponse.TenantNote, Is.EqualTo(_data.LoanInquired.TenantNote));
+        Assert.That(loanResponse.TenantNote, Is.EqualTo(_data.Loan1.TenantNote));
     }
 }

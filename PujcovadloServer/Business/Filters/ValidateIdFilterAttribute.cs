@@ -23,7 +23,8 @@ public class ValidateIdFilterAttribute : ActionFilterAttribute
                     // Throw exception if Id does not match
                     if (routeId.ToString() != idFromRequest)
                     {
-                        context.Result = new BadRequestResult();
+                        context.Result =
+                            new BadRequestObjectResult("Id in the URL does not match the Id in the request body.");
                     }
                 }
             }

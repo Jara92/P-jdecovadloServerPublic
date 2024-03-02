@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using PujcovadloServer.Areas.Api.Attributes;
+using PujcovadloServer.Business.Enums;
 
 namespace PujcovadloServer.Requests;
 
@@ -24,6 +25,8 @@ public class ItemRequest : EntityRequest
     [Price(0, 10000000)] public float? SellingPrice { get; set; }
 
     [Price(0, 10000000)] public float? PurchasePrice { get; set; }
+
+    public ItemStatus? Status { get; set; }
 
     [MaxLength(5)] public virtual IList<int> Categories { get; set; } = new List<int>();
 

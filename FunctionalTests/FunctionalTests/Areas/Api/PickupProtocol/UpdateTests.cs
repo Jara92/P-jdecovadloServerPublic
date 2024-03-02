@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using PujcovadloServer;
+using PujcovadloServer.Business.Entities;
+using PujcovadloServer.Business.Enums;
 using PujcovadloServer.Data;
 using PujcovadloServer.Requests;
 using PujcovadloServer.Responses;
@@ -13,7 +15,7 @@ using Assert = NUnit.Framework.Assert;
 
 namespace FunctionalTests.FunctionalTests.Areas.Api.PickupProtocol;
 
-public class UpdateProtocolTests : IClassFixture<CustomWebApplicationFactory<Program>>
+public class UpdateTests : IClassFixture<CustomWebApplicationFactory<Program>>
 {
     private readonly WebApplicationFactory<Program> _application;
     private readonly HttpClient _client;
@@ -21,27 +23,35 @@ public class UpdateProtocolTests : IClassFixture<CustomWebApplicationFactory<Pro
     private readonly ITestOutputHelper _output;
     private TestData _data;
 
+    private PujcovadloServer.Business.Entities.Loan _loan;
     private readonly PickupProtocolRequest _protocolUpdateRequest;
 
     private readonly string _apiPath = "/api/loans/";
 
-    public UpdateProtocolTests(CustomWebApplicationFactory<Program> factory, ITestOutputHelper output)
+    public UpdateTests(CustomWebApplicationFactory<Program> factory, ITestOutputHelper output)
     {
         _application = factory;
         _client = _application.CreateClient();
         _output = output;
         _data = new TestData();
 
-        // Arrange
-        using (var scope = _application.Services.CreateScope())
-        {
-            var scopedServices = scope.ServiceProvider;
-            _db = scopedServices.GetRequiredService<PujcovadloServerContext>();
+        // get database
+        _db = _application.Services.CreateScope().ServiceProvider.GetRequiredService<PujcovadloServerContext>();
 
-            Utilities.ReinitializeDbForTests(_db, _data);
-        }
+        // Reinicialize database base data
+        Utilities.ReinitializeDbForTests(_db, _data);
 
         var loanStartDate = DateTime.Now.AddDays(1);
+
+        // define the loan for this tests
+        _loan = new PujcovadloServer.Business.Entities.Loan()
+        {
+            Item = _data.Item1, Tenant = UserHelper.Tenant, TenantId = UserHelper.TenantId,
+            From = loanStartDate, To = loanStartDate.AddDays(2), Status = LoanStatus.Accepted
+        };
+
+        _db.Loan.Add(_loan);
+        _db.SaveChanges();
 
         // Define example update request
         _protocolUpdateRequest = new PickupProtocolRequest()
@@ -59,7 +69,7 @@ public class UpdateProtocolTests : IClassFixture<CustomWebApplicationFactory<Pro
         UserHelper.SetAuthorizationHeader(_client, UserHelper.UnauthorizedUserToken);
 
         // Perform the action
-        var response = await _client.PutAsJsonAsync($"{_apiPath}{_data.LoanAccepted.Id}/pickup-protocol",
+        var response = await _client.PutAsJsonAsync($"{_apiPath}{_loan.Id}/pickup-protocol",
             _protocolUpdateRequest);
 
         // Check http status
@@ -72,7 +82,7 @@ public class UpdateProtocolTests : IClassFixture<CustomWebApplicationFactory<Pro
         UserHelper.SetAuthorizationHeader(_client, UserHelper.UserToken);
 
         // Perform the action
-        var response = await _client.PutAsJsonAsync($"{_apiPath}{_data.LoanAccepted.Id}/pickup-protocol",
+        var response = await _client.PutAsJsonAsync($"{_apiPath}{_loan.Id}/pickup-protocol",
             _protocolUpdateRequest);
 
         // Check http status
@@ -86,7 +96,7 @@ public class UpdateProtocolTests : IClassFixture<CustomWebApplicationFactory<Pro
         UserHelper.SetAuthorizationHeader(_client, UserHelper.Owner2Token);
 
         // Perform the action
-        var response = await _client.PutAsJsonAsync($"{_apiPath}{_data.LoanAccepted.Id}/pickup-protocol",
+        var response = await _client.PutAsJsonAsync($"{_apiPath}{_loan.Id}/pickup-protocol",
             _protocolUpdateRequest);
 
         // Check http status
@@ -100,7 +110,7 @@ public class UpdateProtocolTests : IClassFixture<CustomWebApplicationFactory<Pro
         UserHelper.SetAuthorizationHeader(_client, UserHelper.Tenant2Token);
 
         // Perform the action
-        var response = await _client.PutAsJsonAsync($"{_apiPath}{_data.LoanAccepted.Id}/pickup-protocol",
+        var response = await _client.PutAsJsonAsync($"{_apiPath}{_loan.Id}/pickup-protocol",
             _protocolUpdateRequest);
 
         // Check http status
@@ -114,7 +124,7 @@ public class UpdateProtocolTests : IClassFixture<CustomWebApplicationFactory<Pro
         UserHelper.SetAuthorizationHeader(_client, UserHelper.TenantToken);
 
         // Perform the action
-        var response = await _client.PutAsJsonAsync($"{_apiPath}{_data.LoanAccepted.Id}/pickup-protocol",
+        var response = await _client.PutAsJsonAsync($"{_apiPath}{_loan.Id}/pickup-protocol",
             _protocolUpdateRequest);
 
         // Check http status
@@ -129,7 +139,7 @@ public class UpdateProtocolTests : IClassFixture<CustomWebApplicationFactory<Pro
         UserHelper.SetAuthorizationHeader(_client, UserHelper.OwnerToken);
 
         // Perform the action
-        var response = await _client.PutAsJsonAsync($"{_apiPath}{_data.LoanAccepted.Id}/pickup-protocol",
+        var response = await _client.PutAsJsonAsync($"{_apiPath}{_loan.Id}/pickup-protocol",
             _protocolUpdateRequest);
 
         // Check http status
@@ -138,7 +148,7 @@ public class UpdateProtocolTests : IClassFixture<CustomWebApplicationFactory<Pro
 
         // Update the protocol because of some mistake
         _protocolUpdateRequest.Description = "All was not ok (updated)";
-        response = await _client.PutAsJsonAsync($"{_apiPath}{_data.LoanAccepted.Id}/pickup-protocol",
+        response = await _client.PutAsJsonAsync($"{_apiPath}{_loan.Id}/pickup-protocol",
             _protocolUpdateRequest);
 
         // Check http status
@@ -146,15 +156,15 @@ public class UpdateProtocolTests : IClassFixture<CustomWebApplicationFactory<Pro
             Is.EqualTo(HttpStatusCode.NoContent)); // HTTP no content because the protocol already existed
 
         // Add image
-        var image1 = await AddImage(_data.LoanAccepted.Id, "FunctionalTests/data/images/img1.jpg");
-        var image2 = await AddImage(_data.LoanAccepted.Id, "FunctionalTests/data/images/img2.jpg");
+        var image1 = await AddImage(_loan.Id, "FunctionalTests/data/images/img1.jpg");
+        var image2 = await AddImage(_loan.Id, "FunctionalTests/data/images/img2.jpg");
 
         // Get images
-        var images = await GetImages(_data.LoanAccepted.Id, HttpStatusCode.OK);
+        var images = await GetImages(_loan.Id, HttpStatusCode.OK);
         Assert.That(images._data.Count, Is.EqualTo(2));
 
         // Delete image
-        await DeleteImage(_data.LoanAccepted.Id, image1.Id, HttpStatusCode.NoContent);
+        await DeleteImage(_loan.Id, image1.Id, HttpStatusCode.NoContent);
     }
 
     [Fact]
@@ -163,48 +173,75 @@ public class UpdateProtocolTests : IClassFixture<CustomWebApplicationFactory<Pro
         UserHelper.SetAuthorizationHeader(_client, UserHelper.OwnerToken);
 
         // Perform the action
-        var response = await _client.PutAsJsonAsync($"{_apiPath}{_data.LoanPickupDenied.Id}/pickup-protocol",
-            _protocolUpdateRequest);
+        var response = await _client.PutAsJsonAsync($"{_apiPath}{_loan.Id}/pickup-protocol", _protocolUpdateRequest);
 
         // Check http status
-        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NoContent)); // Protocol must have been create before
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created)); // Protocol must have been create before
 
         // Add image
-        var image1 = await AddImage(_data.LoanPickupDenied.Id, "FunctionalTests/data/images/img1.jpg");
-        var image2 = await AddImage(_data.LoanPickupDenied.Id, "FunctionalTests/data/images/img2.jpg");
+        var image1 = await AddImage(_loan.Id, "FunctionalTests/data/images/img1.jpg");
+        var image2 = await AddImage(_loan.Id, "FunctionalTests/data/images/img2.jpg");
 
         // Get images
-        var images = await GetImages(_data.LoanPickupDenied.Id, HttpStatusCode.OK);
+        var images = await GetImages(_loan.Id, HttpStatusCode.OK);
         Assert.That(images._data.Count, Is.EqualTo(2));
 
         // Delete image
-        await DeleteImage(_data.LoanPickupDenied.Id, image1.Id, HttpStatusCode.NoContent);
+        await DeleteImage(_loan.Id, image1.Id, HttpStatusCode.NoContent);
     }
 
     [Fact]
     public async Task Update_UserIsTheOwnerButStatusDoesNotAllowToUpdateTheProtocol_UnprocessableEntity()
     {
-        UserHelper.SetAuthorizationHeader(_client, UserHelper.OwnerToken);
-
-        var loansWhichStatusDoesNotAllowToUpdateTheProtocol = new List<PujcovadloServer.Business.Entities.Loan>
+        // Init pickup protocol
+        _loan.PickupProtocol = new PujcovadloServer.Business.Entities.PickupProtocol()
         {
-            _data.LoanInquired,
-            _data.LoanCancelled,
-            _data.LoanDenied,
-            _data.LoanPreparedForPickup,
-            _data.LoanActive,
-            _data.LoanPreparedForReturn,
-            _data.LoanReturnDenied,
-            _data.LoanReturned
+            Description = "All was ok",
+            AcceptedRefundableDeposit = 200,
+            Images = new List<Image>()
+            {
+                new Image()
+                {
+                    Name = "test1", Extension = ".jpg", Path = "test1.jpg", OwnerId = UserHelper.OwnerId,
+                    Owner = UserHelper.Owner, MimeType = "image/jpeg",
+                }
+            }
         };
 
-        foreach (var loan in loansWhichStatusDoesNotAllowToUpdateTheProtocol)
+        _db.Update(_loan);
+        _db.SaveChanges();
+
+        UserHelper.SetAuthorizationHeader(_client, UserHelper.OwnerToken);
+
+        var loanStatusesWhichDisallowUpdatingTheProtocol = new List<LoanStatus>
         {
+            LoanStatus.PreparedForPickup,
+            LoanStatus.Active,
+            LoanStatus.PreparedForReturn,
+            LoanStatus.ReturnDenied,
+            LoanStatus.Returned
+        };
+
+        foreach (var status in loanStatusesWhichDisallowUpdatingTheProtocol)
+        {
+            _loan.Status = status;
+            _db.Update(_loan);
+            _db.SaveChanges();
+
             // Perform the action
-            var response = await _client.PutAsJsonAsync($"{_apiPath}{loan.Id}/pickup-protocol", _protocolUpdateRequest);
+            var response =
+                await _client.PutAsJsonAsync($"{_apiPath}{_loan.Id}/pickup-protocol", _protocolUpdateRequest);
 
             // Check http status
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.UnprocessableEntity));
+
+            // Try to add new image
+            await AddImage(_loan.Id, "FunctionalTests/data/images/img1.jpg",
+                expectedStatusCode: HttpStatusCode.UnprocessableEntity);
+
+            // Try to delete image
+            await DeleteImage(_loan.Id, _loan.PickupProtocol.Images.First().Id,
+                expectedStatusCode: HttpStatusCode.UnprocessableEntity);
         }
     }
 

@@ -449,7 +449,7 @@ public class ItemFacadeTest
     }
 
     [Test]
-    public async Task UpdateItem_UserAuthenticatedAndItemWasDenied_ItemIsBeingApproved()
+    public async Task UpdateItem_UserAuthenticatedAndItemWasDenied_ItemIsStillDenied()
     {
         // Arrange
         var request = new ItemRequest()
@@ -490,6 +490,51 @@ public class ItemFacadeTest
 
         // Asserations - status is the same
         Assert.That(oldItem.Status, Is.EqualTo(ItemStatus.Denied));
+    }
+
+    [Test]
+    public async Task UpdateItem_UserAuthenticatedAndItemWasDeniedButApprovingStatusIsSet_ItemIsBeingApproved()
+    {
+        // Arrange
+        var request = new ItemRequest()
+        {
+            Name = "Nový item zmena",
+            Description = "Description zmena",
+            PricePerDay = 200,
+            PurchasePrice = 2000,
+            SellingPrice = 4000,
+            RefundableDeposit = 2000,
+            MainImageId = null,
+            Status = ItemStatus.Approving
+        };
+
+        var oldItem = new Item
+        {
+            Name = "Nový item",
+            Alias = "nov-item",
+            Description = "Description",
+            PricePerDay = 100,
+            PurchasePrice = 1000,
+            SellingPrice = 2000,
+            RefundableDeposit = 1000,
+            Status = ItemStatus.Denied,
+            Owner = _user
+        };
+
+        // Mock category service
+        _itemCategoryService
+            .Setup(o => o.GetByIds(It.IsAny<IEnumerable<int>>()))
+            .ReturnsAsync(new List<ItemCategory>());
+
+        // Mock tag service
+        _itemTagService
+            .Setup(o => o.GetOrCreate(It.IsAny<List<string>>()))
+            .ReturnsAsync(new List<ItemTag>());
+
+        await _itemFacade.UpdateItem(oldItem, request);
+
+        // Asserations - status is updated to approving because the request contains approving status
+        Assert.That(oldItem.Status, Is.EqualTo(request.Status));
     }
 
     #endregion
