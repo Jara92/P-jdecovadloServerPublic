@@ -56,7 +56,9 @@ public static class Utilities
         db.Loan.Add(data.LoanPreparedForPickup);
         db.Loan.Add(data.LoanPickupDenied);
         db.Loan.Add(data.LoanActive);
+        db.Loan.Add(data.LoanActiveHasBothProtocols);
         db.Loan.Add(data.LoanPreparedForReturn);
+        db.Loan.Add(data.LoanPreparedForReturnHasBothProtocols);
         db.Loan.Add(data.LoanReturnDenied);
         db.Loan.Add(data.LoanReturned);
 

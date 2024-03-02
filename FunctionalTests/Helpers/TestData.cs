@@ -52,7 +52,11 @@ public class TestData
 
     public Loan LoanActive;
 
+    public Loan LoanActiveHasBothProtocols;
+
     public Loan LoanPreparedForReturn;
+
+    public Loan LoanPreparedForReturnHasBothProtocols;
 
     public Loan LoanReturnDenied;
 
@@ -178,7 +182,8 @@ public class TestData
         LoanPreparedForPickup = new()
         {
             Id = 6, Item = Item1, Tenant = UserHelper.Tenant, TenantId = UserHelper.TenantId,
-            From = DateTime.Today.AddDays(1), To = DateTime.Today.AddDays(3), Status = LoanStatus.PreparedForPickup
+            From = DateTime.Today.AddDays(1), To = DateTime.Today.AddDays(3), Status = LoanStatus.PreparedForPickup,
+            PickupProtocol = new PickupProtocol { Id = 2, Description = "All ok" }
         };
 
         LoanPickupDenied = new()
@@ -202,7 +207,9 @@ public class TestData
         LoanReturnDenied = new()
         {
             Id = 10, Item = Item1, Tenant = UserHelper.Tenant, TenantId = UserHelper.TenantId,
-            From = DateTime.Today.AddDays(1), To = DateTime.Today.AddDays(3), Status = LoanStatus.ReturnDenied
+            From = DateTime.Today.AddDays(1), To = DateTime.Today.AddDays(3), Status = LoanStatus.ReturnDenied,
+            PickupProtocol = new PickupProtocol() { Id = 5, Description = "All ok" },
+            ReturnProtocol = new ReturnProtocol { Id = 5, Description = "All ok" }
         };
 
         LoanReturned = new()
@@ -216,6 +223,22 @@ public class TestData
             Id = 12, Item = Item1, Tenant = UserHelper.Tenant, TenantId = UserHelper.TenantId,
             From = DateTime.Today.AddDays(1), To = DateTime.Today.AddDays(3), Status = LoanStatus.Accepted,
             PickupProtocol = new PickupProtocol { Id = 1, Description = "All ok" }
+        };
+
+        LoanActiveHasBothProtocols = new()
+        {
+            Id = 13, Item = Item1, Tenant = UserHelper.Tenant, TenantId = UserHelper.TenantId,
+            From = DateTime.Today.AddDays(1), To = DateTime.Today.AddDays(3), Status = LoanStatus.Active,
+            PickupProtocol = new PickupProtocol { Id = 3, Description = "All ok" },
+            ReturnProtocol = new ReturnProtocol { Id = 3, Description = "All ok" }
+        };
+
+        LoanPreparedForReturnHasBothProtocols = new()
+        {
+            Id = 14, Item = Item1, Tenant = UserHelper.Tenant, TenantId = UserHelper.TenantId,
+            From = DateTime.Today.AddDays(1), To = DateTime.Today.AddDays(3), Status = LoanStatus.PreparedForReturn,
+            PickupProtocol = new PickupProtocol { Id = 4, Description = "All ok" },
+            ReturnProtocol = new ReturnProtocol { Id = 4, Description = "All ok" }
         };
     }
 }

@@ -23,7 +23,7 @@ public class ActiveLoanState : ALoanState
                 PrepareForReturn(loan);
                 break;
             case LoanStatus.Returned:
-                loan.Status = newStatus;
+                ReturnLoan(loan);
                 break;
             default:
                 throw new OperationNotAllowedException(
@@ -33,12 +33,30 @@ public class ActiveLoanState : ALoanState
 
     private void PrepareForReturn(Entities.Loan loan)
     {
+        // The loan must have a pickup protocol to prepare it for return
+        if (loan.PickupProtocol == null)
+        {
+            throw new OperationNotAllowedException("This action is not allowed because pickup protocol was not set.");
+        }
+
         // Check if the loan has a return protocol
         if (loan.ReturnProtocol == null)
             throw new OperationNotAllowedException("Return protocol does not exist.");
 
         // Change the loan status
         loan.Status = LoanStatus.PreparedForReturn;
+    }
+
+    private void ReturnLoan(Entities.Loan loan)
+    {
+        // Pickup protocol must be null to return the loan directly
+        if (loan.PickupProtocol != null)
+        {
+            throw new OperationNotAllowedException(
+                "This action is not allowed because pickup protocol was already set.");
+        }
+
+        loan.Status = LoanStatus.Returned;
     }
 
     /// <inheritdoc cref="ILoanState"/>

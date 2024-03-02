@@ -103,12 +103,30 @@ public class ActiveLoanStateTest : ALoanStateTest
     }
 
     [Test]
-    public void HandleOwner_ChangeStatusToPreparedForReturnWhenReturnProtocolIsSet_Succeeds()
+    public void HandleOwner_ChangeStatusToPreparedForReturnWhenReturnProtocolIsSetButPickkupProtocolIsNot_Succeeds()
     {
         // Arrange
         _loan.Status = _status;
         var returnProtocol = new ReturnProtocol { Id = 1, Description = "descipriotn" };
         _loan.ReturnProtocol = returnProtocol;
+        _loan.PickupProtocol = null;
+
+        // Act
+        Assert.Throws<OperationNotAllowedException>(() => _state.HandleOwner(_loan, LoanStatus.PreparedForReturn));
+
+        // Check that the status was not changed
+        Assert.That(_loan.Status, Is.EqualTo(_status));
+    }
+
+    [Test]
+    public void HandleOwner_ChangeStatusToPreparedForReturnWhenReturnProtocolAndPickupProtocolAreSet_Succeeds()
+    {
+        // Arrange
+        _loan.Status = _status;
+        var returnProtocol = new ReturnProtocol { Id = 1, Description = "descipriotn" };
+        _loan.ReturnProtocol = returnProtocol;
+        var pickupProtocol = new PickupProtocol() { Id = 1, Description = "pickup desc" };
+        _loan.PickupProtocol = pickupProtocol;
 
         // Act
         _state.HandleOwner(_loan, LoanStatus.PreparedForReturn);
@@ -121,6 +139,9 @@ public class ActiveLoanStateTest : ALoanStateTest
 
         // Check that Return protocol is not signed
         Assert.That(_loan.ReturnProtocol.ConfirmedAt, Is.Null);
+
+        // Check that pickup protocol is still set
+        Assert.That(_loan.PickupProtocol, Is.EqualTo(pickupProtocol));
     }
 
     [Test]
