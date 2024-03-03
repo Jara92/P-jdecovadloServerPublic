@@ -5,9 +5,6 @@
 @{
     Layout = "_Layout";
     ViewData["Title"] = Localizer["Items"];
-
-    Object filterTemplate = new Object();
-    filterTemplate = (new { write = "writeStatus", read = "readStatus" });
 }
 
 <ejs-grid id="Grid" allowPaging="true" allowSorting="true" allowFiltering="true">
@@ -26,44 +23,8 @@
         <e-grid-column field="Id" headerText="@Localizer["Id"].Value" textAlign="Center" width="120"></e-grid-column>
         <e-grid-column field="Name" headerText="@Localizer["Name"].Value" width="150"></e-grid-column>
         <e-grid-column field="Alias" headerText="@Localizer["Alias"].Value" width="130" textAlign="Center"></e-grid-column>
-        <e-grid-column field="Status" headerText="@Localizer["Item status"].Value" foreignKeyField="Value" foreignKeyValue="Text" dataSource="ViewBag.Statuses" width="130" textAlign="Center" filterBarTemplate="filterTemplate"></e-grid-column>
+        <e-grid-column field="Status" headerText="@Localizer["Item status"].Value" foreignKeyField="Value"
+                       foreignKeyValue="Text" dataSource="ViewBag.Statuses" width="130" textAlign="Center">
+        </e-grid-column>
     </e-grid-columns>
 </ejs-grid>
-
-@*@Html.Raw(JsonConvert.ToString(ViewBag.Statuses)*@
-
-<script type="text/javascript">
-        function writeStatus(args) {
-            //var data = [{ text: "clear", value: "clear" }]
-           /* let data = [{ text: "clear", value: "clear" }, { text: "1", value: 1 }, { text: "2", value: 2 }, { text: "3", value: 3 }, { text: "4", value: 4 },
-                        { text: "5", value: 5 }, { text: "6", value: 6 }, { text: "7", value: 7 }, { text: "8", value: 8 }, { text: "9", value: 9 }
-                        ];*/
-            /**/
-            
-            /*//let data = JSON.parse());*/
-            //data.unshift({ text: "clear", value: "clear" });
-             let data = [{ text: "Public", value: "1"}, {text: "Private", value: "2" }];
-            
- 
-            
-            let listObj = new ej.dropdowns.DropDownList({
-                dataSource: data,
-                placeholder: '@Localizer["Select item status"]',
-                change: function () { readStatus(args) }
-            });
-            listObj.appendTo(args.element);
-        }
-        
-        function readStatus(args) {
-            let grid = document.getElementById("Grid").ej2_instances[0];
-            
-            console.log(args.element.value);
-            
-            if (args.element.value === "clear") {
-                grid.clearFiltering(args.column.field);
-                args.element.value = null;
-            } else {
-                grid.filterByColumn(args.column.field, "equal", (args.element.value));
-            }
-        }
-    </script>

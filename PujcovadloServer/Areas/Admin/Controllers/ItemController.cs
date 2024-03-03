@@ -46,11 +46,13 @@ public class ItemController : Controller
     [HttpGet]
     public async Task<IActionResult> Index()
     {
+        // Load available statuses for the item
         var statuses = new List<object>();
         foreach (var i in Enum.GetValues(typeof(ItemStatus)))
         {
             statuses.Add(new
             {
+                // Translate the status name
                 Text = _itemStatusLocalizer[i.ToString()].Value,
                 Value = i
             });
@@ -113,22 +115,12 @@ public class ItemController : Controller
             data = operations.PerformTake(data, dm.Take);
         }
 
+        // Load the data from the database
         var list = await data.ToListAsync();
 
-        var responseList = list;
-        /*var responseList = list.Select(i => new ItemResponse
-        {
-            Id = i.Id,
-            Name = i.Name,
-            Alias = i.Alias,
-            Status = i.Status.ToString()
-        }).ToList();*/
-        //  var responseList = _mapper.Map<List<Item>, List<ItemResponse>>(list);
-
         return dm.RequiresCounts
-            ? Json(Newtonsoft.Json.JsonConvert.SerializeObject(new
-                { result = responseList, count = itemsCOunt, aggregate }))
-            : Json(Newtonsoft.Json.JsonConvert.SerializeObject(responseList));
+            ? Json(new { result = list, count = itemsCOunt, aggregate })
+            : Json(list);
     }
 
     private async Task PrepareViewData()
