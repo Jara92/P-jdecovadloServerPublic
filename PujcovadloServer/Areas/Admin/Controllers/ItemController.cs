@@ -1,16 +1,19 @@
+using System.Collections;
+using System.Data;
 using AutoMapper;
 using Core.Flash2;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using PujcovadloServer.Areas.Admin.Business.Facades;
-using PujcovadloServer.Areas.Admin.Business.Filters;
 using PujcovadloServer.Areas.Admin.Enums;
 using PujcovadloServer.Areas.Admin.Requests;
-using PujcovadloServer.Areas.Admin.ViewModels;
+using PujcovadloServer.Areas.Admin.Responses;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Enums;
-using X.PagedList;
+using PujcovadloServer.Data;
+using Syncfusion.EJ2.Base;
 
 namespace PujcovadloServer.Areas.Admin.Controllers;
 
@@ -24,52 +27,87 @@ public class ItemController : Controller
     private readonly IMapper _mapper;
     private readonly IFlasher _flasher;
     private readonly IStringLocalizer<ItemController> _localizer;
+    private readonly IConfiguration _configuration;
+    private readonly PujcovadloServerContext _dbContext;
 
     public ItemController(ItemFacade itemFacade, IMapper mapper, IFlasher flasher,
-        IStringLocalizer<ItemController> localizer)
+        IStringLocalizer<ItemController> localizer, IConfiguration configuration, PujcovadloServerContext dbContext)
     {
         _itemFacade = itemFacade;
         _mapper = mapper;
         _flasher = flasher;
         _localizer = localizer;
+        _configuration = configuration;
+        _dbContext = dbContext;
     }
 
     [HttpGet]
-    public async Task<IActionResult> Index([FromQuery] ItemFilter filter)
+    public async Task<IActionResult> Index()
     {
-        var model = new ItemViewModel();
+        var table = new DataTable("Items");
 
-        // If model state is valid, get items by the filter
-        if (ModelState.IsValid)
+        var statuses = new List<object>();
+        foreach (var i in Enum.GetValues(typeof(ItemStatus)))
         {
-            // Get items by filter
-            var items = await _itemFacade.GetItems(filter);
-
-            // Create paged list
-            var usersAsIPagedList =
-                new StaticPagedList<Item>(items, items.PageIndex, filter.PageSize, items.TotalCount);
-
-            // Set view data
-            model.Items = usersAsIPagedList;
-        }
-        // If model state is not valid, get use default filter isntead
-        else
-        {
-            var tmpFilter = new ItemFilter();
-            var items = await _itemFacade.GetItems(tmpFilter);
-
-            // Create paged list
-            var usersAsIPagedList =
-                new StaticPagedList<Item>(items, items.PageIndex, tmpFilter.PageSize, items.TotalCount);
-
-            // Set view data
-            model.Items = usersAsIPagedList;
+            statuses.Add(new { text = i.ToString(), value = i });
         }
 
-        // Show real filter
-        model.Filter = filter;
+        ViewBag.Statuses = Newtonsoft.Json.JsonConvert.SerializeObject(statuses);
 
-        return View(model);
+        return View();
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> IndexFilter([FromBody] DataManagerRequest dm)
+    {
+        var data = _dbContext.Item.AsQueryable();
+
+        var operations = new DataOperations();
+
+        if (dm.Search != null && dm.Search.Count > 0)
+        {
+            data = operations.PerformSearching(data, dm.Search); //Search
+        }
+
+        if (dm.Sorted != null && dm.Sorted.Count > 0) //Sorting
+        {
+            data = operations.PerformSorting(data, dm.Sorted);
+        }
+
+        if (dm.Where != null && dm.Where.Count > 0) //Filtering
+        {
+            data = operations.PerformFiltering(data, dm.Where, dm.Where[0].Operator);
+        }
+
+        var itemsCOunt = await data.CountAsync();
+
+        List<string> str = new List<string>();
+        if (dm.Aggregates != null)
+        {
+            for (var i = 0; i < dm.Aggregates.Count; i++)
+                str.Add(dm.Aggregates[i].Field);
+        }
+
+        IEnumerable aggregate = operations.PerformSelect(data, str);
+
+        if (dm.Skip != 0)
+        {
+            data = operations.PerformSkip(data, dm.Skip); //Paging
+        }
+
+        if (dm.Take != 0)
+        {
+            data = operations.PerformTake(data, dm.Take);
+        }
+
+        var list = await data.ToListAsync();
+
+        var responseList = _mapper.Map<List<Item>, List<ItemResponse>>(list);
+
+        return dm.RequiresCounts
+            ? Json(Newtonsoft.Json.JsonConvert.SerializeObject(new
+                { result = responseList, count = itemsCOunt, aggregate }))
+            : Json(Newtonsoft.Json.JsonConvert.SerializeObject(responseList));
     }
 
     private async Task PrepareViewData()

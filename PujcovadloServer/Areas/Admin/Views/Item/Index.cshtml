@@ -1,157 +1,72 @@
-@using X.PagedList.Mvc.Core
 @using PujcovadloServer.Business.Enums
-@using Microsoft.AspNetCore.Mvc.TagHelpers
-@model PujcovadloServer.Areas.Admin.ViewModels.ItemViewModel
+@using Syncfusion.EJ2.Grids
+@using Newtonsoft.Json
+@model Syncfusion.EJ2.DataManager
 @inject IStringLocalizer<ItemStatus> StatusLocalizer
+@inject PujcovadloServer.Data.PujcovadloServerContext dbContext
 
 @{
     Layout = "_Layout";
     ViewData["Title"] = @Localizer["Items"];
-    var firstItem = Model.Items.FirstOrDefault();
+
+    /*int pageSize = 2;
+    int totalPages = 10;
+    int pageNumber = 0;
+
+    var items = await dbContext.Item.ToListAsync();*/
+
+    Object filterTemplate = new Object();
+    filterTemplate = (new { write = "writeStatus", read = "readStatus" });
 }
 
-@section Searchbar
-{
-    <form asp-action="Index" method="get">
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+<ejs-grid id="Grid" allowPaging="true" allowSorting="true" allowFiltering="true">
+    <e-data-manager url="@Url.Action("IndexFilter", "Item")" adaptor="UrlAdaptor"></e-data-manager>
+    <e-grid-pagesettings pageSizes="new int[] { 2, 5, 10 }"></e-grid-pagesettings>
+    <e-grid-aggregates>
+        <e-grid-aggregate>
+            <e-aggregate-columns>
+                <e-aggregate-column field="Id" type="Sum"></e-aggregate-column>
+            </e-aggregate-columns>
+        </e-grid-aggregate>
+    </e-grid-aggregates>
+    <e-grid-filterSettings type="Excel"></e-grid-filterSettings>
+    <e-grid-columns>
+        <e-grid-column field="Id" headerText="ID" textAlign="Center" width="120"></e-grid-column>
+        <e-grid-column field="Name" headerText="Name" width="150"></e-grid-column>
+        <e-grid-column field="Alias" headerText="Alias" width="130" textAlign="Center"></e-grid-column>
+        <e-grid-column field="Status" headerText="Status" width="130" textAlign="Center" filterBarTemplate="filterTemplate"></e-grid-column>
+    </e-grid-columns>
+</ejs-grid>
 
-        <div class="row">
-            <div class="col-md-4">
-                <div class="form-group">
-                    <div class="input-group">
-                        <input type="text" class="form-control" asp-for="Filter.Search" value="@Model.Filter.Search" placeholder="@Localizer["Search"]"/>
-                    </div>
-                    <span asp-validation-for="Filter.Search" class="text-danger"></span>
-                </div>
-            </div>
-
-            <div class="col-md-2">
-                <div class="form-group">
-                    <label asp-for="Filter.Status" class="control-label d-none"></label>
-                    @Html.DropDownListFor(model => model.Filter.Status,
-                        Enum.GetValues(typeof(ItemStatus))
-                            .Cast<ItemStatus>()
-                            .Select(e => new SelectListItem
-                            {
-                                Text = StatusLocalizer[e.ToString()],
-                                Value = e.ToString()
-                            }),
-                        "Select Status",
-                        new { @class = "form-select", @id = "status" })
-                    <span asp-validation-for="Filter.Status" class="text-danger"></span>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-            </div>
-
-            <div class="col-md-2 d-flex justify-content-end">
-                <button type="submit" class="btn btn-primary">
-                    <i class="fa fa-search"></i> @GlobalLocalizer["Search"]
-                </button>
-            </div>
-        </div>
-    </form>
-}
-
-<div class="card mb-4">
-    <div class="card-body">
-        <table class="table">
-            <thead>
-            @if (firstItem != null)
-            {
-                <tr>
-                    <th>
-                        @Html.DisplayNameFor(model => firstItem.Name)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => firstItem.Alias)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => firstItem.Status)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => firstItem.PricePerDay)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => firstItem.RefundableDeposit)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => firstItem.SellingPrice)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => firstItem.CreatedAt)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => firstItem.UpdatedAt)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => firstItem.ApprovedAt)
-                    </th>
-                    <th>
-                        @Localizer["Actions"]
-                    </th>
-                </tr>
+<script type="text/javascript">
+        function writeStatus(args) {
+            //var data = [{ text: "clear", value: "clear" }]
+           /* let data = [{ text: "clear", value: "clear" }, { text: "1", value: 1 }, { text: "2", value: 2 }, { text: "3", value: 3 }, { text: "4", value: 4 },
+                        { text: "5", value: 5 }, { text: "6", value: 6 }, { text: "7", value: 7 }, { text: "8", value: 8 }, { text: "9", value: 9 }
+                        ];*/
+            
+            let data = JSON.parse(@Html.Raw(JsonConvert.ToString(ViewBag.Statuses)));
+            data.unshift({ text: "clear", value: "clear" });
+             data = [{ text: "Public", value: "1"}, {text: "Private", value: "2" }];
+            
+            console.log(data);
+            
+            let listObj = new ej.dropdowns.DropDownList({
+                dataSource: data,
+                placeholder: '@Localizer["Select item status"]',
+                change: function () { readStatus(args) }
+            });
+            listObj.appendTo(args.element);
+        }
+        
+        function readStatus(args) {
+            let grid = document.getElementById("Grid").ej2_instances[0];
+            
+            if (args.element.value === "clear") {
+                grid.clearFiltering(args.column.field);
+                args.element.value = null;
+            } else {
+                grid.filterByColumn(args.column.field, "equal", (args.element.value));
             }
-            </thead>
-
-            <tbody>
-            @foreach (var item in Model.Items)
-            {
-                <tr class="align-middle">
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Name)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Alias)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Status)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.PricePerDay)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.RefundableDeposit)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.SellingPrice)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.CreatedAt)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.UpdatedAt)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.ApprovedAt)
-                    </td>
-                    <td>
-                        <a asp-action="Edit" asp-route-id="@item.Id">@Localizer["Edit"]</a> |
-                        <a asp-action="Delete" asp-route-id="@item.Id">@Localizer["Delete"]</a>
-                    </td>
-                </tr>
-            }
-            </tbody>
-        </table>
-    </div> <!-- /.card-body -->
-    <div class="card-footer clearfix">
-        <!-- output a paging control that lets the user navigation to the previous page, next page, etc -->
-        @Html.PagedListPager(Model.Items, page =>
-            {
-                // Update the page number in the filter
-                Model.Filter.Page = page;
-
-                // Generate the URL for the page
-                return Url.Action("Index", Model.Filter);
-            },
-            new PagedListRenderOptions
-            {
-                ContainerDivClasses = new[] { "pagination pagination-sm m-0 float-end" },
-                LiElementClasses = new[] { "page-item" },
-                PageClasses = new[] { "page-link" },
-                LinkToPreviousPageFormat = "<",
-                LinkToNextPageFormat = ">",
-            })
-    </div>
-</div>
+        }
+    </script>

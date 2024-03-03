@@ -33,6 +33,8 @@ using PujcovadloServer.Data.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
+Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(builder.Configuration["Syncfusion:LicenseKey"]);
+
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -63,7 +65,10 @@ builder.Services.AddOpenApiDocument(options =>
 });
 
 // Use controllers
-builder.Services.AddControllers();
+builder.Services.AddControllers() /*.AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+})*/;
 
 // Add support for razor pages
 builder.Services.AddRazorPages();

@@ -59,5 +59,8 @@ public class MappingProfile : Profile
 
         // CreateMap<ItemCategory, ItemCategoryDto>();
         //CreateMap<ItemCategoryDto, ItemCategory>();
+
+        // Admin area
+        CreateMap<Item, Areas.Admin.Responses.ItemResponse>();
     }
 }
