@@ -13,7 +13,6 @@ public class ItemResponse
 
     public string Description { get; set; } = default!;
 
-    [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
     public ItemStatus Status { get; set; }
 
     public float PricePerDay { get; set; }

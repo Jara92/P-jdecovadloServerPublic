@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Data;
 using AutoMapper;
 using Core.Flash2;
 using Microsoft.AspNetCore.Authorization;
@@ -26,16 +25,19 @@ public class ItemController : Controller
     private readonly ItemFacade _itemFacade;
     private readonly IMapper _mapper;
     private readonly IFlasher _flasher;
+    private readonly IStringLocalizer<ItemStatus> _itemStatusLocalizer;
     private readonly IStringLocalizer<ItemController> _localizer;
     private readonly IConfiguration _configuration;
     private readonly PujcovadloServerContext _dbContext;
 
     public ItemController(ItemFacade itemFacade, IMapper mapper, IFlasher flasher,
+        IStringLocalizer<ItemStatus> itemStatusLocalizer,
         IStringLocalizer<ItemController> localizer, IConfiguration configuration, PujcovadloServerContext dbContext)
     {
         _itemFacade = itemFacade;
         _mapper = mapper;
         _flasher = flasher;
+        _itemStatusLocalizer = itemStatusLocalizer;
         _localizer = localizer;
         _configuration = configuration;
         _dbContext = dbContext;
@@ -44,23 +46,34 @@ public class ItemController : Controller
     [HttpGet]
     public async Task<IActionResult> Index()
     {
-        var table = new DataTable("Items");
-
         var statuses = new List<object>();
         foreach (var i in Enum.GetValues(typeof(ItemStatus)))
         {
-            statuses.Add(new { text = i.ToString(), value = i });
+            statuses.Add(new
+            {
+                Text = _itemStatusLocalizer[i.ToString()].Value,
+                Value = i
+            });
         }
 
-        ViewBag.Statuses = Newtonsoft.Json.JsonConvert.SerializeObject(statuses);
+        ViewBag.Statuses = statuses;
 
         return View();
     }
 
     [HttpPost]
+    [AllowAnonymous]
     public async Task<IActionResult> IndexFilter([FromBody] DataManagerRequest dm)
     {
-        var data = _dbContext.Item.AsQueryable();
+        var data = _dbContext.Item.AsQueryable()
+                .Select(i => new ItemResponse
+                {
+                    Id = i.Id,
+                    Name = i.Name,
+                    Alias = i.Alias,
+                    Status = i.Status
+                })
+            ;
 
         var operations = new DataOperations();
 
@@ -102,7 +115,15 @@ public class ItemController : Controller
 
         var list = await data.ToListAsync();
 
-        var responseList = _mapper.Map<List<Item>, List<ItemResponse>>(list);
+        var responseList = list;
+        /*var responseList = list.Select(i => new ItemResponse
+        {
+            Id = i.Id,
+            Name = i.Name,
+            Alias = i.Alias,
+            Status = i.Status.ToString()
+        }).ToList();*/
+        //  var responseList = _mapper.Map<List<Item>, List<ItemResponse>>(list);
 
         return dm.RequiresCounts
             ? Json(Newtonsoft.Json.JsonConvert.SerializeObject(new

@@ -1,19 +1,10 @@
-@using PujcovadloServer.Business.Enums
 @using Syncfusion.EJ2.Grids
-@using Newtonsoft.Json
+@using Syncfusion.EJ2
 @model Syncfusion.EJ2.DataManager
-@inject IStringLocalizer<ItemStatus> StatusLocalizer
-@inject PujcovadloServer.Data.PujcovadloServerContext dbContext
 
 @{
     Layout = "_Layout";
-    ViewData["Title"] = @Localizer["Items"];
-
-    /*int pageSize = 2;
-    int totalPages = 10;
-    int pageNumber = 0;
-
-    var items = await dbContext.Item.ToListAsync();*/
+    ViewData["Title"] = Localizer["Items"];
 
     Object filterTemplate = new Object();
     filterTemplate = (new { write = "writeStatus", read = "readStatus" });
@@ -30,13 +21,16 @@
         </e-grid-aggregate>
     </e-grid-aggregates>
     <e-grid-filterSettings type="Excel"></e-grid-filterSettings>
+    @*<e-grid-filtersettings type="Menu"/>*@
     <e-grid-columns>
-        <e-grid-column field="Id" headerText="ID" textAlign="Center" width="120"></e-grid-column>
-        <e-grid-column field="Name" headerText="Name" width="150"></e-grid-column>
-        <e-grid-column field="Alias" headerText="Alias" width="130" textAlign="Center"></e-grid-column>
-        <e-grid-column field="Status" headerText="Status" width="130" textAlign="Center" filterBarTemplate="filterTemplate"></e-grid-column>
+        <e-grid-column field="Id" headerText="@Localizer["Id"].Value" textAlign="Center" width="120"></e-grid-column>
+        <e-grid-column field="Name" headerText="@Localizer["Name"].Value" width="150"></e-grid-column>
+        <e-grid-column field="Alias" headerText="@Localizer["Alias"].Value" width="130" textAlign="Center"></e-grid-column>
+        <e-grid-column field="Status" headerText="@Localizer["Item status"].Value" foreignKeyField="Value" foreignKeyValue="Text" dataSource="ViewBag.Statuses" width="130" textAlign="Center" filterBarTemplate="filterTemplate"></e-grid-column>
     </e-grid-columns>
 </ejs-grid>
+
+@*@Html.Raw(JsonConvert.ToString(ViewBag.Statuses)*@
 
 <script type="text/javascript">
         function writeStatus(args) {
@@ -44,12 +38,13 @@
            /* let data = [{ text: "clear", value: "clear" }, { text: "1", value: 1 }, { text: "2", value: 2 }, { text: "3", value: 3 }, { text: "4", value: 4 },
                         { text: "5", value: 5 }, { text: "6", value: 6 }, { text: "7", value: 7 }, { text: "8", value: 8 }, { text: "9", value: 9 }
                         ];*/
+            /**/
             
-            let data = JSON.parse(@Html.Raw(JsonConvert.ToString(ViewBag.Statuses)));
-            data.unshift({ text: "clear", value: "clear" });
-             data = [{ text: "Public", value: "1"}, {text: "Private", value: "2" }];
+            /*//let data = JSON.parse());*/
+            //data.unshift({ text: "clear", value: "clear" });
+             let data = [{ text: "Public", value: "1"}, {text: "Private", value: "2" }];
             
-            console.log(data);
+ 
             
             let listObj = new ej.dropdowns.DropDownList({
                 dataSource: data,
@@ -61,6 +56,8 @@
         
         function readStatus(args) {
             let grid = document.getElementById("Grid").ej2_instances[0];
+            
+            console.log(args.element.value);
             
             if (args.element.value === "clear") {
                 grid.clearFiltering(args.column.field);
