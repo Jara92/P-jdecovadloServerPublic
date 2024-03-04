@@ -166,19 +166,14 @@ public class ItemController : Controller
         return View(request);
     }
 
-    [HttpGet("delete/{id}")]
+
+    [HttpPost("delete/{id}")]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(int id)
     {
         var item = await _itemFacade.GetItem(id);
 
-        return View(item);
-    }
-
-    [HttpPost("delete/{id}")]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> DoDelete(int id)
-    {
-        var item = await _itemFacade.GetItem(id);
+        // return Problem("todo");
 
         await _itemFacade.Delete(item);
 
