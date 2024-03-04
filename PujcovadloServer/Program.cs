@@ -269,6 +269,10 @@ builder.Services.AddScoped<ReviewService>();
 builder.Services.AddScoped<ProfileService>();
 builder.Services.AddScoped<ApplicationUserService>();
 
+// Admin services
+builder.Services.AddScoped<PujcovadloServer.Areas.Admin.Services.ItemService>();
+builder.Services.AddScoped<PujcovadloServer.Areas.Admin.Services.ApplicationUserService>();
+
 // Facades
 builder.Services.AddScoped<ItemFacade>();
 builder.Services.AddScoped<ItemCategoryFacade>();

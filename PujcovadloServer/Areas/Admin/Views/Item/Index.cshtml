@@ -28,11 +28,11 @@
         <e-grid-column field="Id" headerText="@Localizer["Id"].Value" textAlign="Center" width="120"></e-grid-column>
         <e-grid-column field="Name" headerText="@Localizer["Name"].Value" width="150"></e-grid-column>
         <e-grid-column field="Alias" headerText="@Localizer["Alias"].Value" width="130" textAlign="Center"></e-grid-column>
-        <e-grid-column field="Status" headerText="@Localizer["Item status"].Value" foreignKeyField="Value"
-                       foreignKeyValue="Text" dataSource="@ViewBag.Statuses" width="130" textAlign="Center">
+        <e-grid-column field="Status" headerText="@Localizer["Item status"].Value" foreignKeyField="Id"
+                       foreignKeyValue="Name" dataSource="@ViewBag.Statuses" width="130" textAlign="Center">
         </e-grid-column>
         <e-grid-column field="OwnerId" headerText="@Localizer["Item owner"].Value" foreignKeyField="Id"
-                       foreignKeyValue="FullName" dataSource="@ViewBag.Users" width="130" textAlign="Center">
+                       foreignKeyValue="Name" dataSource="@ViewBag.Users" width="130" textAlign="Center">
         </e-grid-column>
         <e-grid-column field="PricePerDay" headerText="@Localizer["Price per day"].Value" type="number" width="100" textAlign="Center"></e-grid-column>
         <e-grid-column field="SellingPrice" headerText="@Localizer["Selling price"].Value" type="number" width="100" textAlign="Center"></e-grid-column>

@@ -1,19 +1,15 @@
-using System.Collections;
 using AutoMapper;
 using Core.Flash2;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using PujcovadloServer.Areas.Admin.Business.Facades;
 using PujcovadloServer.Areas.Admin.Enums;
 using PujcovadloServer.Areas.Admin.Requests;
 using PujcovadloServer.Areas.Admin.Responses;
-using PujcovadloServer.Authentication;
+using PujcovadloServer.Areas.Admin.Services;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Enums;
-using PujcovadloServer.Data;
 using Syncfusion.EJ2.Base;
 
 namespace PujcovadloServer.Areas.Admin.Controllers;
@@ -27,115 +23,45 @@ public class ItemController : Controller
     private readonly ItemFacade _itemFacade;
     private readonly IMapper _mapper;
     private readonly IFlasher _flasher;
-    private readonly IStringLocalizer<ItemStatus> _itemStatusLocalizer;
     private readonly IStringLocalizer<ItemController> _localizer;
-    private readonly UserManager<ApplicationUser> _userManager;
-    private readonly IConfiguration _configuration;
-    private readonly PujcovadloServerContext _dbContext;
+    private readonly ApplicationUserService _userService;
+    private readonly ItemService _itemService;
 
     public ItemController(ItemFacade itemFacade, IMapper mapper, IFlasher flasher,
-        IStringLocalizer<ItemStatus> itemStatusLocalizer, UserManager<ApplicationUser> userManager,
-        IStringLocalizer<ItemController> localizer, IConfiguration configuration, PujcovadloServerContext dbContext)
+        IStringLocalizer<ItemController> localizer, ApplicationUserService userService, ItemService itemService)
     {
         _itemFacade = itemFacade;
         _mapper = mapper;
         _flasher = flasher;
-        _itemStatusLocalizer = itemStatusLocalizer;
-        _userManager = userManager;
         _localizer = localizer;
-        _configuration = configuration;
-        _dbContext = dbContext;
+        _userService = userService;
+        _itemService = itemService;
     }
+
 
     [HttpGet]
     public async Task<IActionResult> Index()
     {
-        // Load available statuses for the item
-        var statuses = new List<object>();
-        foreach (var i in Enum.GetValues(typeof(ItemStatus)))
-        {
-            statuses.Add(new
-            {
-                // Translate the status name
-                Text = _itemStatusLocalizer[i.ToString()].Value,
-                Value = i
-            });
-        }
-
-        ViewBag.Statuses = statuses;
-
-        ViewBag.Users = await _dbContext.Users.Select(u => new
-        {
-            Id = u.Id,
-            FullName = u.FirstName + " " + u.LastName
-        }).ToListAsync();
+        ViewBag.Statuses = await _itemService.GetItemStatusOptions();
+        ViewBag.Users = await _userService.GetUserOptions();
 
         return View();
     }
 
     [HttpPost]
-    [AllowAnonymous]
     public async Task<IActionResult> IndexFilter([FromBody] DataManagerRequest dm)
     {
-        var data = _dbContext.Item.AsNoTracking().AsQueryable()
-            //.With
-            /*.Select(i => new ItemResponse
-            {
-                Id = i.Id,
-                Name = i.Name,
-                Alias = i.Alias,
-                Status = i.Status,
-                PricePerDay = i.PricePerDay,
-                RefundableDeposit = i.RefundableDeposit,
-                SellingPrice = i.SellingPrice,
-                Owner = i.Owner,
-                OwnerName = i.Owner.LastName + " "+ i.Owner.FirstName,
-                CreatedAt = i.CreatedAt
-            })*/
-            ;
+        // get the items
+        var items = await _itemService.GetItems(dm);
 
-        var operations = new DataOperations();
+        // get total count of items which match the filter
+        var itemsCOunt = await _itemService.GetItemsCount(dm);
 
-        if (dm.Search != null && dm.Search.Count > 0)
-        {
-            data = operations.PerformSearching(data, dm.Search); //Search
-        }
+        // get aggregations
+        var aggregate = await _itemService.GetAggregations(dm);
 
-        if (dm.Sorted != null && dm.Sorted.Count > 0) //Sorting
-        {
-            data = operations.PerformSorting(data, dm.Sorted);
-        }
-
-        if (dm.Where != null && dm.Where.Count > 0) //Filtering
-        {
-            data = operations.PerformFiltering(data, dm.Where, dm.Where[0].Operator);
-        }
-
-        var itemsCOunt = await data.CountAsync();
-
-        List<string> str = new List<string>();
-        if (dm.Aggregates != null)
-        {
-            for (var i = 0; i < dm.Aggregates.Count; i++)
-                str.Add(dm.Aggregates[i].Field);
-        }
-
-        IEnumerable aggregate = operations.PerformSelect(data, str);
-
-        if (dm.Skip != 0)
-        {
-            data = operations.PerformSkip(data, dm.Skip); //Paging
-        }
-
-        if (dm.Take != 0)
-        {
-            data = operations.PerformTake(data, dm.Take);
-        }
-
-        // Load the data from the database
-        var listData = await data.ToListAsync();
-
-        var list = _mapper.Map<List<Item>, List<ItemResponse>>(listData);
+        // map the items to the response
+        var list = _mapper.Map<List<Item>, List<ItemResponse>>(items);
 
         return dm.RequiresCounts
             ? Json(new { result = list, count = itemsCOunt, aggregate })
