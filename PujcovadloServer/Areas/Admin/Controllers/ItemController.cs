@@ -2,6 +2,7 @@ using System.Collections;
 using AutoMapper;
 using Core.Flash2;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
@@ -9,6 +10,7 @@ using PujcovadloServer.Areas.Admin.Business.Facades;
 using PujcovadloServer.Areas.Admin.Enums;
 using PujcovadloServer.Areas.Admin.Requests;
 using PujcovadloServer.Areas.Admin.Responses;
+using PujcovadloServer.Authentication;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Enums;
 using PujcovadloServer.Data;
@@ -27,17 +29,19 @@ public class ItemController : Controller
     private readonly IFlasher _flasher;
     private readonly IStringLocalizer<ItemStatus> _itemStatusLocalizer;
     private readonly IStringLocalizer<ItemController> _localizer;
+    private readonly UserManager<ApplicationUser> _userManager;
     private readonly IConfiguration _configuration;
     private readonly PujcovadloServerContext _dbContext;
 
     public ItemController(ItemFacade itemFacade, IMapper mapper, IFlasher flasher,
-        IStringLocalizer<ItemStatus> itemStatusLocalizer,
+        IStringLocalizer<ItemStatus> itemStatusLocalizer, UserManager<ApplicationUser> userManager,
         IStringLocalizer<ItemController> localizer, IConfiguration configuration, PujcovadloServerContext dbContext)
     {
         _itemFacade = itemFacade;
         _mapper = mapper;
         _flasher = flasher;
         _itemStatusLocalizer = itemStatusLocalizer;
+        _userManager = userManager;
         _localizer = localizer;
         _configuration = configuration;
         _dbContext = dbContext;
@@ -60,6 +64,12 @@ public class ItemController : Controller
 
         ViewBag.Statuses = statuses;
 
+        ViewBag.Users = await _dbContext.Users.Select(u => new
+        {
+            Id = u.Id,
+            FullName = u.FirstName + " " + u.LastName
+        }).ToListAsync();
+
         return View();
     }
 
@@ -67,14 +77,21 @@ public class ItemController : Controller
     [AllowAnonymous]
     public async Task<IActionResult> IndexFilter([FromBody] DataManagerRequest dm)
     {
-        var data = _dbContext.Item.AsQueryable()
-                .Select(i => new ItemResponse
-                {
-                    Id = i.Id,
-                    Name = i.Name,
-                    Alias = i.Alias,
-                    Status = i.Status
-                })
+        var data = _dbContext.Item.AsNoTracking().AsQueryable()
+            //.With
+            /*.Select(i => new ItemResponse
+            {
+                Id = i.Id,
+                Name = i.Name,
+                Alias = i.Alias,
+                Status = i.Status,
+                PricePerDay = i.PricePerDay,
+                RefundableDeposit = i.RefundableDeposit,
+                SellingPrice = i.SellingPrice,
+                Owner = i.Owner,
+                OwnerName = i.Owner.LastName + " "+ i.Owner.FirstName,
+                CreatedAt = i.CreatedAt
+            })*/
             ;
 
         var operations = new DataOperations();
@@ -116,7 +133,9 @@ public class ItemController : Controller
         }
 
         // Load the data from the database
-        var list = await data.ToListAsync();
+        var listData = await data.ToListAsync();
+
+        var list = _mapper.Map<List<Item>, List<ItemResponse>>(listData);
 
         return dm.RequiresCounts
             ? Json(new { result = list, count = itemsCOunt, aggregate })

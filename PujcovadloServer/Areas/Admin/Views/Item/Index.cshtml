@@ -1,15 +1,20 @@
 @using Syncfusion.EJ2.Grids
 @using Syncfusion.EJ2
-@model Syncfusion.EJ2.DataManager
+@model PujcovadloServer.Areas.Admin.Responses.ItemResponse
 
 @{
     Layout = "_Layout";
     ViewData["Title"] = Localizer["Items"];
 }
 
+<script>
+    ej.base.setCurrencyCode('CZK'); 
+    ej.base.setCulture('cs-CZ');
+</script>
+
 <ejs-grid id="Grid" allowPaging="true" allowSorting="true" allowFiltering="true">
     <e-data-manager url="@Url.Action("IndexFilter", "Item")" adaptor="UrlAdaptor"></e-data-manager>
-    <e-grid-pagesettings pageSizes="new int[] { 2, 5, 10 }"></e-grid-pagesettings>
+    <e-grid-pagesettings pageSize="20" pageSizes="new int[] { 2, 5, 10, 20, 50, 100 }"></e-grid-pagesettings>
     <e-grid-aggregates>
         <e-grid-aggregate>
             <e-aggregate-columns>
@@ -24,7 +29,13 @@
         <e-grid-column field="Name" headerText="@Localizer["Name"].Value" width="150"></e-grid-column>
         <e-grid-column field="Alias" headerText="@Localizer["Alias"].Value" width="130" textAlign="Center"></e-grid-column>
         <e-grid-column field="Status" headerText="@Localizer["Item status"].Value" foreignKeyField="Value"
-                       foreignKeyValue="Text" dataSource="ViewBag.Statuses" width="130" textAlign="Center">
+                       foreignKeyValue="Text" dataSource="@ViewBag.Statuses" width="130" textAlign="Center">
         </e-grid-column>
+        <e-grid-column field="OwnerId" headerText="@Localizer["Item owner"].Value" foreignKeyField="Id"
+                       foreignKeyValue="FullName" dataSource="@ViewBag.Users" width="130" textAlign="Center">
+        </e-grid-column>
+        <e-grid-column field="PricePerDay" headerText="@Localizer["Price per day"].Value" type="number" width="100" textAlign="Center"></e-grid-column>
+        <e-grid-column field="SellingPrice" headerText="@Localizer["Selling price"].Value" type="number" width="100" textAlign="Center"></e-grid-column>
+        <e-grid-column field="CreatedAt" headerText="@Localizer["Created at"].Value" type="date" format="dd.MM.yyyy" width="100" textAlign="Center"></e-grid-column>
     </e-grid-columns>
 </ejs-grid>
