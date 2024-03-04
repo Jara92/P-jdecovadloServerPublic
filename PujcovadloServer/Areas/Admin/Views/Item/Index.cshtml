@@ -5,15 +5,6 @@
 @{
     Layout = "_Layout";
     ViewData["Title"] = Localizer["Items"];
-
-    var textAreaValueAccessor = "textAreaValueAccessorFn";
-
-    // var toolbarItems = new List<string>() {"Edit", "Delete", "Update","Search"};
-    // var toolbarItems = new List<object>();
-    //toolbarItems.Add(new { text = "Edit", tooltipText = "Edit selected row", prefixIcon = "e-edit", id = "editrow" });
-
-    //var dpParams = new { format="d.m.y" };
-    /*var dpParams = new { format = "d.m.Y" } ;*/
 }
 
 <script>
@@ -21,12 +12,10 @@
     ej.base.setCulture('cs-CZ');
 </script>
 
-<ejs-grid id="Grid" allowPaging="true" allowSorting="true" allowFiltering="true" toolbar="@(new List<string>() { "Edit", "Delete", "Update", "Cancel", "Search" })" actionBegin="actionBegin" actionComplete="actionComplete">
-    <e-data-manager url="@Url.Action("IndexFilter", "Item")" updateUrl="@Url.Action("Update", "Item")" removeUrl="@Url.Action("Delete", "Item")"
-                    adaptor="UrlAdaptor">
+<ejs-grid id="Grid" allowPaging="true" allowSorting="true" allowFiltering="true" toolbar="@(new List<string>() { "Search" })" actionBegin="actionBegin" actionComplete="actionComplete">
+    <e-data-manager url="@Url.Action("IndexFilter", "Item")" adaptor="UrlAdaptor">
     </e-data-manager>
     <e-grid-pagesettings pageSize="20" pageSizes="new int[] { 2, 5, 10, 20, 50, 100 }"></e-grid-pagesettings>
-    <e-grid-editSettings allowAdding="false" allowDeleting="true" allowEditing="true" mode="Dialog"></e-grid-editSettings>
     <e-grid-aggregates>
         <e-grid-aggregate>
             <e-aggregate-columns>
@@ -35,16 +24,11 @@
         </e-grid-aggregate>
     </e-grid-aggregates>
     <e-grid-filterSettings type="Excel"></e-grid-filterSettings>
-    @*<e-grid-filtersettings type="Menu"/>*@
     <e-grid-columns>
         <e-grid-column field="Id" headerText="@Localizer["Id"].Value" textAlign="Center" width="120"
                        validationRules="@(new { required = true })" isPrimaryKey="true">
         </e-grid-column>
-        <e-grid-column field="Name" headerText="@Localizer["Name"].Value" width="150"></e-grid-column>
-        <e-grid-column field="Description" headerText="@Localizer["Description"].Value" width="150" visible="false"
-                       valueAccessor="textAreaValueAccessor"
-                       edit="@(new { create = "textAreaCreate", read = "textAreaRead", destroy = "textAreaDestroy", write = "textAreaWrite" })">
-        </e-grid-column>
+        <e-grid-column field="Name" headerText="@Localizer["Name"].Value" width="150" template="#itemNameTemplate"></e-grid-column>
         <e-grid-column field="Alias" headerText="@Localizer["Alias"].Value" width="130" textAlign="Center"></e-grid-column>
         <e-grid-column field="Status" headerText="@Localizer["Item status"].Value" foreignKeyField="Id"
                        foreignKeyValue="Name" dataSource="@ViewBag.Statuses" width="130" textAlign="Center">
@@ -55,92 +39,35 @@
         <e-grid-column field="PricePerDay" headerText="@Localizer["Price per day"].Value" type="number" width="100" textAlign="Center"></e-grid-column>
         <e-grid-column field="SellingPrice" headerText="@Localizer["Selling price"].Value" type="number" width="100" textAlign="Center"></e-grid-column>
         <e-grid-column field="CreatedAt" headerText="@Localizer["Created at"].Value" type="date" editType="datepickeredit" format="dd.MM.yyyy" width="100" textAlign="Center"></e-grid-column>
+        <e-grid-column headerText="@Localizer["Actions"].Value" width="130" template="#actionsTemplate"></e-grid-column>
 
     </e-grid-columns>
 </ejs-grid>
 
+<script id="itemNameTemplate" type="text/x-template">
+    <span class="badge bg-secondary">${name}</span>
+</script>
+
+<script id="actionsTemplate" type="text/x-template">
+    <div class="d-flex flex-row justify-content-start">
+        <a class="btn btn-sm" href="${editItemLink(id)}">
+            <i class="bi bi-pen"></i> Edit
+        </a>
+        
+        <a class="btn btn-sm" href="${deleteItemLink(id)}">
+            <i class="bi bi-trash"></i> Delete
+        </a>
+    </div>
+</script>
+
 <script>
-    function actionComplete(args) {
-        if ((args.requestType === 'beginEdit' || args.requestType === 'add')) {
-                var dialog = args.dialog;
-                dialog.showCloseIcon = true;
-                dialog.FullScreen = true;
-                dialog.show = true;
-                dialog.height = 700;
-                dialog.width = 1000;
-                
-                console.log(args.rowData);
-                
-                // change the header of the dialog
-                dialog.header = args.requestType === 'beginEdit' ? 'Edit Record of ' + args.rowData.name : 'New Item';
-            }
+    function editItemLink(id) {
+        let url = '@Url.Action("Edit", "Item", new { id = "id" })';
+        return url.replace("id", id);
     }
     
-    function actionBegin(args) {
-        if ((args.requestType === 'beginEdit' || args.requestType === 'add')) {
-            for (var i = 0; i < this.columns.length; i++) {
-                if (this.columns[i].field == "Description") {
-                    this.columns[i].visible = true;
-                }
-            }
-        }
-        if (args.requestType === 'save') {
-            for (var i = 0; i < this.columns.length; i++) {
-                if (this.columns[i].field == "Description") {
-                    this.columns[i].visible = false;
-                }
-            }
-        }
-    }
-    
-    var textareaElem;
-    
-    function textAreaCreate(args) {
-        var container = document.createElement('div');
-    
-        labelElem = document.createElement('label');
-        labelElem.textContent = args.column.headerText;
-        labelElem.classList.add('d-block', 'mb-2');
-    
-        textareaElem = document.createElement('textarea');
-        textareaElem.classList.add('w-100');
-         textareaElem.rows = 4;
-    
-        container.appendChild(labelElem);
-        container.appendChild(textareaElem);
-    
-        return container;
-    }
-    
-    function textAreaWrite(args) {
-        // No need to set the value here, handle it in the 'created' event
-        
-        console.log(args.column.field);
-        console.log(args.column.field.toLowerCase());
-        console.log(args.rowData);
-        
-        textareaElem.value = args.rowData[args.column.field.toLowerCase()];
-    }
-    
-    function textAreaDestroy() {
-        // No additional destroy logic needed for a simple textarea
-    }
-    
-    function textAreaRead(args) {
-        return textareaElem.value;
-    }
-    
-    function textAreaCreated(args) {
-      
-        document.getElementById('Grid').ej2_instances[0].keyConfigs.enter = '';
-    }
-    
-    function textAreaValueAccessorFn(field, data, column) {
-        var value = data[field];
-        if (value !== undefined) {
-            return value.split("\n").join("<br>");
-        } else {
-            return "";
-        }
+    function deleteItemLink(id){
+        let url = '@Url.Action("Delete", "Item", new { id = "id" })';
+        return url.replace("id", id);
     }
 </script>
