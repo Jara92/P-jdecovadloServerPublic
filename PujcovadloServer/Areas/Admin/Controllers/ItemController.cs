@@ -68,6 +68,58 @@ public class ItemController : Controller
             : Json(list);
     }
 
+    [HttpPost("update")]
+    public async Task<IActionResult> Update([FromBody] ViewModels.CRUDModel<ItemRequest> value)
+    {
+        if (!ModelState.IsValid)
+        {
+            var allErrors = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage));
+            return Json(allErrors);
+        }
+
+        var itemData = value.value;
+
+        if (itemData.Id == null)
+        {
+            ModelState.AddModelError("Id", "Item ID is required.");
+            var allErrors = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage));
+            return Json(allErrors);
+        }
+
+        // get the item
+        var item = await _itemFacade.GetItem(itemData.Id.Value);
+
+        // update the item
+        await _itemFacade.UpdateItem(item, itemData);
+
+        return Json(itemData);
+    }
+
+    [HttpPost("delete")]
+    public async Task<IActionResult> Delete([FromBody] ViewModels.CRUDModel<ItemRequest> value)
+    {
+        if (!ModelState.IsValid)
+        {
+            var allErrors = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage));
+            return Json(allErrors);
+        }
+
+        if (value.key == null)
+        {
+            ModelState.AddModelError("Id", "Item ID is required.");
+            var allErrors = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage));
+            return Json(allErrors);
+        }
+
+        // get the item
+        var item = await _itemFacade.GetItem(int.Parse(value.key.ToString()));
+
+        // update the item
+        await _itemFacade.Delete(item);
+
+        return Json(value);
+    }
+
     private async Task PrepareViewData()
     {
         // get all users, categories and tags

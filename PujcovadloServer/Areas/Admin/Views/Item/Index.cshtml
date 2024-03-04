@@ -5,6 +5,10 @@
 @{
     Layout = "_Layout";
     ViewData["Title"] = Localizer["Items"];
+
+    // var toolbarItems = new List<string>() {"Edit", "Delete", "Update","Search"};
+    // var toolbarItems = new List<object>();
+    //toolbarItems.Add(new { text = "Edit", tooltipText = "Edit selected row", prefixIcon = "e-edit", id = "editrow" });
 }
 
 <script>
@@ -12,9 +16,12 @@
     ej.base.setCulture('cs-CZ');
 </script>
 
-<ejs-grid id="Grid" allowPaging="true" allowSorting="true" allowFiltering="true">
-    <e-data-manager url="@Url.Action("IndexFilter", "Item")" adaptor="UrlAdaptor"></e-data-manager>
+<ejs-grid id="Grid" allowPaging="true" allowSorting="true" allowFiltering="true" toolbar="@(new List<string>() { "Edit", "Delete", "Update", "Cancel", "Search" })" actionBegin="actionBegin" actionComplete="actionComplete">
+    <e-data-manager url="@Url.Action("IndexFilter", "Item")" updateUrl="@Url.Action("Update", "Item")" removeUrl="@Url.Action("Delete", "Item")"
+                    adaptor="UrlAdaptor">
+    </e-data-manager>
     <e-grid-pagesettings pageSize="20" pageSizes="new int[] { 2, 5, 10, 20, 50, 100 }"></e-grid-pagesettings>
+    <e-grid-editSettings allowAdding="false" allowDeleting="true" allowEditing="true" mode="Dialog"></e-grid-editSettings>
     <e-grid-aggregates>
         <e-grid-aggregate>
             <e-aggregate-columns>
@@ -25,8 +32,11 @@
     <e-grid-filterSettings type="Excel"></e-grid-filterSettings>
     @*<e-grid-filtersettings type="Menu"/>*@
     <e-grid-columns>
-        <e-grid-column field="Id" headerText="@Localizer["Id"].Value" textAlign="Center" width="120"></e-grid-column>
+        <e-grid-column field="Id" headerText="@Localizer["Id"].Value" textAlign="Center" width="120"
+                       validationRules="@(new { required = true })" isPrimaryKey="true">
+        </e-grid-column>
         <e-grid-column field="Name" headerText="@Localizer["Name"].Value" width="150"></e-grid-column>
+        <e-grid-column field="Description" headerText="@Localizer["Description"].Value" width="150" visible="false"></e-grid-column>
         <e-grid-column field="Alias" headerText="@Localizer["Alias"].Value" width="130" textAlign="Center"></e-grid-column>
         <e-grid-column field="Status" headerText="@Localizer["Item status"].Value" foreignKeyField="Id"
                        foreignKeyValue="Name" dataSource="@ViewBag.Statuses" width="130" textAlign="Center">
@@ -37,5 +47,43 @@
         <e-grid-column field="PricePerDay" headerText="@Localizer["Price per day"].Value" type="number" width="100" textAlign="Center"></e-grid-column>
         <e-grid-column field="SellingPrice" headerText="@Localizer["Selling price"].Value" type="number" width="100" textAlign="Center"></e-grid-column>
         <e-grid-column field="CreatedAt" headerText="@Localizer["Created at"].Value" type="date" format="dd.MM.yyyy" width="100" textAlign="Center"></e-grid-column>
+
     </e-grid-columns>
 </ejs-grid>
+
+<script>
+
+    function actionComplete(args) {
+        if ((args.requestType === 'beginEdit' || args.requestType === 'add')) {
+                var dialog = args.dialog;
+                dialog.showCloseIcon = true;
+                dialog.FullScreen = true;
+                dialog.show = true;
+                dialog.height = 700;
+                dialog.width = 1000;
+                
+                console.log(args.rowData);
+                
+                // change the header of the dialog
+                dialog.header = args.requestType === 'beginEdit' ? 'Edit Record of ' + args.rowData.name : 'New Item';
+            }
+    }
+    
+        function actionBegin(args) {
+            if ((args.requestType === 'beginEdit' || args.requestType === 'add')) {
+                for (var i = 0; i < this.columns.length; i++) {
+                    if (this.columns[i].field == "Description") {
+                        this.columns[i].visible = true;
+                    }
+                }
+            }
+            if (args.requestType === 'save') {
+                for (var i = 0; i < this.columns.length; i++) {
+                    if (this.columns[i].field == "Description") {
+                        this.columns[i].visible = false;
+                    }
+                }
+            }
+        }
+
+</script>

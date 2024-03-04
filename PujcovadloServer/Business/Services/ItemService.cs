@@ -33,6 +33,8 @@ public class ItemService(IItemRepository repository) : ACrudService<Item, IItemR
 
     public override Task Delete(Item entity)
     {
+        // todo add option for soft / hard deltee
+
         entity.DeletedAt = DateTime.Now;
         entity.Status = ItemStatus.Deleted;
 
