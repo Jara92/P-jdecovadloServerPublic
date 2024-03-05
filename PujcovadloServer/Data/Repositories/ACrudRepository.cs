@@ -13,6 +13,11 @@ namespace PujcovadloServer.Data.Repositories
         protected readonly PujcovadloServerContext _context;
         protected readonly DbSet<T> _dbSet;
 
+        /// <summary>
+        /// Defines maximum returned records count.
+        /// </summary>
+        public int MaximumReturnedRecords { get; set; } = 200;
+
         protected ACrudRepository(PujcovadloServerContext context)
         {
             _context = context;
@@ -34,10 +39,11 @@ namespace PujcovadloServer.Data.Repositories
                 query = operations.PerformSkip(query, dm.Skip); //Paging
             }
 
-            if (dm.Take != 0)
-            {
-                query = operations.PerformTake(query, dm.Take);
-            }
+            // MAke sure we have a limit
+            if (dm.Take == 0) dm.Take = MaximumReturnedRecords;
+
+            query = operations.PerformTake(query, dm.Take);
+
 
             return query.ToListAsync();
         }
