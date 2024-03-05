@@ -123,9 +123,10 @@ public class ItemController : Controller
     private async Task PrepareViewData()
     {
         // get all users, categories and tags
-        ViewData["Users"] = await _itemFacade.GetUserOptions();
-        ViewData["Categories"] = await _itemFacade.GetItemCategoryOptions();
-        ViewData["Tags"] = await _itemFacade.GetItemTagOptions();
+        ViewBag.Categories = await _itemFacade.GetItemCategoryOptions();
+        ViewBag.Tags = await _itemFacade.GetItemTagOptions();
+        ViewBag.Statuses = await _itemService.GetItemStatusOptions();
+        ViewBag.Users = await _userService.GetUserOptions();
     }
 
     [HttpGet("edit/{id}")]
@@ -137,6 +138,8 @@ public class ItemController : Controller
         // map the item to the request
         var model = _mapper.Map<Item, ItemRequest>(item);
 
+        ViewBag.Images = item.Images;
+
         await PrepareViewData();
 
         return View(model);
@@ -146,11 +149,10 @@ public class ItemController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(int id, ItemRequest request)
     {
+        // get the item
+        var item = await _itemFacade.GetItem(id);
         if (ModelState.IsValid)
         {
-            // get the item
-            var item = await _itemFacade.GetItem(id);
-
             // update the item
             await _itemFacade.UpdateItem(item, request);
 
@@ -162,6 +164,8 @@ public class ItemController : Controller
         }
 
         await PrepareViewData();
+
+        ViewBag.Images = item.Images;
 
         return View(request);
     }

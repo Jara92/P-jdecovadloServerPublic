@@ -17,6 +17,8 @@ public class Image : BaseEntity
     [StringLength(256, MinimumLength = 1)]
     public string Path { get; set; } = default!;
 
+    [NotMapped] public string Url { get; set; } = default!;
+
     public string Extension { get; set; } = default!;
 
     public string MimeType { get; set; } = default!;

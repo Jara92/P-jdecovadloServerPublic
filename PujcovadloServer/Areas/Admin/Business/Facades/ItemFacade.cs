@@ -4,6 +4,7 @@ using PujcovadloServer.Areas.Admin.Requests;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Exceptions;
 using PujcovadloServer.Business.Filters;
+using PujcovadloServer.Business.Interfaces;
 using PujcovadloServer.Business.Objects;
 using PujcovadloServer.Business.Services;
 using PujcovadloServer.Lib;
@@ -17,21 +18,28 @@ public class ItemFacade
     private readonly ItemTagService _itemTagService;
     private readonly ApplicationUserService _userService;
     private readonly IMapper _mapper;
+    private readonly IFileStorage _storage;
 
     public ItemFacade(ItemService itemService, ItemCategoryService itemCategoryService,
-        ItemTagService itemTagService, ApplicationUserService userService, IMapper mapper)
+        ItemTagService itemTagService, ApplicationUserService userService, IMapper mapper, IFileStorage storage)
     {
         _itemService = itemService;
         _itemCategoryService = itemCategoryService;
         _itemTagService = itemTagService;
         _userService = userService;
         _mapper = mapper;
+        _storage = storage;
     }
 
     public async Task<Item> GetItem(int id)
     {
         var item = await _itemService.Get(id);
         if (item == null) throw new EntityNotFoundException();
+
+        foreach (var image in item.Images)
+        {
+            image.Url = await _storage.GetFilePublicUrl("images", image.Path);
+        }
 
         return item;
     }

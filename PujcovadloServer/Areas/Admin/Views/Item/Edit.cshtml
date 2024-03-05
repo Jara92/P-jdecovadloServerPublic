@@ -1,5 +1,4 @@
 @using PujcovadloServer.Business.Enums
-@using PujcovadloServer.Business.Objects
 @using Microsoft.AspNetCore.Mvc.TagHelpers
 @model PujcovadloServer.Areas.Admin.Requests.ItemRequest
 @inject IStringLocalizer<ItemStatus> StatusLocalizer
@@ -38,83 +37,66 @@
                                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
                                 <div class="form-group mb-3">
-                                    <label asp-for="Name" class="form-label"></label>
-                                    <input asp-for="Name" class="form-control"/>
+                                    <ejs-textbox ejs-for="Name" id="name" placeholder="@Localizer["Name"].Value"
+                                                 floatLabelType="Always">
+                                    </ejs-textbox>
                                     <span asp-validation-for="Name" class="text-danger"></span>
                                 </div>
 
                                 <div class="form-group mb-3">
-                                    <label asp-for="Alias" class="form-label"></label>
-                                    <input asp-for="Alias" class="form-control"/>
+                                    <ejs-textbox ejs-for="Alias" id="alias" placeholder="@Localizer["Alias"].Value"
+                                                 floatLabelType="Always">
+                                    </ejs-textbox>
                                     <span asp-validation-for="Alias" class="text-danger"></span>
                                 </div>
 
                                 <div class="form-group mb-3">
-                                    <label asp-for="OwnerId" class="control-label"></label>
-                                    @Html.DropDownListFor(model => model.OwnerId,
-                                        (ViewData["Users"] as List<ApplicationUserOption>)
-                                        .Select(c => new SelectListItem
-                                        {
-                                            Text = c.FirstName + " " + c.LastName,
-                                            Value = c.Id
-                                        }),
-                                        "Select Owner",
-                                        new { @class = "form-select" })
+                                    <ejs-dropdownlist id="dlOwnerId" dataSource="@ViewBag.Users" placeholder="@Localizer["Owner"].Value"
+                                                      popupHeight="220px" ejs-for="OwnerId" floatLabelType="Always">
+                                        <e-dropdownlist-fields value="Id" text="Name"></e-dropdownlist-fields>
+                                    </ejs-dropdownlist>
                                     <span asp-validation-for="OwnerId" class="text-danger"></span>
                                 </div>
 
                                 <div class="form-group mb-3">
-                                    <label asp-for="Status" class="control-label"></label>
-                                    @Html.DropDownListFor(model => model.Status,
-                                        Enum.GetValues(typeof(ItemStatus))
-                                            .Cast<ItemStatus>()
-                                            .Select(e => new SelectListItem
-                                            {
-                                                Text = StatusLocalizer[e.ToString()],
-                                                Value = e.ToString()
-                                            }),
-                                        "Select Status",
-                                        new { @class = "form-select" })
+                                    <ejs-dropdownlist id="dlStatus" dataSource="@ViewBag.Statuses" placeholder="@Localizer["Status"].Value"
+                                                      popupHeight="220px" ejs-for="Status" floatLabelType="Always">
+                                        <e-dropdownlist-fields value="Id" text="Name"></e-dropdownlist-fields>
+                                    </ejs-dropdownlist>
                                     <span asp-validation-for="Status" class="text-danger"></span>
                                 </div>
 
                                 <div class="form-group mb-3">
-                                    <label asp-for="Categories" class="control-label"></label>
-                                    @Html.ListBoxFor(model => model.Categories,
-                                        (ViewData["Categories"] as List<ItemCategoryOption>)
-                                        .Select(c => new SelectListItem
-                                        {
-                                            Text = c.Name,
-                                            Value = c.Id.ToString()
-                                        }),
-                                        new { @class = "form-select", multiple = "multiple" })
+                                    <ejs-multiselect id="dlCategories" dataSource="@ViewBag.Categories" placeholder="@Localizer["Categories"].Value"
+                                                     popupHeight="500px" ejs-for="Categories" floatLabelType="Always"
+                                                     allowFiltering="true" ignoreAccent="true" filterType="Contains">
+                                        <e-multiselect-fields value="Id" text="Name"></e-multiselect-fields>
+                                    </ejs-multiselect>
                                     <span asp-validation-for="Categories" class="text-danger"></span>
                                 </div>
                             </div>
 
                             <div class="col-md-12 col-lg-6">
                                 <div class="form-group mb-3">
-                                    <label asp-for="Description" class="control-label"></label>
-                                    <textarea class="form-control" id="Description" name="Description" rows="4">@Model.Description</textarea>
+                                    <ejs-textbox ejs-for="Description" id="description" placeholder="@Localizer["Description"].Value"
+                                                 floatLabelType="Always" multiline="true">
+                                    </ejs-textbox>
                                     <span asp-validation-for="Description" class="text-danger"></span>
                                 </div>
 
                                 <div class="form-group mb-3">
-                                    <label asp-for="Parameters" class="control-label"></label>
-                                    <textarea class="form-control" id="Parameters" name="Parameters" rows="4">@Model.Parameters</textarea>
+                                    <ejs-textbox ejs-for="Parameters" id="parameters" placeholder="@Localizer["Parameters"].Value"
+                                                 floatLabelType="Always" multiline="true">
+                                    </ejs-textbox>
                                     <span asp-validation-for="Parameters" class="text-danger"></span>
                                 </div>
 
                                 <div class="form-group mb-3">
-                                    <label asp-for="Tags" class="control-label"></label>
-                                    @Html.ListBoxFor(model => model.Tags,
-                                        (ViewData["Tags"] as List<ItemTagOption>)
-                                        .Select(c => new SelectListItem
-                                        {
-                                            Text = c.Name,
-                                            Value = c.Id.ToString()
-                                        }),
-                                        new { @class = "form-select", multiple = "multiple" })
+                                    <ejs-multiselect id="dlTags" dataSource="@ViewBag.Tags" placeholder="@Localizer["Tags"].Value"
+                                                     popupHeight="500px" ejs-for="Tags" floatLabelType="Always"
+                                                     allowFiltering="true" ignoreAccent="true" filterType="Contains">
+                                        <e-multiselect-fields value="Id" text="Name"></e-multiselect-fields>
+                                    </ejs-multiselect>
                                     <span asp-validation-for="Tags" class="text-danger"></span>
                                 </div>
                             </div>
@@ -134,38 +116,38 @@
                             <div class="col-12">
 
                                 <div class="form-group mb-3">
-                                    <label asp-for="PricePerDay" class="form-label"></label>
-                                    <div class="input-group">
-                                        <input asp-for="PricePerDay" type="number" min="0" class="form-control"/>
-                                        <span class="input-group-text"> Kč</span>
-                                    </div>
+                                    <ejs-numerictextbox id="pricePerDay" ejs-for="PricePerDay" step="1" min="0"
+                                                        format="###.## Kč"
+                                                        floatLabelType="Always"
+                                                        placeholder="@Localizer["Price per day"].Value">
+                                    </ejs-numerictextbox>
                                     <span asp-validation-for="PricePerDay" class="text-danger"></span>
                                 </div>
 
                                 <div class="form-group mb-3">
-                                    <label asp-for="RefundableDeposit" class="form-label"></label>
-                                    <div class="input-group">
-                                        <input asp-for="RefundableDeposit" type="number" min="0" class="form-control"/>
-                                        <span class="input-group-text"> Kč</span>
-                                    </div>
+                                    <ejs-numerictextbox id="refundableDeposit" ejs-for="RefundableDeposit" step="1" min="0"
+                                                        format="###.## Kč"
+                                                        floatLabelType="Always"
+                                                        placeholder="@Localizer["Refundable deposit"].Value">
+                                    </ejs-numerictextbox>
                                     <span asp-validation-for="RefundableDeposit" class="text-danger"></span>
                                 </div>
 
                                 <div class="form-group mb-3">
-                                    <label asp-for="PurchasePrice" class="form-label"></label>
-                                    <div class="input-group">
-                                        <input asp-for="PurchasePrice" type="number" min="0" class="form-control"/>
-                                        <span class="input-group-text"> Kč</span>
-                                    </div>
+                                    <ejs-numerictextbox id="purchasePrice" ejs-for="PurchasePrice" step="1" min="0"
+                                                        format="###.## Kč"
+                                                        floatLabelType="Always"
+                                                        placeholder="@Localizer["Purchase price"].Value">
+                                    </ejs-numerictextbox>
                                     <span asp-validation-for="PurchasePrice" class="text-danger"></span>
                                 </div>
 
                                 <div class="form-group mb-3">
-                                    <label asp-for="SellingPrice" class="form-label"></label>
-                                    <div class="input-group">
-                                        <input asp-for="SellingPrice" type="number" min="0" class="form-control"/>
-                                        <span class="input-group-text"> Kč</span>
-                                    </div>
+                                    <ejs-numerictextbox id="sellingPrice" ejs-for="SellingPrice" step="1" min="0"
+                                                        format="###.## Kč"
+                                                        floatLabelType="Always"
+                                                        placeholder="@Localizer["Selling price"].Value">
+                                    </ejs-numerictextbox>
                                     <span asp-validation-for="SellingPrice" class="text-danger"></span>
                                 </div>
                             </div>
@@ -183,18 +165,21 @@
                             <div class="col-12">
 
                                 <div class="form-group mb-3">
-                                    <label asp-for="CreatedAt" class="control-label"></label>
-                                    <input asp-for="CreatedAt" class="form-control"/>
+                                    <ejs-datetimepicker id="createdAt" ejs-for="CreatedAt" placeholder="@Localizer["Created at"].Value"
+                                                        format="d.M.yyyy hh:mm" floatLabelType="Always">
+                                    </ejs-datetimepicker>
                                     <span asp-validation-for="CreatedAt" class="text-danger"></span>
                                 </div>
                                 <div class="form-group mb-3">
-                                    <label asp-for="UpdatedAt" class="control-label"></label>
-                                    <input asp-for="UpdatedAt" class="form-control"/>
+                                    <ejs-datetimepicker id="updatedAt" ejs-for="UpdatedAt" placeholder="@Localizer["Updated at"].Value"
+                                                        format="d.M.yyyy hh:mm" floatLabelType="Always">
+                                    </ejs-datetimepicker>
                                     <span asp-validation-for="UpdatedAt" class="text-danger"></span>
                                 </div>
                                 <div class="form-group mb-3">
-                                    <label asp-for="ApprovedAt" class="control-label"></label>
-                                    <input asp-for="ApprovedAt" class="form-control"/>
+                                    <ejs-datetimepicker id="approvedAt" ejs-for="ApprovedAt" placeholder="@Localizer["Approved at"].Value"
+                                                        format="d.M.yyyy hh:mm" floatLabelType="Always">
+                                    </ejs-datetimepicker>
                                     <span asp-validation-for="ApprovedAt" class="text-danger"></span>
                                 </div>
                             </div>
@@ -209,9 +194,14 @@
                     </div>
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-12">
-
-                            </div>
+                            @foreach (var image in ViewBag.Images)
+                            {
+                                <div class="col-4">
+                                    <a href="@image.Url" target="_blank">
+                                        <img src="@image.Url" class="img-fluid img-thumbnail" alt="Item image">
+                                    </a>
+                                </div>
+                            }
                         </div>
                     </div>
                 </div>

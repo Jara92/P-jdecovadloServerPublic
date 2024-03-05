@@ -26,7 +26,7 @@ public class ItemService
         {
             statuses.Add(new
             {
-                Id = i,
+                Id = (int)i,
                 // Translate the status name
                 Name = _itemStatusLocalizer[i.ToString()].Value
             });
