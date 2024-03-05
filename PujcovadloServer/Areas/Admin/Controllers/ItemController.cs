@@ -39,7 +39,7 @@ public class ItemController : Controller
     [HttpGet]
     public async Task<IActionResult> Index()
     {
-        ViewBag.Statuses = await _itemService.GetItemStatusOptions();
+        ViewBag.Statuses = await _itemFacade.GetItemStatusOptions();
         ViewBag.Users = await _itemFacade.GetUserOptions();
 
         return View();

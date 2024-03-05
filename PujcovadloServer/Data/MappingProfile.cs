@@ -62,5 +62,11 @@ public class MappingProfile : Profile
 
         // Admin area
         CreateMap<Item, Areas.Admin.Responses.ItemResponse>();
+
+        CreateMap<ItemCategory, Areas.Admin.Responses.ItemCategoryResponse>()
+            .ForMember(r => r.ParentName, opt => opt.MapFrom(c => (c.Parent == null) ? null : c.Parent.Name));
+
+        CreateMap<Areas.Admin.Requests.ItemCategoryRequest, ItemCategory>();
+        CreateMap<ItemCategory, Areas.Admin.Requests.ItemCategoryRequest>();
     }
 }
