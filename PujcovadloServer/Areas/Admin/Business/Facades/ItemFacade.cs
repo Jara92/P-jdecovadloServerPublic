@@ -7,7 +7,6 @@ using PujcovadloServer.Business.Filters;
 using PujcovadloServer.Business.Interfaces;
 using PujcovadloServer.Business.Objects;
 using PujcovadloServer.Business.Services;
-using PujcovadloServer.Lib;
 
 namespace PujcovadloServer.Areas.Admin.Business.Facades;
 
@@ -66,12 +65,7 @@ public class ItemFacade
         return _itemService.Delete(item);
     }
 
-    public Task<PaginatedList<Item>> GetItems(ItemFilter filter)
-    {
-        return _itemService.GetAll(filter);
-    }
-
-    public Task<IList<ItemCategoryOption>> GetItemCategoryOptions()
+    public Task<List<EntityOption>> GetItemCategoryOptions()
     {
         return _itemCategoryService.GetAllOptions();
     }
@@ -84,5 +78,10 @@ public class ItemFacade
     public Task<IList<ApplicationUserOption>> GetUserOptions()
     {
         return _userService.GetAllAsOptions(new ApplicationUserFilter());
+    }
+
+    public Task<List<EntityOption>> GetItemStatusOptions()
+    {
+        return _itemService.GetItemStatusOptions();
     }
 }

@@ -7,7 +7,6 @@ using PujcovadloServer.Areas.Admin.Business.Facades;
 using PujcovadloServer.Areas.Admin.Enums;
 using PujcovadloServer.Areas.Admin.Requests;
 using PujcovadloServer.Areas.Admin.Responses;
-using PujcovadloServer.Areas.Admin.Services;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Enums;
 using Syncfusion.EJ2.Base;
@@ -24,17 +23,15 @@ public class ItemController : Controller
     private readonly IMapper _mapper;
     private readonly IFlasher _flasher;
     private readonly IStringLocalizer<ItemController> _localizer;
-    private readonly ApplicationUserService _userService;
-    private readonly ItemService _itemService;
+    private readonly PujcovadloServer.Business.Services.ItemService _itemService;
 
     public ItemController(ItemFacade itemFacade, IMapper mapper, IFlasher flasher,
-        IStringLocalizer<ItemController> localizer, ApplicationUserService userService, ItemService itemService)
+        IStringLocalizer<ItemController> localizer, PujcovadloServer.Business.Services.ItemService itemService)
     {
         _itemFacade = itemFacade;
         _mapper = mapper;
         _flasher = flasher;
         _localizer = localizer;
-        _userService = userService;
         _itemService = itemService;
     }
 
@@ -43,7 +40,7 @@ public class ItemController : Controller
     public async Task<IActionResult> Index()
     {
         ViewBag.Statuses = await _itemService.GetItemStatusOptions();
-        ViewBag.Users = await _userService.GetUserOptions();
+        ViewBag.Users = await _itemFacade.GetUserOptions();
 
         return View();
     }
@@ -52,10 +49,10 @@ public class ItemController : Controller
     public async Task<IActionResult> IndexFilter([FromBody] DataManagerRequest dm)
     {
         // get the items
-        var items = await _itemService.GetItems(dm);
+        var items = await _itemService.GetAll(dm);
 
         // get total count of items which match the filter
-        var itemsCOunt = await _itemService.GetItemsCount(dm);
+        var itemsCount = await _itemService.GetCount(dm);
 
         // get aggregations
         var aggregate = await _itemService.GetAggregations(dm);
@@ -64,60 +61,8 @@ public class ItemController : Controller
         var list = _mapper.Map<List<Item>, List<ItemResponse>>(items);
 
         return dm.RequiresCounts
-            ? Json(new { result = list, count = itemsCOunt, aggregate })
+            ? Json(new { result = list, count = itemsCount, aggregate })
             : Json(list);
-    }
-
-    [HttpPost("update")]
-    public async Task<IActionResult> Update([FromBody] ViewModels.CRUDModel<ItemRequest> value)
-    {
-        if (!ModelState.IsValid)
-        {
-            var allErrors = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage));
-            return Json(allErrors);
-        }
-
-        var itemData = value.value;
-
-        if (itemData.Id == null)
-        {
-            ModelState.AddModelError("Id", "Item ID is required.");
-            var allErrors = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage));
-            return Json(allErrors);
-        }
-
-        // get the item
-        var item = await _itemFacade.GetItem(itemData.Id.Value);
-
-        // update the item
-        await _itemFacade.UpdateItem(item, itemData);
-
-        return Json(itemData);
-    }
-
-    [HttpPost("delete")]
-    public async Task<IActionResult> Delete([FromBody] ViewModels.CRUDModel<ItemRequest> value)
-    {
-        if (!ModelState.IsValid)
-        {
-            var allErrors = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage));
-            return Json(allErrors);
-        }
-
-        if (value.key == null)
-        {
-            ModelState.AddModelError("Id", "Item ID is required.");
-            var allErrors = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage));
-            return Json(allErrors);
-        }
-
-        // get the item
-        var item = await _itemFacade.GetItem(int.Parse(value.key.ToString()));
-
-        // update the item
-        await _itemFacade.Delete(item);
-
-        return Json(value);
     }
 
     private async Task PrepareViewData()
@@ -125,8 +70,8 @@ public class ItemController : Controller
         // get all users, categories and tags
         ViewBag.Categories = await _itemFacade.GetItemCategoryOptions();
         ViewBag.Tags = await _itemFacade.GetItemTagOptions();
-        ViewBag.Statuses = await _itemService.GetItemStatusOptions();
-        ViewBag.Users = await _userService.GetUserOptions();
+        ViewBag.Statuses = await _itemFacade.GetItemStatusOptions();
+        ViewBag.Users = await _itemFacade.GetUserOptions();
     }
 
     [HttpGet("edit/{id}")]
@@ -177,7 +122,7 @@ public class ItemController : Controller
     {
         var item = await _itemFacade.GetItem(id);
 
-        // return Problem("todo");
+        //return Problem("todo");
 
         await _itemFacade.Delete(item);
 

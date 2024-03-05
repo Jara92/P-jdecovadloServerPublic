@@ -1,9 +1,11 @@
+using System.Collections;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Exceptions;
 using PujcovadloServer.Business.Filters;
 using PujcovadloServer.Business.Interfaces;
 using PujcovadloServer.Business.Services.Interfaces;
 using PujcovadloServer.Lib;
+using Syncfusion.EJ2.Base;
 
 namespace PujcovadloServer.Business.Services;
 
@@ -14,7 +16,9 @@ namespace PujcovadloServer.Business.Services;
 /// <typeparam name="T">Managed entity</typeparam>
 /// <typeparam name="R">Repository class</typeparam>
 /// <typeparam name="G">Filter class</typeparam>
-public abstract class ACrudService<T, R, G> : ICrudService<T, R, G> where T : BaseEntity where R: ICrudRepository<T, G> where G : BaseFilter
+public abstract class ACrudService<T, R, G> : ICrudService<T, R, G> where T : BaseEntity
+    where R : ICrudRepository<T, G>
+    where G : BaseFilter
 {
     protected readonly R _repository;
 
@@ -28,9 +32,24 @@ public abstract class ACrudService<T, R, G> : ICrudService<T, R, G> where T : Ba
         return await _repository.GetAll(filter);
     }
 
+    public Task<List<T>> GetAll(DataManagerRequest dm)
+    {
+        return _repository.GetAll(dm);
+    }
+
+    public Task<IEnumerable> GetAggregations(DataManagerRequest dm)
+    {
+        return _repository.GetAggregations(dm);
+    }
+
+    public Task<int> GetCount(DataManagerRequest dm)
+    {
+        return _repository.GetCount(dm);
+    }
+
     public virtual async Task<T?> Get(int id, bool track = true)
     {
-        if(track)
+        if (track)
             return await _repository.Get(id);
         else
             return await _repository.GetUntracked(id);
@@ -45,12 +64,12 @@ public abstract class ACrudService<T, R, G> : ICrudService<T, R, G> where T : Ba
     {
         await _repository.Update(entity);
     }
-    
+
     public virtual async Task Delete(int id)
     {
         var entity = await _repository.Get(id);
-        
-        if(entity is null)
+
+        if (entity is null)
             throw new EntityNotFoundException($"Entity with id {id} not found.");
 
         await Delete(entity);
@@ -60,7 +79,7 @@ public abstract class ACrudService<T, R, G> : ICrudService<T, R, G> where T : Ba
     {
         await _repository.Delete(entity);
     }
-    
+
     /*public virtual void FillRequest(T entity, object request)
     {
         var editableProperties = request.GetType()

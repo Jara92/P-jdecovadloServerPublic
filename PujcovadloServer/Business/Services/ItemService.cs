@@ -2,6 +2,7 @@ using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Enums;
 using PujcovadloServer.Business.Filters;
 using PujcovadloServer.Business.Interfaces;
+using PujcovadloServer.Business.Objects;
 using PujcovadloServer.Lib;
 
 namespace PujcovadloServer.Business.Services;
@@ -45,5 +46,20 @@ public class ItemService(IItemRepository repository) : ACrudService<Item, IItemR
     public async Task<int> GetPublicItemsCountByUser(string userId)
     {
         return await _repository.GetPublicItemsCountByUser(userId);
+    }
+
+    public Task<List<EntityOption>> GetItemStatusOptions()
+    {
+        var statuses = new List<EntityOption>();
+        foreach (var i in Enum.GetValues(typeof(ItemStatus)))
+        {
+            statuses.Add(new EntityOption()
+            {
+                Id = (int)i,
+                Name = i.ToString(),
+            });
+        }
+
+        return Task.FromResult(statuses);
     }
 }

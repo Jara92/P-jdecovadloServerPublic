@@ -17,9 +17,9 @@ public class ItemCategoryRepository : ACrudRepository<ItemCategory, ItemCategory
         return await _context.ItemCategory.Where(c => ids.Contains(c.Id)).ToListAsync();
     }
 
-    public async Task<IList<ItemCategoryOption>> GetAllOptions()
+    public async Task<List<EntityOption>> GetAllOptions()
     {
-        return await _dbSet.Select(c => new ItemCategoryOption
+        return await _dbSet.Select(c => new EntityOption
         {
             Id = c.Id,
             Name = c.Name

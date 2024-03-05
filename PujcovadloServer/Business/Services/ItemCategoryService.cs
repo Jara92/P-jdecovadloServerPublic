@@ -16,7 +16,7 @@ public class ItemCategoryService : ACrudService<ItemCategory, IItemCategoryRepos
         return await _repository.GetByIds(ids);
     }
 
-    public Task<IList<ItemCategoryOption>> GetAllOptions()
+    public Task<List<EntityOption>> GetAllOptions()
     {
         return _repository.GetAllOptions();
     }

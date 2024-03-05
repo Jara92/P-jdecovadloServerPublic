@@ -8,5 +8,5 @@ public interface IItemCategoryRepository : ICrudRepository<ItemCategory, ItemCat
 {
     public Task<IList<ItemCategory>> GetByIds(IEnumerable<int> ids);
 
-    Task<IList<ItemCategoryOption>> GetAllOptions();
+    Task<List<EntityOption>> GetAllOptions();
 }
