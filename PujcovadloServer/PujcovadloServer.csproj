@@ -51,7 +51,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <AdditionalFiles Include="Areas\Admin\Views\Item\Delete.cshtml"/>
         <AdditionalFiles Include="Areas\Admin\Views\Item\Edit.cshtml"/>
         <AdditionalFiles Include="Areas\Admin\Views\Item\Index.cshtml"/>
         <AdditionalFiles Include="Areas\Admin\Views\Shared\_ValidationScriptsPartial.cshtml"/>
