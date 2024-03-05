@@ -1,0 +1,70 @@
+@using Syncfusion.EJ2.Grids
+@using Syncfusion.EJ2
+@model PujcovadloServer.Areas.Admin.Responses.LoanResponse
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = Localizer["Loans"];
+}
+
+<ejs-grid id="Grid" allowPaging="true" allowSorting="true" allowFiltering="true" toolbar="@(new List<string>() { "Search" })">
+    <e-data-manager url="@Url.Action("IndexFilter", "Loan")" adaptor="UrlAdaptor">
+    </e-data-manager>
+    <e-grid-pagesettings pageSize="20" pageSizes="new int[] { 2, 5, 10, 20, 50, 100 }"></e-grid-pagesettings>
+    <e-grid-filterSettings type="Excel"></e-grid-filterSettings>
+    <e-grid-columns>
+        <e-grid-column field="Id" headerText="@Localizer["Id"].Value" textAlign="Center" width="120"
+                       validationRules="@(new { required = true })" isPrimaryKey="true">
+        </e-grid-column>
+        <e-grid-column field="Item.Name" headerText="@Localizer["Item name"].Value" width="150" template="#itemNameTemplate" textAlign="Center"></e-grid-column>
+        <e-grid-column field="Status" headerText="@Localizer["Loan status"].Value" foreignKeyField="Id"
+                       foreignKeyValue="Name" dataSource="@ViewBag.Statuses" width="130" textAlign="Center">
+        </e-grid-column>
+        <e-grid-column field="Days" headerText="@Localizer["Duration [days]"].Value" width="150" textAlign="Center"></e-grid-column>
+        <e-grid-column field="ExpectedPrice" headerText="@Localizer["Expected price"].Value" type="number" width="100" textAlign="Center"></e-grid-column>
+        <e-grid-column field="CreatedAt" headerText="@Localizer["Created at"].Value" type="date" editType="datepickeredit" format="dd.MM.yyyy" width="100" textAlign="Center"></e-grid-column>
+
+        <e-grid-column headerText="@Localizer["Actions"].Value" width="130" template="#actionsTemplate" textAlign="Center"></e-grid-column>
+    </e-grid-columns>
+</ejs-grid>
+
+<script id="itemNameTemplate" type="text/x-template">
+    <a href="${itemEditLink(Item.Id)}">${Item.Name}</a>
+</script>
+
+<script id="actionsTemplate" type="text/x-template">
+    <div class="d-flex flex-row justify-content-start">
+        <a class="btn btn-sm no-a-decoration me-1" href="${editLink(Id)}">
+            <i class="bi bi-pen"></i>
+        </a>
+        
+        <form action="${deleteLink(Id)}" method="post">
+                <input type="hidden" name="id" value="${Id}"/>
+            
+                <!-- Include the AntiForgeryToken -->
+                @Html.AntiForgeryToken()
+            
+            <button type="submit" class="btn btn-sm btn-danger" 
+                onclick="return confirm(&quot; @Localizer["Are you sure you want to delete this record?"].Value &quot;)">
+                <i class="bi bi-trash"></i>
+            </button>
+        </form>
+    </div>
+</script>
+
+<script>
+    function itemEditLink(id){
+        let url = '@Url.Action("Edit", "Item", new { id = "id" })';
+        return url.replace("id", id);
+    }
+
+    function editLink(id) {
+        let url = '@Url.Action("Edit", "Loan", new { id = "id" })';
+        return url.replace("id", id);
+    }
+    
+    function deleteLink(id){
+        let url = '@Url.Action("Delete", "Loan", new { id = "id" })';
+        return url.replace("id", id);
+    }
+</script>

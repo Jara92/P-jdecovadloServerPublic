@@ -68,5 +68,10 @@ public class MappingProfile : Profile
 
         CreateMap<Areas.Admin.Requests.ItemCategoryRequest, ItemCategory>();
         CreateMap<ItemCategory, Areas.Admin.Requests.ItemCategoryRequest>();
+
+        CreateMap<Areas.Admin.Requests.LoanRequest, Loan>();
+        CreateMap<Loan, Areas.Admin.Requests.LoanRequest>();
+
+        CreateMap<Loan, Areas.Admin.Responses.LoanResponse>();
     }
 }

@@ -290,6 +290,7 @@ builder.Services.AddScoped<ProfileFacade>();
 // Admin facades
 builder.Services.AddScoped<PujcovadloServer.Areas.Admin.Business.Facades.ItemFacade>();
 builder.Services.AddScoped<PujcovadloServer.Areas.Admin.Business.Facades.ItemCategoryFacade>();
+builder.Services.AddScoped<PujcovadloServer.Areas.Admin.Business.Facades.LoanFacade>();
 
 // Filters
 builder.Services.AddScoped<ExceptionFilter>();

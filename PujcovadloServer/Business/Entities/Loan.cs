@@ -25,6 +25,8 @@ public class Loan : BaseEntity
 
     public virtual ApplicationUser Tenant { get; set; } = default!;
 
+    public int ItemId { get; set; }
+
     public virtual Item Item { get; set; } = default!;
 
     public int? PickupProtocolId { get; set; }

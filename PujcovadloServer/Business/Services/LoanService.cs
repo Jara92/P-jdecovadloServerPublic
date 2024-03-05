@@ -1,8 +1,10 @@
 using PujcovadloServer.Authentication;
 using PujcovadloServer.Business.Entities;
+using PujcovadloServer.Business.Enums;
 using PujcovadloServer.Business.Factories.State;
 using PujcovadloServer.Business.Filters;
 using PujcovadloServer.Business.Interfaces;
+using PujcovadloServer.Business.Objects;
 using PujcovadloServer.Business.States.Loan;
 using PujcovadloServer.Lib;
 
@@ -42,5 +44,20 @@ public class LoanService : ACrudService<Loan, ILoanRepository, LoanFilter>
     public virtual async Task<PaginatedList<Loan>> GetLoansByUserId(string userId, LoanFilter filter)
     {
         return await _repository.GetAllByUserId(userId, filter);
+    }
+
+    public Task<List<EntityOption>> GetLoanStatusOptions()
+    {
+        var statuses = new List<EntityOption>();
+        foreach (var i in Enum.GetValues(typeof(LoanStatus)))
+        {
+            statuses.Add(new EntityOption()
+            {
+                Id = (int)i,
+                Name = i.ToString(),
+            });
+        }
+
+        return Task.FromResult(statuses);
     }
 }

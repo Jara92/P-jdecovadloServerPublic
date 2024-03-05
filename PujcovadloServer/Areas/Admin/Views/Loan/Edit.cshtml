@@ -1,0 +1,133 @@
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model PujcovadloServer.Areas.Admin.Requests.LoanRequest
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = Model.Id == null ? Localizer["Create new loan"] : Localizer["Edit loan"].Value + ": " + Model.Id;
+}
+
+@section Toolbar{
+
+}
+
+<form asp-action="Edit" asp-controller="Loan" id="loan-form">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-6">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="form-group mb-3">
+                    <ejs-dropdownlist id="dlStatus" dataSource="@ViewBag.Statuses" placeholder="@Localizer["Status"].Value"
+                                      popupHeight="220px" ejs-for="Status" floatLabelType="Always" allowFiltering="true">
+                        <e-dropdownlist-fields value="Id" text="Name"></e-dropdownlist-fields>
+                    </ejs-dropdownlist>
+                    <span asp-validation-for="Status" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <ejs-dropdownlist id="dlItemId" placeholder="@Localizer["Item"].Value"
+                                      popupHeight="220px" ejs-for="ItemId" floatLabelType="Always"
+                                      allowFiltering="true" filterType="Contains">
+                        <e-data-manager adaptor="UrlAdaptor" url="@Url.Action("IndexFilter", "Item")" crossDomain="false"></e-data-manager>
+                        <e-dropdownlist-fields value="Id" text="Name"></e-dropdownlist-fields>
+                    </ejs-dropdownlist>
+                    <span asp-validation-for="ItemId" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <ejs-dropdownlist id="dlTenantId" dataSource="@ViewBag.Users" placeholder="@Localizer["Tenant"].Value"
+                                      popupHeight="220px" ejs-for="TenantId" floatLabelType="Always"
+                                      allowFiltering="true" filterType="Contains">
+                        @*TODO data-manger*@
+                        <e-dropdownlist-fields value="Id" text="Name"></e-dropdownlist-fields>
+                    </ejs-dropdownlist>
+                    <span asp-validation-for="TenantId" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <ejs-numerictextbox id="pricePerDay" ejs-for="PricePerDay" step="1" min="0"
+                                        format="###.## Kč"
+                                        floatLabelType="Always"
+                                        placeholder="@Localizer["Price per day"].Value">
+                    </ejs-numerictextbox>
+                    <span asp-validation-for="PricePerDay" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <ejs-numerictextbox id="refundableDeposit" ejs-for="RefundableDeposit" step="1" min="0"
+                                        format="###.## Kč"
+                                        floatLabelType="Always"
+                                        placeholder="@Localizer["Refundable deposit"].Value">
+                    </ejs-numerictextbox>
+                    <span asp-validation-for="RefundableDeposit" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <ejs-numerictextbox id="expectedPrice" ejs-for="ExpectedPrice" step="1" min="1"
+                                        format="###.## Kč"
+                                        floatLabelType="Always"
+                                        placeholder="@Localizer["Expected price"].Value">
+                    </ejs-numerictextbox>
+                    <small>@Localizer["Expected price is based on duration [days] and price per day."]</small>
+                    <span asp-validation-for="ExpectedPrice" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="form-group mb-3">
+                    <ejs-datetimepicker id="from" ejs-for="From" placeholder="@Localizer["From"].Value"
+                                        format="d.M.yyyy hh:mm" floatLabelType="Always">
+                    </ejs-datetimepicker>
+                    <span asp-validation-for="From" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <ejs-datetimepicker id="to" ejs-for="To" placeholder="@Localizer["To"].Value"
+                                        format="d.M.yyyy hh:mm" floatLabelType="Always">
+                    </ejs-datetimepicker>
+                    <span asp-validation-for="To" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <ejs-numerictextbox id="days" ejs-for="Days" step="1" min="0"
+                                        format="###.## Days"
+                                        floatLabelType="Always"
+                                        placeholder="@Localizer["Duration [days]"].Value">
+                    </ejs-numerictextbox>
+                    <span asp-validation-for="Days" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <ejs-textbox ejs-for="TenantNote" id="tenantNote" placeholder="@Localizer["Tenant note"].Value"
+                                 floatLabelType="Always" multiline="true">
+                    </ejs-textbox>
+                    <span asp-validation-for="TenantNote" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<div class="container-fluid">
+    <div class="btn-toolbar mb-md-4 mb-sm-2">
+        <ejs-button id="save" cssClass="e-primary me-2" iconCss="bi bi-save" content="@Localizer["Save changes"].Value"
+                    isPrimary="true" form="item-form">
+        </ejs-button>
+
+        <ejs-button id="back" cssClass="e-link me-2" iconCss="bi bi-x" content="@Localizer["Cancel"].Value"></ejs-button>
+
+        <script>
+            document.getElementById('back').onclick = function () {
+                window.location.href='@Url.Action("Index", "Loan")';
+            };
+            
+            document.getElementById('save').onclick = function () {
+                document.getElementById('loan-form').submit();
+            };
+        </script>
+    </div>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}
