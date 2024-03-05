@@ -72,8 +72,10 @@
         <div class="app-content">
             @if (IsSectionDefined("Toolbar"))
             {
-                <div class="btn-toolbar mb-md-4 mb-sm-2">
-                    @RenderSection("Toolbar", required: false)
+                <div class="container-fluid">
+                    <div class="btn-toolbar mb-md-4 mb-sm-2">
+                        @RenderSection("Toolbar", required: false)
+                    </div>
                 </div>
             }
 

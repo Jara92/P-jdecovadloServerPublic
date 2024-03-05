@@ -9,16 +9,21 @@
 }
 
 @section Toolbar{
-    <div class="btn-group me-2">
-        <a asp-action="Index" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i>
-            @GlobalLocalizer["Back"]
-        </a>
-    </div>
+    <ejs-button id="back" cssClass="e-secondary e-flat me-2" iconCss="bi bi-arrow-left-square-fill" content="@Localizer["Back"].Value"></ejs-button>
 
-    <div class="btn-group me-2">
-        <button type="submit" form="item-form" class="btn btn-primary">@GlobalLocalizer["Save changes"]</button>
-    </div>
+    <ejs-button id="save" cssClass="e-primary me-2" iconCss="bi bi-save" content="@Localizer["Save changes"].Value"
+                isPrimary="true" form="item-form">
+    </ejs-button>
+
+    <script>
+        document.getElementById('back').onclick = function () {
+            window.location.href='@Url.Action("Index", "Item")';
+        };
+        
+        document.getElementById('save').onclick = function () {
+            document.getElementById('item-form').submit();
+        };
+    </script>
 }
 
 <form asp-action="Edit" id="item-form">
@@ -52,7 +57,8 @@
 
                                 <div class="form-group mb-3">
                                     <ejs-dropdownlist id="dlOwnerId" dataSource="@ViewBag.Users" placeholder="@Localizer["Owner"].Value"
-                                                      popupHeight="220px" ejs-for="OwnerId" floatLabelType="Always">
+                                                      popupHeight="220px" ejs-for="OwnerId" floatLabelType="Always"
+                                                      allowFiltering="true" filterType="Contains">
                                         <e-dropdownlist-fields value="Id" text="Name"></e-dropdownlist-fields>
                                     </ejs-dropdownlist>
                                     <span asp-validation-for="OwnerId" class="text-danger"></span>
