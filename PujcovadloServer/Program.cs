@@ -65,10 +65,16 @@ builder.Services.AddOpenApiDocument(options =>
 });
 
 // Use controllers
-builder.Services.AddControllers() /*.AddJsonOptions(options =>
-{
-    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
-})*/;
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        // Keep first letter of properties as uppercase
+        options.JsonSerializerOptions.PropertyNamingPolicy = null;
+    })
+    /*.AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+    })*/;
 
 // Add support for razor pages
 builder.Services.AddRazorPages();

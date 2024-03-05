@@ -38,17 +38,17 @@
 </ejs-grid>
 
 <script id="itemNameTemplate" type="text/x-template">
-    <span class="badge bg-secondary">${name}</span>
+    <span class="badge bg-secondary">${Name}</span>
 </script>
 
 <script id="actionsTemplate" type="text/x-template">
     <div class="d-flex flex-row justify-content-start">
-        <a class="btn btn-sm no-a-decoration me-1" href="${editCategoryLink(id)}">
+        <a class="btn btn-sm no-a-decoration me-1" href="${editCategoryLink(Id)}">
             <i class="bi bi-pen"></i>
         </a>
         
-        <form action="${deleteCategoryLink(id)}" method="post">
-                <input type="hidden" name="id" value="${id}"/>
+        <form action="${deleteCategoryLink(Id)}" method="post">
+                <input type="hidden" name="id" value="${Id}"/>
             
                 <!-- Include the AntiForgeryToken -->
                 @Html.AntiForgeryToken()
