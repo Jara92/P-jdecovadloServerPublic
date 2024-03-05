@@ -48,6 +48,7 @@
         <Folder Include="Areas\Admin\Resources\"/>
         <Folder Include="Areas\Admin\wwwroot\assets\"/>
       <Folder Include="Migrations\" />
+        <Folder Include="Resources\"/>
     </ItemGroup>
 
     <ItemGroup>
@@ -74,10 +75,6 @@
             <Generator>ResXFileCodeGenerator</Generator>
             <LastGenOutput>Login.cs-CZ.Designer.cs</LastGenOutput>
         </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Authentication\LoginRequest.cs-CZ.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>LoginRequest.cs-CZ.Designer.cs</LastGenOutput>
-        </EmbeddedResource>
         <EmbeddedResource Update="Resources\Areas\Admin\Views\Shared\_SidebarMenu.cs-CZ.resx">
             <Generator>ResXFileCodeGenerator</Generator>
             <LastGenOutput>_SidebarMenu.cs-CZ.Designer.cs</LastGenOutput>
@@ -98,10 +95,6 @@
             <Generator>ResXFileCodeGenerator</Generator>
             <LastGenOutput>Global.cs-CZ.Designer.cs</LastGenOutput>
         </EmbeddedResource>
-        <EmbeddedResource Update="Resources\GlobalResources.cs-CZ.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>GlobalResources.cs-CZ.Designer.cs</LastGenOutput>
-        </EmbeddedResource>
     </ItemGroup>
 
     <ItemGroup>
@@ -114,11 +107,6 @@
             <DesignTime>True</DesignTime>
             <AutoGen>True</AutoGen>
             <DependentUpon>Login.cs-CZ.resx</DependentUpon>
-        </Compile>
-        <Compile Update="Resources\Authentication\LoginRequest.cs-CZ.Designer.cs">
-            <DesignTime>True</DesignTime>
-            <AutoGen>True</AutoGen>
-            <DependentUpon>LoginRequest.cs-CZ.resx</DependentUpon>
         </Compile>
         <Compile Update="Resources\Areas\Admin\Views\Shared\_SidebarMenu.cs-CZ.Designer.cs">
             <DesignTime>True</DesignTime>
@@ -144,11 +132,6 @@
             <DesignTime>True</DesignTime>
             <AutoGen>True</AutoGen>
             <DependentUpon>Global.cs-CZ.resx</DependentUpon>
-        </Compile>
-        <Compile Update="Resources\GlobalResources.cs-CZ.Designer.cs">
-            <DesignTime>True</DesignTime>
-            <AutoGen>True</AutoGen>
-            <DependentUpon>GlobalResources.cs-CZ.resx</DependentUpon>
         </Compile>
     </ItemGroup>
 
