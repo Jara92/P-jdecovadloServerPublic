@@ -121,22 +121,23 @@ public class ItemTagController : Controller
         var tag = await _tagFacade.Get(id);
 
         // Check if the model is valid
-        if (!ModelState.IsValid)
+        if (ModelState.IsValid)
         {
-            _flasher.Flash(FlashType.Error, _localizer["Tag cannot be updated because of errors."]);
+            // Update the tag
+            await _tagFacade.Update(tag, request);
 
-            await PrepareViewData();
-            return View("CreateOrEdit", request);
+            // Display a success message
+            _flasher.Flash(FlashType.Success, _localizer["Tag has been updated."]);
+
+            // redirect to the edit page
+            return RedirectToAction(nameof(Edit), new { id = tag.Id });
         }
 
-        // Update the tag
-        await _tagFacade.Update(tag, request);
+        // Display errors
+        _flasher.Flash(FlashType.Error, _localizer["Tag cannot be updated because of errors."]);
 
-        // Display a success message
-        _flasher.Flash(FlashType.Success, _localizer["Tag has been updated."]);
-
-        // redirect to the edit page
-        return RedirectToAction(nameof(Edit), new { id = tag.Id });
+        await PrepareViewData();
+        return View("CreateOrEdit", request);
     }
 
     [HttpPost("delete/{id}")]

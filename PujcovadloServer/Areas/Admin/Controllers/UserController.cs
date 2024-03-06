@@ -121,22 +121,23 @@ public class UserController : Controller
         var user = await _userFacade.Get(id);
 
         // Check if the model is valid
-        if (!ModelState.IsValid)
+        if (ModelState.IsValid)
         {
-            _flasher.Flash(FlashType.Error, _localizer["User cannot be updated because of errors."]);
+            // Update the user
+            await _userFacade.Update(user, request);
 
-            await PrepareViewData();
-            return View("CreateOrEdit", request);
+            // Display a success message
+            _flasher.Flash(FlashType.Success, _localizer["User has been updated."]);
+
+            // redirect to the edit page
+            return RedirectToAction(nameof(Edit), new { id = user.Id });
         }
 
-        // Update the user
-        await _userFacade.Update(user, request);
+        // Display errors
+        _flasher.Flash(FlashType.Error, _localizer["User cannot be updated because of errors."]);
 
-        // Display a success message
-        _flasher.Flash(FlashType.Success, _localizer["User has been updated."]);
-
-        // redirect to the edit page
-        return RedirectToAction(nameof(Edit), new { id = user.Id });
+        await PrepareViewData();
+        return View("CreateOrEdit", request);
     }
 
 

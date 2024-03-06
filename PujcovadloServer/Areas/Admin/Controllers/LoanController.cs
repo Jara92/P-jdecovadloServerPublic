@@ -98,11 +98,12 @@ public class LoanController : Controller
             await _loanFacade.Update(loan, request);
 
             _flasher.Flash(FlashType.Success, _localizer["Loan has been updated."]);
+
+            return RedirectToAction(nameof(Edit), new { id });
         }
-        else
-        {
-            _flasher.Flash(FlashType.Error, _localizer["Loan cannot be updated because of errors."]);
-        }
+
+        // Display errors
+        _flasher.Flash(FlashType.Error, _localizer["Loan cannot be updated because of errors."]);
 
         await PrepareViewData();
 

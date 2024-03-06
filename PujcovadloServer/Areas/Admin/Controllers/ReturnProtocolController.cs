@@ -64,22 +64,23 @@ public class ReturnProtocolController : Controller
         var protocol = await _protocolFacade.Get(id);
 
         // Check if the model is valid
-        if (!ModelState.IsValid)
+        if (ModelState.IsValid)
         {
-            _flasher.Flash(FlashType.Error, _localizer["Return protocol cannot be updated because of errors."]);
+            // Update the protocol
+            await _protocolFacade.Update(protocol, request);
 
-            await PrepareView(protocol);
+            // Display a success message
+            _flasher.Flash(FlashType.Success, _localizer["Return protocol has been updated."]);
 
-            return View("CreateOrEdit", request);
+            // redirect to the edit page
+            return RedirectToAction(nameof(Edit), new { id = protocol.Id });
         }
 
-        // Update the protocol
-        await _protocolFacade.Update(protocol, request);
+        // Display errors
+        _flasher.Flash(FlashType.Error, _localizer["Return protocol cannot be updated because of errors."]);
 
-        // Display a success message
-        _flasher.Flash(FlashType.Success, _localizer["Return protocol has been updated."]);
+        await PrepareView(protocol);
 
-        // redirect to the edit page
-        return RedirectToAction(nameof(Edit), new { id = protocol.Id });
+        return View("CreateOrEdit", request);
     }
 }

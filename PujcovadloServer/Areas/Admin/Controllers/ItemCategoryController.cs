@@ -121,22 +121,23 @@ public class ItemCategoryController : Controller
         var category = await _categoryFacade.Get(id);
 
         // Check if the model is valid
-        if (!ModelState.IsValid)
+        if (ModelState.IsValid)
         {
-            _flasher.Flash(FlashType.Error, _localizer["Category cannot be updated because of errors."]);
+            // Update the category
+            await _categoryFacade.Update(category, request);
 
-            await PrepareViewData();
-            return View("CreateOrEdit", request);
+            // Display a success message
+            _flasher.Flash(FlashType.Success, _localizer["Category has been updated."]);
+
+            // redirect to the edit page
+            return RedirectToAction(nameof(Edit), new { id = category.Id });
         }
 
-        // Update the category
-        await _categoryFacade.Update(category, request);
+        // display an error message
+        _flasher.Flash(FlashType.Error, _localizer["Category cannot be updated because of errors."]);
 
-        // Display a success message
-        _flasher.Flash(FlashType.Success, _localizer["Category has been updated."]);
-
-        // redirect to the edit page
-        return RedirectToAction(nameof(Edit), new { id = category.Id });
+        await PrepareViewData();
+        return View("CreateOrEdit", request);
     }
 
     [HttpPost("delete/{id}")]

@@ -102,11 +102,12 @@ public class ItemController : Controller
             await _itemFacade.UpdateItem(item, request);
 
             _flasher.Flash(FlashType.Success, _localizer["Item has been updated."]);
+
+            return RedirectToAction(nameof(Edit), new { id = item.Id });
         }
-        else
-        {
-            _flasher.Flash(FlashType.Error, _localizer["Item cannot be updated because of errors."]);
-        }
+
+        // if there are errors, show the form again
+        _flasher.Flash(FlashType.Error, _localizer["Item cannot be updated because of errors."]);
 
         await PrepareViewData();
 
