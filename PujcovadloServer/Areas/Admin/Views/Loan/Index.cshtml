@@ -70,41 +70,40 @@
 </script>
 
 @section Scripts{
-    <script>
-    
-    function gridDataBound(args){
-        reloadTooltips();
-    }
-    
-    function gridActionComplete(args) {  
-        reloadTooltips();
-    }
+    <script>    
+        function gridDataBound(args){
+            reloadTooltips();
+        }
+        
+        function gridActionComplete(args) {  
+            reloadTooltips();
+        }
     </script>
 
     <script>
-    function itemEditLink(id){
-        let url = '@Url.Action("Edit", "Item", new { id = "id" })';
-        return url.replace("id", id);
-    }
+        function itemEditLink(id){
+            let url = '@Url.Action("Edit", "Item", new { id = "id" })';
+            return url.replace("id", id);
+        }
+        
+        function pickupProtocolEditLink(id){
+            let url = '@Url.Action("Edit", "PickupProtocol", new { id = "id" })';
+            return url.replace("id", id);
+        }
+        
+        function returnProtocolEditLink(id){
+            let url = '@Url.Action("Edit", "ReturnProtocol", new { id = "id" })';
+            return url.replace("id", id);
+        }
     
-    function pickupProtocolEditLink(id){
-        let url = '@Url.Action("Edit", "PickupProtocol", new { id = "id" })';
-        return url.replace("id", id);
-    }
-    
-    function returnProtocolEditLink(id){
-        let url = '@Url.Action("Edit", "ReturnProtocol", new { id = "id" })';
-        return url.replace("id", id);
-    }
-
-    function editLink(id) {
-        let url = '@Url.Action("Edit", "Loan", new { id = "id" })';
-        return url.replace("id", id);
-    }
-    
-    function deleteLink(id){
-        let url = '@Url.Action("Delete", "Loan", new { id = "id" })';
-        return url.replace("id", id);
-    }
-</script>
+        function editLink(id) {
+            let url = '@Url.Action("Edit", "Loan", new { id = "id" })';
+            return url.replace("id", id);
+        }
+        
+        function deleteLink(id){
+            let url = '@Url.Action("Delete", "Loan", new { id = "id" })';
+            return url.replace("id", id);
+        }
+    </script>
 }

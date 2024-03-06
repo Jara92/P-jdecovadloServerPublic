@@ -19,7 +19,8 @@
     </script>
 }
 
-<ejs-grid id="Grid" allowPaging="true" allowSorting="true" allowFiltering="true" toolbar="@(new List<string>() { "Search" })">
+<ejs-grid id="Grid" allowPaging="true" allowSorting="true" allowFiltering="true" toolbar="@(new List<string>() { "Search" })"
+          actionComplete="gridActionComplete" dataBound="gridDataBound">
     <e-data-manager url="@Url.Action("IndexFilter", "ItemCategory")" adaptor="UrlAdaptor">
     </e-data-manager>
     <e-grid-pagesettings pageSize="20" pageSizes="new int[] { 2, 5, 10, 20, 50, 100 }"></e-grid-pagesettings>
@@ -43,7 +44,8 @@
 
 <script id="actionsTemplate" type="text/x-template">
     <div class="d-flex flex-row justify-content-start">
-        <a class="btn btn-sm no-a-decoration me-1" href="${editCategoryLink(Id)}">
+        <a class="btn btn-sm no-a-decoration me-1" href="${editCategoryLink(Id)}"
+            data-bs-toggle="tooltip" data-bs-placement="top" title="@Localizer["Edit category"].Value">
             <i class="bi bi-pen"></i>
         </a>
         
@@ -54,21 +56,34 @@
                 @Html.AntiForgeryToken()
             
             <button type="submit" class="btn btn-sm btn-danger" 
-                onclick="return confirm(&quot; @Localizer["Are you sure you want to delete this record?"].Value &quot;)">
+                onclick="return confirm(&quot; @Localizer["Are you sure you want to delete this record?"].Value &quot;)"
+                    data-bs-toggle="tooltip" data-bs-placement="top" title="@Localizer["Delete category"].Value">
                 <i class="bi bi-trash"></i>
             </button>
         </form>
     </div>
 </script>
 
-<script>
-    function editCategoryLink(id) {
-        let url = '@Url.Action("Edit", "ItemCategory", new { id = "id" })';
-        return url.replace("id", id);
+@section Scripts{
+    <script>
+    function gridDataBound(args){
+        reloadTooltips();
     }
     
-    function deleteCategoryLink(id){
-        let url = '@Url.Action("Delete", "ItemCategory", new { id = "id" })';
-        return url.replace("id", id);
+    function gridActionComplete(args) {  
+        reloadTooltips();
     }
-</script>
+    </script>
+
+    <script>
+        function editCategoryLink(id) {
+            let url = '@Url.Action("Edit", "ItemCategory", new { id = "id" })';
+            return url.replace("id", id);
+        }
+        
+        function deleteCategoryLink(id){
+            let url = '@Url.Action("Delete", "ItemCategory", new { id = "id" })';
+            return url.replace("id", id);
+        }
+    </script>
+}

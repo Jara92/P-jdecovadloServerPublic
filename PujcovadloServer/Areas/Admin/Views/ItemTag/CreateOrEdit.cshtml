@@ -8,28 +8,10 @@
     string action = Model.Id == null ? "Create" : "Edit";
 }
 
-@section Toolbar{
-    <ejs-button id="back" cssClass="e-secondary e-flat me-2" iconCss="bi bi-arrow-left-square-fill" content="@Localizer["Back"].Value"></ejs-button>
-
-    <ejs-button id="save" cssClass="e-primary me-2" iconCss="bi bi-save" content="@Localizer["Save changes"].Value"
-                isPrimary="true" form="item-form">
-    </ejs-button>
-
-    <script>
-        document.getElementById('back').onclick = function () {
-            window.location.href='@Url.Action("Index", "ItemTag")';
-        };
-        
-        document.getElementById('save').onclick = function () {
-            document.getElementById('item-tag-form').submit();
-        };
-    </script>
-}
-
 <form asp-action="@action" asp-controller="ItemTag" id="item-tag-form">
     <div class="container-fluid">
         <div class="row">
-            <div class="col-6 m-2">
+            <div class="col-md-6">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
                 <div class="form-group mb-3">
@@ -48,6 +30,26 @@
         </div>
     </div>
 </form>
+
+<div class="container-fluid">
+    <div class="btn-toolbar form-toolbar mb-md-4 mb-sm-2">
+        <ejs-button id="save" cssClass="e-primary me-2" iconCss="bi bi-save" content="@Localizer["Save changes"].Value"
+                    isPrimary="true">
+        </ejs-button>
+
+        <ejs-button id="back" cssClass="e-link me-2" iconCss="bi bi-x" content="@Localizer["Cancel"].Value"></ejs-button>
+
+        <script>
+            document.getElementById('back').onclick = function () {
+                window.location.href='@Url.Action("Index", "ItemTag")';
+            };
+            
+            document.getElementById('save').onclick = function () {
+                document.getElementById('item-tag-form').submit();
+            };
+        </script>
+    </div>
+</div>
 
 @section Scripts {
     @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }

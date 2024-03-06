@@ -6,10 +6,6 @@
     ViewData["Title"] = Model.Id == null ? Localizer["Create new loan"] : Localizer["Edit loan"].Value + ": " + Model.Id;
 }
 
-@section Toolbar{
-
-}
-
 <form asp-action="Edit" asp-controller="Loan" id="loan-form">
     <div class="container-fluid">
         <div class="row">
@@ -116,9 +112,9 @@
 </form>
 
 <div class="container-fluid">
-    <div class="btn-toolbar mb-md-4 mb-sm-2">
+    <div class="btn-toolbar form-toolbar mb-md-4 mb-sm-2">
         <ejs-button id="save" cssClass="e-primary me-2" iconCss="bi bi-save" content="@Localizer["Save changes"].Value"
-                    isPrimary="true" form="item-form">
+                    isPrimary="true">
         </ejs-button>
 
         <ejs-button id="back" cssClass="e-link me-2" iconCss="bi bi-x" content="@Localizer["Cancel"].Value"></ejs-button>
