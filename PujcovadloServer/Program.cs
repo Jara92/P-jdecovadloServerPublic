@@ -293,6 +293,7 @@ builder.Services.AddScoped<PujcovadloServer.Areas.Admin.Business.Facades.ItemCat
 builder.Services.AddScoped<PujcovadloServer.Areas.Admin.Business.Facades.ItemTagFacade>();
 builder.Services.AddScoped<PujcovadloServer.Areas.Admin.Business.Facades.LoanFacade>();
 builder.Services.AddScoped<PujcovadloServer.Areas.Admin.Business.Facades.PickupProtocolFacade>();
+builder.Services.AddScoped<PujcovadloServer.Areas.Admin.Business.Facades.ReturnProtocolFacade>();
 
 // Filters
 builder.Services.AddScoped<ExceptionFilter>();

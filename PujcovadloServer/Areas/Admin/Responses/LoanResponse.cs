@@ -35,6 +35,8 @@ public class LoanResponse
 
     public int? PickupProtocolId { get; set; }
 
+    public int? ReturnProtocolId { get; set; }
+
     public DateTime CreatedAt { get; set; }
 
     public DateTime? UpdatedAt { get; set; }

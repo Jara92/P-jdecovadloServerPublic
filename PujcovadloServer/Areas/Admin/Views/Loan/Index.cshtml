@@ -59,6 +59,13 @@
                         <i class="bi bi-cash"></i>
             </a>
         ${/if}
+        
+        ${if(ReturnProtocolId != null)}
+            <a class="btn btn-sm no-a-decoration me-1" href="${returnProtocolEditLink(ReturnProtocolId)}"
+                data-bs-toggle="tooltip" data-bs-placement="top" title="@Localizer["Edit return protocol"].Value">
+                        <i class="bi bi-arrow-return-left"></i>
+            </a>
+        ${/if}
     </div>
 </script>
 
@@ -82,6 +89,11 @@
     
     function pickupProtocolEditLink(id){
         let url = '@Url.Action("Edit", "PickupProtocol", new { id = "id" })';
+        return url.replace("id", id);
+    }
+    
+    function returnProtocolEditLink(id){
+        let url = '@Url.Action("Edit", "ReturnProtocol", new { id = "id" })';
         return url.replace("id", id);
     }
 

@@ -79,5 +79,9 @@ public class MappingProfile : Profile
         CreateMap<Areas.Admin.Requests.PickupProtocolRequest, PickupProtocol>();
         CreateMap<PickupProtocol, Areas.Admin.Requests.PickupProtocolRequest>();
         CreateMap<PickupProtocol, Areas.Admin.Responses.PickupProtocolResponse>();
+
+        CreateMap<Areas.Admin.Requests.ReturnProtocolRequest, ReturnProtocol>();
+        CreateMap<ReturnProtocol, Areas.Admin.Requests.ReturnProtocolRequest>();
+        CreateMap<ReturnProtocol, Areas.Admin.Responses.ReturnProtocolResponse>();
     }
 }
