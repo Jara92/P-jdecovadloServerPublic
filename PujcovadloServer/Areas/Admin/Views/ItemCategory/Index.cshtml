@@ -31,7 +31,7 @@
         </e-grid-column>
         <e-grid-column field="Name" headerText="@Localizer["Name"].Value" width="150" template="#itemNameTemplate"></e-grid-column>
         <e-grid-column field="Alias" headerText="@Localizer["Alias"].Value" width="130" textAlign="Center"></e-grid-column>
-        <e-grid-column field="ParentId" headerText="@Localizer["Parent"].Value" foreignKeyField="Id"
+        <e-grid-column field="ParentId" headerText="@Localizer["Parent"].Value" foreignKeyField="Id" template="#parentTemplate"
                        foreignKeyValue="Name" dataSource="@ViewBag.Categories" width="130" textAlign="Center">
         </e-grid-column>
         <e-grid-column headerText="@Localizer["Actions"].Value" width="130" template="#actionsTemplate" textAlign="Center"></e-grid-column>
@@ -40,6 +40,14 @@
 
 <script id="itemNameTemplate" type="text/x-template">
     <span class="badge bg-secondary">${Name}</span>
+</script>
+
+<script id="parentTemplate" type="text/x-template">
+    ${if(ParentId != null)}
+        <a href="${editCategoryLink(ParentId)}">${(data.foreignKeyData.Name)}</a>
+    ${else}
+    
+    ${/if}
 </script>
 
 <script id="actionsTemplate" type="text/x-template">

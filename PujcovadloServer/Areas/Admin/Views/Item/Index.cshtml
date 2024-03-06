@@ -35,7 +35,7 @@
                        foreignKeyValue="Name" dataSource="@ViewBag.Statuses" width="130" textAlign="Center">
         </e-grid-column>
         <e-grid-column field="OwnerId" headerText="@Localizer["Item owner"].Value" foreignKeyField="Id"
-                       foreignKeyValue="Name" dataSource="@ViewBag.Users" width="130" textAlign="Center">
+                       foreignKeyValue="Name" dataSource="@ViewBag.Users" width="130" textAlign="Center" template="#ownerTemplate">
         </e-grid-column>
         <e-grid-column field="PricePerDay" headerText="@Localizer["Price per day"].Value" type="number" width="100" textAlign="Center"></e-grid-column>
         <e-grid-column field="SellingPrice" headerText="@Localizer["Selling price"].Value" type="number" width="100" textAlign="Center"></e-grid-column>
@@ -46,7 +46,11 @@
 </ejs-grid>
 
 <script id="itemNameTemplate" type="text/x-template">
-    <span class="badge bg-secondary">${Name}</span>
+     <span class="badge bg-secondary">${Name}</span>
+</script>
+
+<script id="ownerTemplate" type="text/x-template">
+    <a href="${editUserLink(OwnerId)}">${(data.foreignKeyData.Name)}</a>
 </script>
 
 <script id="actionsTemplate" type="text/x-template">
@@ -90,6 +94,11 @@
         
         function deleteItemLink(id){
             let url = '@Url.Action("Delete", "Item", new { id = "id" })';
+            return url.replace("id", id);
+        }
+        
+        function editUserLink(id){
+            let url = '@Url.Action("Edit", "User", new { id = "id" })';
             return url.replace("id", id);
         }
     </script>
