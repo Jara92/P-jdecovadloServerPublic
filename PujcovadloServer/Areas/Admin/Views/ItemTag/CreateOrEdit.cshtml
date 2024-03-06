@@ -1,0 +1,54 @@
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model PujcovadloServer.Areas.Admin.Requests.ItemTagRequest
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = Model.Id == null ? Localizer["Create new tag"] : Localizer["Edit category"].Value + ": " + Model.Name;
+
+    string action = Model.Id == null ? "Create" : "Edit";
+}
+
+@section Toolbar{
+    <ejs-button id="back" cssClass="e-secondary e-flat me-2" iconCss="bi bi-arrow-left-square-fill" content="@Localizer["Back"].Value"></ejs-button>
+
+    <ejs-button id="save" cssClass="e-primary me-2" iconCss="bi bi-save" content="@Localizer["Save changes"].Value"
+                isPrimary="true" form="item-form">
+    </ejs-button>
+
+    <script>
+        document.getElementById('back').onclick = function () {
+            window.location.href='@Url.Action("Index", "ItemTag")';
+        };
+        
+        document.getElementById('save').onclick = function () {
+            document.getElementById('item-tag-form').submit();
+        };
+    </script>
+}
+
+<form asp-action="@action" asp-controller="ItemTag" id="item-tag-form">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-6 m-2">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="form-group mb-3">
+                    <ejs-textbox ejs-for="Name" id="name" placeholder="@Localizer["Name"].Value"
+                                 floatLabelType="Always">
+                    </ejs-textbox>
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="isApproved" class="form-label col-form-label-sm">@Localizer["Is approved"]</label><br/>
+                    <ejs-switch id="isApproved" ejs-for="IsApproved" onLabel="@Localizer["Yes"].Value" offLabel="@Localizer["No"].Value"></ejs-switch>
+                    <span asp-validation-for="IsApproved" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

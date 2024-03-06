@@ -65,9 +65,12 @@ public class MappingProfile : Profile
 
         CreateMap<ItemCategory, Areas.Admin.Responses.ItemCategoryResponse>()
             .ForMember(r => r.ParentName, opt => opt.MapFrom(c => (c.Parent == null) ? null : c.Parent.Name));
-
         CreateMap<Areas.Admin.Requests.ItemCategoryRequest, ItemCategory>();
         CreateMap<ItemCategory, Areas.Admin.Requests.ItemCategoryRequest>();
+
+        CreateMap<ItemTag, Areas.Admin.Responses.ItemTagResponse>();
+        CreateMap<Areas.Admin.Requests.ItemTagRequest, ItemTag>();
+        CreateMap<ItemTag, Areas.Admin.Requests.ItemTagRequest>();
 
         CreateMap<Areas.Admin.Requests.LoanRequest, Loan>();
         CreateMap<Loan, Areas.Admin.Requests.LoanRequest>();
