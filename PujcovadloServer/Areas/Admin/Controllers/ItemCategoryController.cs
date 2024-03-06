@@ -129,15 +129,6 @@ public class ItemCategoryController : Controller
             return View("CreateOrEdit", request);
         }
 
-        // Check if the parent category is set and if it exists
-        if (request.ParentId.HasValue && request.ParentId.Value == category.Id)
-        {
-            ModelState.AddModelError("ParentId", _localizer["Parent category cannot be the category itself"]);
-
-            await PrepareViewData();
-            return View("CreateOrEdit", request);
-        }
-
         // Update the category
         await _categoryFacade.Update(category, request);
 
