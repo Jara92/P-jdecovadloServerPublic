@@ -8,6 +8,8 @@ public interface ICrudRepository<T, G> : IPaginableRepository<T>
 
     public Task<T?> Get(int id);
 
+    public Task<bool> Exists(int id);
+
     public Task<T?> GetUntracked(int id);
 
     public Task Create(T entity);

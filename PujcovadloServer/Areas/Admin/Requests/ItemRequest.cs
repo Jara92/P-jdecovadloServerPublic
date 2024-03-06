@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using PujcovadloServer.Attributes;
 using PujcovadloServer.Business.Enums;
 
 namespace PujcovadloServer.Areas.Admin.Requests;
@@ -40,7 +41,9 @@ public class ItemRequest
 
     [DisplayName("Selling price")] public float? SellingPrice { get; set; }
 
-    [DisplayName("Categories")] public ICollection<int> Categories { get; } = new List<int>();
+    [ItemCategoryExists]
+    [DisplayName("Categories")]
+    public ICollection<int> Categories { get; } = new List<int>();
 
     [DisplayName("Tags")] public ICollection<int> Tags { get; } = new List<int>();
 

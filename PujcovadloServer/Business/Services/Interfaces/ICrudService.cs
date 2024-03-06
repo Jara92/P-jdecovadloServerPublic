@@ -25,6 +25,8 @@ public interface ICrudService<T, R, G> where T : BaseEntity where R : ICrudRepos
 
     public Task<T?> Get(int id, bool track = true);
 
+    public Task<bool> Exists(int id);
+
     public Task Create(T entity);
 
     public Task Update(T entity);

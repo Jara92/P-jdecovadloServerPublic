@@ -105,6 +105,11 @@ namespace PujcovadloServer.Data.Repositories
             return await _dbSet.FindAsync(id);
         }
 
+        public virtual Task<bool> Exists(int id)
+        {
+            return _dbSet.AnyAsync(e => e.Id == id);
+        }
+
         public virtual async Task<T?> GetUntracked(int id)
         {
             return await _dbSet.AsNoTracking().FirstOrDefaultAsync(e => e.Id == id);

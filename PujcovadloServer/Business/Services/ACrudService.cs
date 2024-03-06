@@ -55,6 +55,11 @@ public abstract class ACrudService<T, R, G> : ICrudService<T, R, G> where T : Ba
             return await _repository.GetUntracked(id);
     }
 
+    public virtual Task<bool> Exists(int id)
+    {
+        return _repository.Exists(id);
+    }
+
     public virtual async Task Create(T entity)
     {
         await _repository.Create(entity);
