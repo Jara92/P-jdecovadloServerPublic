@@ -83,5 +83,9 @@ public class MappingProfile : Profile
         CreateMap<Areas.Admin.Requests.ReturnProtocolRequest, ReturnProtocol>();
         CreateMap<ReturnProtocol, Areas.Admin.Requests.ReturnProtocolRequest>();
         CreateMap<ReturnProtocol, Areas.Admin.Responses.ReturnProtocolResponse>();
+
+        CreateMap<ApplicationUser, Areas.Admin.Responses.UserResponse>();
+        CreateMap<Areas.Admin.Requests.UserRequest, ApplicationUser>();
+        CreateMap<ApplicationUser, Areas.Admin.Requests.UserRequest>();
     }
 }

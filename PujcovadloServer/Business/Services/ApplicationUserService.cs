@@ -1,8 +1,11 @@
+using System.Collections;
 using PujcovadloServer.Authentication;
+using PujcovadloServer.Business.Enums;
 using PujcovadloServer.Business.Filters;
 using PujcovadloServer.Business.Interfaces;
 using PujcovadloServer.Business.Objects;
 using PujcovadloServer.Lib;
+using Syncfusion.EJ2.Base;
 
 namespace PujcovadloServer.Business.Services;
 
@@ -18,6 +21,21 @@ public class ApplicationUserService
     public virtual async Task<PaginatedList<ApplicationUser>> GetAll(ApplicationUserFilter filter)
     {
         return await _repository.GetAll(filter);
+    }
+
+    public Task<List<ApplicationUser>> GetAll(DataManagerRequest dm)
+    {
+        return _repository.GetAll(dm);
+    }
+
+    public Task<IEnumerable> GetAggregations(DataManagerRequest dm)
+    {
+        return _repository.GetAggregations(dm);
+    }
+
+    public Task<int> GetCount(DataManagerRequest dm)
+    {
+        return _repository.GetCount(dm);
     }
 
     public Task<ApplicationUser?> Get(string id)
@@ -49,5 +67,14 @@ public class ApplicationUserService
     public Task<IList<ApplicationUserOption>> GetAllAsOptions(ApplicationUserFilter filter)
     {
         return _repository.GetAllAsOptions(filter);
+    }
+
+    public dynamic GetRoleOptions()
+    {
+        return UserRoles.AllRoles.Select(r => new RoleOption
+        {
+            Id = r,
+            Name = r
+        });
     }
 }

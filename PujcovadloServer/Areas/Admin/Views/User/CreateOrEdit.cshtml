@@ -1,0 +1,91 @@
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model PujcovadloServer.Areas.Admin.Requests.UserRequest
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = Model.Id == null ? Localizer["Create new user"] : Localizer["Edit user"].Value + ": " + Model.Name;
+
+    string action = Model.Id == null ? "Create" : "Edit";
+}
+
+@section Toolbar{
+
+}
+
+<form asp-action="@action" asp-controller="User" id="user-form">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-6 m-2">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="form-group mb-3">
+                    <ejs-textbox ejs-for="FirstName" id="firstname" placeholder="@Localizer["First name"].Value"
+                                 floatLabelType="Always">
+                    </ejs-textbox>
+                    <span asp-validation-for="FirstName" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <ejs-textbox ejs-for="LastName" id="lastname" placeholder="@Localizer["Last name"].Value"
+                                 floatLabelType="Always">
+                    </ejs-textbox>
+                    <span asp-validation-for="LastName" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <ejs-textbox ejs-for="Username" id="username" placeholder="@Localizer["Username"].Value"
+                                 floatLabelType="Always">
+                    </ejs-textbox>
+                    <span asp-validation-for="Username" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <ejs-multiselect id="dlRoles" dataSource="@ViewBag.Roles" placeholder="@Localizer["Roles"].Value"
+                                     popupHeight="500px" ejs-for="Roles" floatLabelType="Always"
+                                     allowFiltering="true" ignoreAccent="true" filterType="Contains">
+                        <e-multiselect-fields value="Id" text="Name"></e-multiselect-fields>
+                    </ejs-multiselect>
+                    <span asp-validation-for="Roles" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <ejs-datetimepicker id="createdAt" ejs-for="CreatedAt" placeholder="@Localizer["Created at"].Value"
+                                        format="d.M.yyyy hh:mm" floatLabelType="Always">
+                    </ejs-datetimepicker>
+                    <span asp-validation-for="CreatedAt" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <ejs-datepicker id="dateOfBirth" ejs-for="DateOfBirth" placeholder="@Localizer["Date of birth"].Value"
+                                    format="d.M.yyyy" floatLabelType="Always">
+                    </ejs-datepicker>
+                    <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<div class="container-fluid">
+    <div class="btn-toolbar mb-md-4 mb-sm-2">
+        <ejs-button id="save" cssClass="e-primary me-2" iconCss="bi bi-save" content="@Localizer["Save changes"].Value"
+                    isPrimary="true" form="user-form">
+        </ejs-button>
+
+        <ejs-button id="back" cssClass="e-link me-2" iconCss="bi bi-x" content="@Localizer["Cancel"].Value"></ejs-button>
+
+        <script>
+            document.getElementById('back').onclick = function () {
+                window.location.href='@Url.Action("Index", "User")';
+            };
+            
+            document.getElementById('save').onclick = function () {
+                document.getElementById('user-form').submit();
+            };
+        </script>
+    </div>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

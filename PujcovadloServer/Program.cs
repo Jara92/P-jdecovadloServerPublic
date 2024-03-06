@@ -294,6 +294,7 @@ builder.Services.AddScoped<PujcovadloServer.Areas.Admin.Business.Facades.ItemTag
 builder.Services.AddScoped<PujcovadloServer.Areas.Admin.Business.Facades.LoanFacade>();
 builder.Services.AddScoped<PujcovadloServer.Areas.Admin.Business.Facades.PickupProtocolFacade>();
 builder.Services.AddScoped<PujcovadloServer.Areas.Admin.Business.Facades.ReturnProtocolFacade>();
+builder.Services.AddScoped<PujcovadloServer.Areas.Admin.Business.Facades.UserFacade>();
 
 // Filters
 builder.Services.AddScoped<ExceptionFilter>();

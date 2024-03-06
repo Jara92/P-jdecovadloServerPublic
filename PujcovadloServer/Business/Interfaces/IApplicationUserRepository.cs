@@ -5,7 +5,7 @@ using PujcovadloServer.Lib;
 
 namespace PujcovadloServer.Business.Interfaces;
 
-public interface IApplicationUserRepository
+public interface IApplicationUserRepository : IPaginableRepository<ApplicationUser>
 {
     public Task<PaginatedList<ApplicationUser>> GetAll(ApplicationUserFilter filter);
 

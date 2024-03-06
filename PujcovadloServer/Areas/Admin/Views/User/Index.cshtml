@@ -1,0 +1,93 @@
+@using Syncfusion.EJ2.Grids
+@using Syncfusion.EJ2
+@model PujcovadloServer.Areas.Admin.Responses.UserResponse
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = Localizer["Users"];
+}
+
+<ejs-grid id="Grid" allowPaging="true" allowSorting="true" allowFiltering="true" toolbar="@(new List<string>() { "Search" })"
+          actionComplete="gridActionComplete" dataBound="gridDataBound">
+    <e-data-manager url="@Url.Action("IndexFilter", "User")" adaptor="UrlAdaptor">
+    </e-data-manager>
+    <e-grid-pagesettings pageSize="20" pageSizes="new int[] { 2, 5, 10, 20, 50, 100 }"></e-grid-pagesettings>
+    <e-grid-filterSettings type="Excel"></e-grid-filterSettings>
+    <e-grid-columns>
+        <e-grid-column field="Id" headerText="@Localizer["Id"].Value" textAlign="Center" width="120"
+                       validationRules="@(new { required = true })" isPrimaryKey="true">
+        </e-grid-column>
+        <e-grid-column field="Name" headerText="@Localizer["Name"].Value" width="150" textAlign="Center"></e-grid-column>
+        <e-grid-column field="Username" headerText="@Localizer["Username"].Value" width="150" template="#userNameTemplate" textAlign="Center"></e-grid-column>
+        <e-grid-column field="CreatedAt" headerText="@Localizer["Created at"].Value" type="date" editType="datepickeredit" format="dd.MM.yyyy" width="100" textAlign="Center"></e-grid-column>
+        <e-grid-column field="DateOfBirth" headerText="@Localizer["Date of birth"].Value" type="date" editType="datepickeredit" format="dd.MM.yyyy" width="100" textAlign="Center"></e-grid-column>
+
+        <e-grid-column headerText="@Localizer["Actions"].Value" width="130" template="#actionsTemplate" textAlign="Center"></e-grid-column>
+    </e-grid-columns>
+</ejs-grid>
+
+<script id="userNameTemplate" type="text/x-template">
+     <span class="badge bg-secondary">${Username}</span>
+</script>
+
+<script id="actionsTemplate" type="text/x-template">
+    <div class="d-flex flex-row justify-content-start">
+        <a class="btn btn-sm no-a-decoration me-1" href="${editLink(Id)}"
+            data-bs-toggle="tooltip" data-bs-placement="top" title="@Localizer["Edit user"].Value">
+            <i class="bi bi-pen"></i>
+        </a>
+        
+        <form action="${deleteLink(Id)}" method="post">
+                <input type="hidden" name="id" value="${Id}"/>
+            
+                <!-- Include the AntiForgeryToken -->
+                @Html.AntiForgeryToken()
+            
+            <button type="submit" class="btn btn-sm btn-danger" 
+                onclick="return confirm(&quot; @Localizer["Are you sure you want to delete this record?"].Value &quot;)"
+                data-bs-toggle="tooltip" data-bs-placement="top" title="@Localizer["Delete user"].Value">
+                <i class="bi bi-trash"></i>
+            </button>
+        </form>
+    </div>
+</script>
+
+@section Scripts{
+    <script>
+    
+    function gridDataBound(args){
+        reloadTooltips();
+    }
+    
+    function gridActionComplete(args) {  
+        reloadTooltips();
+    }
+    </script>
+
+    <script>
+    function itemEditLink(id){
+        let url = '@Url.Action("Edit", "Item", new { id = "id" })';
+        return url.replace("id", id);
+    }
+    
+    function pickupProtocolEditLink(id){
+        let url = '@Url.Action("Edit", "PickupProtocol", new { id = "id" })';
+        return url.replace("id", id);
+    }
+    
+    function returnProtocolEditLink(id){
+        let url = '@Url.Action("Edit", "ReturnProtocol", new { id = "id" })';
+        return url.replace("id", id);
+    }
+
+    function editLink(id) {
+        let url = '@Url.Action("Edit", "User", new { id = "id" })';
+        return url.replace("id", id);
+    }
+    
+    function deleteLink(id){
+        let url = '@Url.Action("Delete", "User", new { id = "id" })';
+        return url.replace("id", id);
+    }
+</script>
+}

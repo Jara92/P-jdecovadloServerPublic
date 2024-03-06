@@ -19,6 +19,15 @@
                 </li>
 
                 <li class="nav-item">
+                    <a asp-action="Index" asp-controller="User" class="nav-link">
+                        <i class="nav-icon bi bi-person"></i>
+                        <p>
+                            @Localizer["Users"]
+                        </p>
+                    </a>
+                </li>
+
+                <li class="nav-item">
                     <a asp-action="Index" asp-controller="Item" class="nav-link">
                         <i class="nav-icon bi bi-box-seam-fill"></i>
                         <p>

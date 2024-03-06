@@ -21,7 +21,7 @@ public class ApplicationUser : IdentityUser
 
     public virtual Profile? Profile { get; set; }
 
-    public DateTime? CreatedAt { get; set; }
+    public DateTime? CreatedAt { get; set; } = DateTime.Now;
 
     public DateTime? UpdatedAt { get; set; }
 
