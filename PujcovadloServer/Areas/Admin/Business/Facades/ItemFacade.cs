@@ -7,6 +7,7 @@ using PujcovadloServer.Business.Filters;
 using PujcovadloServer.Business.Interfaces;
 using PujcovadloServer.Business.Objects;
 using PujcovadloServer.Business.Services;
+using PujcovadloServer.Helpers;
 
 namespace PujcovadloServer.Areas.Admin.Business.Facades;
 
@@ -48,6 +49,12 @@ public class ItemFacade
     {
         // map the request to the item
         _mapper.Map(request, item);
+
+        // Generate the alias if it is not set
+        if (string.IsNullOrEmpty(item.Alias))
+        {
+            item.Alias = UrlHelper.CreateUrlStub(item.Name);
+        }
 
         // sync categories
         item.Categories.Clear();
