@@ -27,4 +27,6 @@ public class LoanRequest
     [Required] public int ItemId { get; set; }
 
     [Required] public string TenantId { get; set; } = default!;
+
+    [DataType(DataType.DateTime)] public DateTime? CreatedAt { get; set; }
 }

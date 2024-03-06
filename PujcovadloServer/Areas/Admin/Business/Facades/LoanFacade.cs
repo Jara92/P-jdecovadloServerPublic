@@ -46,6 +46,8 @@ public class LoanFacade
         loan.ExpectedPrice = request.ExpectedPrice;
         loan.RefundableDeposit = request.RefundableDeposit;
         loan.TenantNote = request.TenantNote;
+
+        loan.CreatedAt = request.CreatedAt ?? DateTime.Now;
         // todo: actions
 
         // Update tenant
