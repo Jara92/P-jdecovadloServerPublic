@@ -31,9 +31,10 @@
                 </div>
 
                 <div class="form-group mb-3">
-                    <ejs-dropdownlist id="dlParentId" dataSource="@ViewBag.Categories" placeholder="@Localizer["Parent"].Value"
+                    <ejs-dropdownlist id="dlParentId" placeholder="@Localizer["Parent"].Value"
                                       popupHeight="220px" ejs-for="ParentId" floatLabelType="Always"
-                                      allowFiltering="true" filterType="Contains">
+                                      allowFiltering="true" filterType="Contains" showClearButton="true">
+                        <e-data-manager adaptor="UrlAdaptor" url="@Url.Action("IndexFilter", "ItemCategory")" crossDomain="false"></e-data-manager>
                         <e-dropdownlist-fields value="Id" text="Name"></e-dropdownlist-fields>
                     </ejs-dropdownlist>
                     <span asp-validation-for="ParentId" class="text-danger"></span>

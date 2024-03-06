@@ -1,4 +1,9 @@
 @using PujcovadloServer.Business.Enums
+@using Syncfusion.EJ2
+@using Syncfusion.EJ2.Buttons
+@using Syncfusion.EJ2.Calendars
+@using Syncfusion.EJ2.DropDowns
+@using Syncfusion.EJ2.Inputs
 @using Microsoft.AspNetCore.Mvc.TagHelpers
 @model PujcovadloServer.Areas.Admin.Requests.ItemRequest
 @inject IStringLocalizer<ItemStatus> StatusLocalizer
@@ -83,10 +88,10 @@
 
             <div class="col-md-4">
                 <div class="form-group mb-3">
-                    <ejs-dropdownlist id="dlOwnerId" dataSource="@ViewBag.Users" placeholder="@Localizer["Owner"].Value"
+                    <ejs-dropdownlist id="dlOwnerId" placeholder="@Localizer["Owner"].Value"
                                       popupHeight="220px" ejs-for="OwnerId" floatLabelType="Always"
-                                      allowFiltering="true" filterType="Contains">
-                        @*TODO: use data manager instead*@
+                                      allowFiltering="true" filtering="onOwnerFiltering" filterType="Contains" ignoreAccent="true" ignoreCase="true">
+                        <e-data-manager adaptor="UrlAdaptor" url="@Url.Action("IndexFilter", "User")" crossDomain="false"></e-data-manager>
                         <e-dropdownlist-fields value="Id" text="Name"></e-dropdownlist-fields>
                     </ejs-dropdownlist>
                     <span asp-validation-for="OwnerId" class="text-danger"></span>
@@ -102,8 +107,9 @@
 
                 <div class="form-group mb-3">
                     <ejs-multiselect id="dlCategories" placeholder="@Localizer["Categories"].Value"
+                                     query="new ej.data.Query().sortBy('Id').select(['Id', 'Name']).take(20)"
                                      popupHeight="500px" ejs-for="Categories" floatLabelType="Always"
-                                     allowFiltering="true" ignoreAccent="true" filterType="Contains">
+                                     allowFiltering="true" ignoreCase="true" ignoreAccent="true" filterType="Contains">
                         <e-data-manager adaptor="UrlAdaptor" url="@Url.Action("IndexFilter", "ItemCategory")" crossDomain="false"></e-data-manager>
                         <e-multiselect-fields value="Id" text="Name"></e-multiselect-fields>
                     </ejs-multiselect>
@@ -111,10 +117,11 @@
                 </div>
 
                 <div class="form-group mb-3">
-                    <ejs-multiselect id="dlTags" dataSource="@ViewBag.Tags" placeholder="@Localizer["Tags"].Value"
-                                     popupHeight="500px" ejs-for="Tags" floatLabelType="Always"
+                    <ejs-multiselect id="dlTags" placeholder="@Localizer["Tags"].Value"
+                                     query="new ej.data.Query().sortBy('Id').select(['Id', 'Name']).take(20)"
+                                     popupHeight="500px" ejs-for="Tags" floatLabelType="Always" ignoreCase="true"
                                      allowFiltering="true" ignoreAccent="true" filterType="Contains">
-                        @*TODO: use data manager instead*@
+                        <e-data-manager adaptor="UrlAdaptor" url="@Url.Action("IndexFilter", "ItemTag")" crossDomain="false"></e-data-manager>
                         <e-multiselect-fields value="Id" text="Name"></e-multiselect-fields>
                     </ejs-multiselect>
                     <span asp-validation-for="Tags" class="text-danger"></span>
@@ -177,5 +184,41 @@
 </div>
 
 @section Scripts {
+    <script>
+        function onOwnerFiltering(e) {
+            // Get the owner DropDownList instance
+            let dlOwnerId = document.getElementById('dlOwnerId').ej2_instances[0];
+            
+            // Create a new query
+            let query = new ej.data.Query();
+            
+            // Apply filter only if the text is not empty
+            if(e.text !== ''){
+                let firstName, lastName;
+                firstName = lastName = e.text;
+                
+                // Split the name so we can filter by first and last name
+                let split = e.text.split(' ');
+                
+                // If there are more than one word, use the first as first name and the rest as last name
+                if(split.length > 1){
+                    firstName = split[0];
+                    lastName = split.slice(1).join(' '); // Join the rest of the words as last name
+                } 
+                
+                // Apply the filter
+                query = query.where(
+                    new ej.data.Predicate("FirstName", dlOwnerId.filterType, firstName, dlOwnerId.ignoreCase, dlOwnerId.ignoreAccent)
+                    .or("LastName", dlOwnerId.filterType, lastName, dlOwnerId.ignoreCase, dlOwnerId.ignoreAccent));
+            }
+            
+            // Take only N records
+            query.take(20);
+            
+            // Update the data
+            e.updateData(dlOwnerId.dataSource, query);
+        }
+    </script>
+
     @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
 }
