@@ -48,21 +48,24 @@ public class UserController : Controller
     [HttpPost]
     public async Task<IActionResult> IndexFilter([FromBody] DataManagerRequest dm)
     {
-        // get the loans
+        // get the users
         var users = await _userService.GetAll(dm);
 
-        // get total count of loans which match the filter
-        var count = await _userService.GetCount(dm);
+        // map the users to the response
+        var result = _mapper.Map<List<ApplicationUser>, List<UserResponse>>(users);
 
-        // get aggregations
-        var aggregate = await _userService.GetAggregations(dm);
+        if (dm.RequiresCounts)
+        {
+            // get total count of users which match the filter
+            var count = await _userService.GetCount(dm);
 
-        // map the loans to the response
-        var list = _mapper.Map<List<ApplicationUser>, List<UserResponse>>(users);
+            // get aggregations
+            var aggregate = await _userService.GetAggregations(dm);
 
-        return dm.RequiresCounts
-            ? Json(new { result = list, count, aggregate })
-            : Json(list);
+            return Json(new { result, count, aggregate });
+        }
+
+        return Json(result);
     }
 
     private async Task PrepareViewData()

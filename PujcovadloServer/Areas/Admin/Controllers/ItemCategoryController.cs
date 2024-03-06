@@ -49,21 +49,24 @@ public class ItemCategoryController : Controller
     [HttpPost]
     public async Task<IActionResult> IndexFilter([FromBody] DataManagerRequest dm)
     {
-        // get the items
+        // get list of categories
         var categories = await _itemCategoryService.GetAll(dm);
 
-        // get total count of items which match the filter
-        var itemsCount = await _itemCategoryService.GetCount(dm);
+        // map to response
+        var result = _mapper.Map<List<ItemCategory>, List<ItemCategoryResponse>>(categories);
 
-        // get aggregations
-        var aggregate = await _itemCategoryService.GetAggregations(dm);
+        if (dm.RequiresCounts)
+        {
+            // get total count of categories which match the filter
+            var count = await _itemCategoryService.GetCount(dm);
 
-        // map the items to the response
-        var list = _mapper.Map<List<ItemCategory>, List<ItemCategoryResponse>>(categories);
+            // get aggregations
+            var aggregate = await _itemCategoryService.GetAggregations(dm);
 
-        return dm.RequiresCounts
-            ? Json(new { result = list, count = itemsCount, aggregate })
-            : Json(list);
+            return Json(new { result, count, aggregate });
+        }
+
+        return Json(result);
     }
 
     private async Task PrepareViewData()

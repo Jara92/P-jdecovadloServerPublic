@@ -51,18 +51,21 @@ public class LoanController : Controller
         // get the loans
         var loans = await _loanService.GetAll(dm);
 
-        // get total count of loans which match the filter
-        var count = await _loanService.GetCount(dm);
-
-        // get aggregations
-        var aggregate = await _loanService.GetAggregations(dm);
-
         // map the loans to the response
-        var list = _mapper.Map<List<Loan>, List<LoanResponse>>(loans);
+        var result = _mapper.Map<List<Loan>, List<LoanResponse>>(loans);
 
-        return dm.RequiresCounts
-            ? Json(new { result = list, count, aggregate })
-            : Json(list);
+        if (dm.RequiresCounts)
+        {
+            // get total count of loans which match the filter
+            var count = await _loanService.GetCount(dm);
+
+            // get aggregations
+            var aggregate = await _loanService.GetAggregations(dm);
+
+            return Json(new { result, count, aggregate });
+        }
+
+        return Json(result);
     }
 
     private async Task PrepareViewData()
