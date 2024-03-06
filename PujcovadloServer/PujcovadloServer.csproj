@@ -58,6 +58,7 @@
         <AdditionalFiles Include="Areas\Admin\Views\Item\Edit.cshtml"/>
         <AdditionalFiles Include="Areas\Admin\Views\Item\Index.cshtml"/>
         <AdditionalFiles Include="Areas\Admin\Views\Loan\Index.cshtml"/>
+        <AdditionalFiles Include="Areas\Admin\Views\PickupProtocol\CreateOrEdit.cshtml"/>
         <AdditionalFiles Include="Areas\Admin\Views\Shared\_ValidationScriptsPartial.cshtml"/>
         <AdditionalFiles Include="Views\Item\Create.cshtml"/>
         <AdditionalFiles Include="Views\Item\Delete.cshtml"/>

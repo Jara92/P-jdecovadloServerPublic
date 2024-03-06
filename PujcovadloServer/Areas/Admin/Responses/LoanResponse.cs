@@ -33,6 +33,8 @@ public class LoanResponse
 
     public string OwnerId => Item.OwnerId;
 
+    public int? PickupProtocolId { get; set; }
+
     public DateTime CreatedAt { get; set; }
 
     public DateTime? UpdatedAt { get; set; }

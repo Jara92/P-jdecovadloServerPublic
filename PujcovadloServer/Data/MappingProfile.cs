@@ -74,7 +74,10 @@ public class MappingProfile : Profile
 
         CreateMap<Areas.Admin.Requests.LoanRequest, Loan>();
         CreateMap<Loan, Areas.Admin.Requests.LoanRequest>();
-
         CreateMap<Loan, Areas.Admin.Responses.LoanResponse>();
+
+        CreateMap<Areas.Admin.Requests.PickupProtocolRequest, PickupProtocol>();
+        CreateMap<PickupProtocol, Areas.Admin.Requests.PickupProtocolRequest>();
+        CreateMap<PickupProtocol, Areas.Admin.Responses.PickupProtocolResponse>();
     }
 }
