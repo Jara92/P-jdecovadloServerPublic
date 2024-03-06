@@ -3,6 +3,9 @@ using PujcovadloServer.Business.Enums;
 
 namespace PujcovadloServer.Attributes;
 
+/// <summary>
+/// A validation attribute that checks if the array items belongs to the <see cref="UserRoles"/>.
+/// </summary>
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
 public class UserRolesAttribute : ValidationAttribute
 {
