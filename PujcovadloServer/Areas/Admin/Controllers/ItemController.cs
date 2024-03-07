@@ -40,7 +40,6 @@ public class ItemController : Controller
     public async Task<IActionResult> Index()
     {
         ViewBag.Statuses = await _itemFacade.GetItemStatusOptions();
-        ViewBag.Users = await _itemFacade.GetUserOptions();
 
         return View();
     }
@@ -70,11 +69,7 @@ public class ItemController : Controller
 
     private async Task PrepareViewData()
     {
-        // get all users, categories and tags
-        ViewBag.Categories = await _itemFacade.GetItemCategoryOptions();
-        ViewBag.Tags = await _itemFacade.GetItemTagOptions();
         ViewBag.Statuses = await _itemFacade.GetItemStatusOptions();
-        ViewBag.Users = await _itemFacade.GetUserOptions();
     }
 
     [HttpGet("edit/{id}")]

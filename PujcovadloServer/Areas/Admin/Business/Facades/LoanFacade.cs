@@ -2,7 +2,6 @@ using AutoMapper;
 using PujcovadloServer.Areas.Admin.Requests;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Exceptions;
-using PujcovadloServer.Business.Filters;
 using PujcovadloServer.Business.Objects;
 using PujcovadloServer.Business.Services;
 
@@ -72,11 +71,6 @@ public class LoanFacade
     public Task Delete(Loan loan)
     {
         return _loanService.Delete(loan);
-    }
-
-    public Task<IList<ApplicationUserOption>> GetUserOptions()
-    {
-        return _userService.GetAllAsOptions(new ApplicationUserFilter());
     }
 
     public Task<List<EntityOption>> GetLoanStatusOptions()

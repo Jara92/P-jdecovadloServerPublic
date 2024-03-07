@@ -40,7 +40,6 @@ public class LoanController : Controller
     public async Task<IActionResult> Index()
     {
         ViewBag.Statuses = await _loanFacade.GetLoanStatusOptions();
-        ViewBag.Users = await _loanFacade.GetUserOptions();
 
         return View();
     }
@@ -72,7 +71,6 @@ public class LoanController : Controller
     {
         // get all users, categories and tags
         ViewBag.Statuses = await _loanFacade.GetLoanStatusOptions();
-        ViewBag.Users = await _loanFacade.GetUserOptions();
     }
 
     [HttpGet("edit/{id}")]

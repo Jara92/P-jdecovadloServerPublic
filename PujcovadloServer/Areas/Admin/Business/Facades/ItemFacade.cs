@@ -3,7 +3,6 @@ using NuGet.Packaging;
 using PujcovadloServer.Areas.Admin.Requests;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Exceptions;
-using PujcovadloServer.Business.Filters;
 using PujcovadloServer.Business.Interfaces;
 using PujcovadloServer.Business.Objects;
 using PujcovadloServer.Business.Services;
@@ -44,7 +43,6 @@ public class ItemFacade
         return item;
     }
 
-
     public async Task UpdateItem(Item item, ItemRequest request)
     {
         // map the request to the item
@@ -70,21 +68,6 @@ public class ItemFacade
     public Task Delete(Item item)
     {
         return _itemService.Delete(item);
-    }
-
-    public Task<List<EntityOption>> GetItemCategoryOptions()
-    {
-        return _itemCategoryService.GetAllOptions();
-    }
-
-    public Task<IList<ItemTagOption>> GetItemTagOptions()
-    {
-        return _itemTagService.GetAllAsOptions();
-    }
-
-    public Task<IList<ApplicationUserOption>> GetUserOptions()
-    {
-        return _userService.GetAllAsOptions(new ApplicationUserFilter());
     }
 
     public Task<List<EntityOption>> GetItemStatusOptions()

@@ -34,8 +34,10 @@
         <e-grid-column field="Status" headerText="@Localizer["Item status"].Value" foreignKeyField="Id"
                        foreignKeyValue="Name" dataSource="@ViewBag.Statuses" width="130" textAlign="Center">
         </e-grid-column>
+        @* TODO: FIX FILTERING - Name does not exist *@
         <e-grid-column field="OwnerId" headerText="@Localizer["Item owner"].Value" foreignKeyField="Id"
-                       foreignKeyValue="Name" dataSource="@ViewBag.Users" width="130" textAlign="Center" template="#ownerTemplate">
+                       foreignKeyValue="Name" width="130" textAlign="Center" template="#ownerTemplate">
+            <e-data-manager url="@Url.Action("IndexFilter", "User")" adaptor="UrlAdaptor"></e-data-manager>
         </e-grid-column>
         <e-grid-column field="PricePerDay" headerText="@Localizer["Price per day"].Value" type="number" width="100" textAlign="Center"></e-grid-column>
         <e-grid-column field="SellingPrice" headerText="@Localizer["Selling price"].Value" type="number" width="100" textAlign="Center"></e-grid-column>

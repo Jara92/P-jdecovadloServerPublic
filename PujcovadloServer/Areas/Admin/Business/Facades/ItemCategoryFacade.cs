@@ -2,9 +2,7 @@ using AutoMapper;
 using PujcovadloServer.Areas.Admin.Requests;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Exceptions;
-using PujcovadloServer.Business.Filters;
 using PujcovadloServer.Business.Interfaces;
-using PujcovadloServer.Business.Objects;
 using PujcovadloServer.Business.Services;
 using PujcovadloServer.Helpers;
 
@@ -97,20 +95,5 @@ public class ItemCategoryFacade
     public Task Delete(ItemCategory category)
     {
         return _itemCategoryService.Delete(category);
-    }
-
-    public Task<List<EntityOption>> GetItemCategoryOptions()
-    {
-        return _itemCategoryService.GetAllOptions();
-    }
-
-    public Task<IList<ItemTagOption>> GetItemTagOptions()
-    {
-        return _itemTagService.GetAllAsOptions();
-    }
-
-    public Task<IList<ApplicationUserOption>> GetUserOptions()
-    {
-        return _userService.GetAllAsOptions(new ApplicationUserFilter());
     }
 }

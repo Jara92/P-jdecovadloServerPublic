@@ -41,8 +41,6 @@ public class ItemCategoryController : Controller
     [HttpGet]
     public async Task<IActionResult> Index()
     {
-        await PrepareViewData();
-
         return View();
     }
 
@@ -69,17 +67,9 @@ public class ItemCategoryController : Controller
         return Json(result);
     }
 
-    private async Task PrepareViewData()
-    {
-        // get all users, categories and tags
-        ViewBag.Categories = await _categoryFacade.GetItemCategoryOptions();
-    }
-
     [HttpGet("create")]
     public async Task<IActionResult> Create()
     {
-        await PrepareViewData();
-
         return View("CreateOrEdit", new ItemCategoryRequest());
     }
 
@@ -98,8 +88,6 @@ public class ItemCategoryController : Controller
 
         _flasher.Flash(FlashType.Error, _localizer["Category cannot be created because of errors."]);
 
-        await PrepareViewData();
-
         return View("CreateOrEdit", request);
     }
 
@@ -110,8 +98,6 @@ public class ItemCategoryController : Controller
 
         // map the cat to the request
         var model = _mapper.Map<ItemCategory, ItemCategoryRequest>(category);
-
-        await PrepareViewData();
 
         return View("CreateOrEdit", model);
     }
@@ -139,7 +125,6 @@ public class ItemCategoryController : Controller
         // display an error message
         _flasher.Flash(FlashType.Error, _localizer["Category cannot be updated because of errors."]);
 
-        await PrepareViewData();
         return View("CreateOrEdit", request);
     }
 

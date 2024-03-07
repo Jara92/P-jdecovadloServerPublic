@@ -65,10 +65,6 @@ public class ReviewController : Controller
         return Json(result);
     }
 
-    private async Task PrepareViewData()
-    {
-    }
-
     [HttpGet("edit/{id}")]
     public async Task<IActionResult> Edit(int id)
     {
@@ -77,8 +73,6 @@ public class ReviewController : Controller
 
         // map the item to the request
         var model = _mapper.Map<Review, ReviewRequest>(review);
-
-        await PrepareViewData();
 
         return View(model);
     }
@@ -101,8 +95,6 @@ public class ReviewController : Controller
 
         // if there are errors, show the form again
         _flasher.Flash(FlashType.Error, _localizer["Item cannot be updated because of errors."]);
-
-        await PrepareViewData();
 
         return View(request);
     }

@@ -29,16 +29,17 @@
         <e-grid-column field="Id" headerText="@Localizer["Id"].Value" textAlign="Center" width="120"
                        validationRules="@(new { required = true })" isPrimaryKey="true">
         </e-grid-column>
-        <e-grid-column field="Name" headerText="@Localizer["Name"].Value" width="150" template="#itemNameTemplate"></e-grid-column>
+        <e-grid-column field="Name" headerText="@Localizer["Name"].Value" width="150" template="#categoryNameTemplate"></e-grid-column>
         <e-grid-column field="Alias" headerText="@Localizer["Alias"].Value" width="130" textAlign="Center"></e-grid-column>
         <e-grid-column field="ParentId" headerText="@Localizer["Parent"].Value" foreignKeyField="Id" template="#parentTemplate"
-                       foreignKeyValue="Name" dataSource="@ViewBag.Categories" width="130" textAlign="Center">
+                       foreignKeyValue="Name" width="130" textAlign="Center">
+            <e-data-manager url="@Url.Action("IndexFilter", "ItemCategory")" adaptor="UrlAdaptor"></e-data-manager>
         </e-grid-column>
         <e-grid-column headerText="@Localizer["Actions"].Value" width="130" template="#actionsTemplate" textAlign="Center"></e-grid-column>
     </e-grid-columns>
 </ejs-grid>
 
-<script id="itemNameTemplate" type="text/x-template">
+<script id="categoryNameTemplate" type="text/x-template">
     <span class="badge bg-secondary">${Name}</span>
 </script>
 

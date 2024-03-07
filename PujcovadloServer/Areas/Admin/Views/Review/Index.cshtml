@@ -33,8 +33,7 @@
 
         <e-grid-column field="AuthorId" headerText="@Localizer["Author"].Value" foreignKeyField="Id"
                        foreignKeyValue="Name" width="130" textAlign="Center" template="#ownerTemplate">
-            <e-data-manager url="@Url.Action("IndexFilter", "User")" adaptor="UrlAdaptor">
-            </e-data-manager>
+            <e-data-manager url="@Url.Action("IndexFilter", "User")" adaptor="UrlAdaptor"></e-data-manager>
         </e-grid-column>
 
         <e-grid-column field="Rating" headerText="@Localizer["Rating"].Value" width="50" template="#ratingTemplate"></e-grid-column>

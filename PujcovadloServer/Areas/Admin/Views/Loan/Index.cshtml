@@ -17,9 +17,17 @@
         <e-grid-column field="Id" headerText="@Localizer["Id"].Value" textAlign="Center" width="120"
                        validationRules="@(new { required = true })" isPrimaryKey="true">
         </e-grid-column>
-        <e-grid-column field="Item.Name" headerText="@Localizer["Item name"].Value" width="150" template="#itemNameTemplate" textAlign="Center"></e-grid-column>
+        <e-grid-column field="ItemId" headerText="@Localizer["Item name"].Value" width="150" foreignKeyField="Id"
+                       foreignKeyValue="Name" template="#itemNameTemplate" textAlign="Center">
+            <e-data-manager url="@Url.Action("IndexFilter", "Item")" adaptor="UrlAdaptor"></e-data-manager>
+        </e-grid-column>
         <e-grid-column field="Status" headerText="@Localizer["Loan status"].Value" foreignKeyField="Id"
                        foreignKeyValue="Name" dataSource="@ViewBag.Statuses" width="130" textAlign="Center">
+        </e-grid-column>
+        @* TODO: FIX FILTERING - Name does not exist *@
+        <e-grid-column field="TenantId" headerText="@Localizer["Tenant"].Value" foreignKeyField="Id"
+                       foreignKeyValue="Name" width="130" textAlign="Center" template="#tenantTemplate">
+            <e-data-manager url="@Url.Action("IndexFilter", "User")" adaptor="UrlAdaptor"></e-data-manager>
         </e-grid-column>
         <e-grid-column field="Days" headerText="@Localizer["Duration [days]"].Value" width="150" textAlign="Center"></e-grid-column>
         <e-grid-column field="ExpectedPrice" headerText="@Localizer["Expected price"].Value" type="number" width="100" textAlign="Center"></e-grid-column>
@@ -30,7 +38,11 @@
 </ejs-grid>
 
 <script id="itemNameTemplate" type="text/x-template">
-    <a href="${itemEditLink(Item.Id)}">${Item.Name}</a>
+    <a href="${itemEditLink(ItemId)}">${(data.foreignKeyData.Name)}</a>
+</script>
+
+<script id="tenantTemplate" type="text/x-template">
+    <a href="${editUserLink(TenantId)}">${(data.foreignKeyData.Name)}</a>
 </script>
 
 <script id="actionsTemplate" type="text/x-template">
@@ -103,6 +115,11 @@
         
         function deleteLink(id){
             let url = '@Url.Action("Delete", "Loan", new { id = "id" })';
+            return url.replace("id", id);
+        }
+        
+        function editUserLink(id){
+            let url = '@Url.Action("Edit", "User", new { id = "id" })';
             return url.replace("id", id);
         }
     </script>
