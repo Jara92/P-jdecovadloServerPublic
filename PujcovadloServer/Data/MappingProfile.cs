@@ -87,5 +87,9 @@ public class MappingProfile : Profile
         CreateMap<ApplicationUser, Areas.Admin.Responses.UserResponse>();
         CreateMap<Areas.Admin.Requests.UserRequest, ApplicationUser>();
         CreateMap<ApplicationUser, Areas.Admin.Requests.UserRequest>();
+
+        CreateMap<Review, Areas.Admin.Responses.ReviewResponse>();
+        CreateMap<Areas.Admin.Requests.ReviewRequest, Review>();
+        CreateMap<Review, Areas.Admin.Requests.ReviewRequest>();
     }
 }

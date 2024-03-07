@@ -14,6 +14,8 @@ public class Review : BaseEntity
 
     // TODO: Add item rating?
 
+    public int LoanId { get; set; }
+
     public virtual Loan Loan { get; set; } = default!;
 
     public string AuthorId { get; set; }

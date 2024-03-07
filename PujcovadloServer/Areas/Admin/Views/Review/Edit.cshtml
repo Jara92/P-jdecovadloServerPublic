@@ -1,0 +1,173 @@
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using Syncfusion.EJ2.Inputs
+@using Syncfusion.EJ2.DropDowns
+@using Syncfusion.EJ2
+@using Syncfusion.EJ2.Buttons
+@using Syncfusion.EJ2.Calendars
+@model PujcovadloServer.Areas.Admin.Requests.ReviewRequest
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = Localizer["Editing review"].Value + ": " + Model.Id;
+}
+
+<form asp-action="Edit" id="review-form">
+    <input type="hidden" asp-for="Id"/>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-6">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="form-group mb-3">
+                    <ejs-numerictextbox id="rating" ejs-for="Rating" step="0.5" min="0" max="5"
+                                        format="#.#"
+                                        floatLabelType="Always"
+                                        placeholder="@Localizer["Rating"].Value">
+                    </ejs-numerictextbox>
+                    <span asp-validation-for="Rating" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <ejs-textbox ejs-for="Comment" id="comment" placeholder="@Localizer["Comment"].Value"
+                                 floatLabelType="Always" multiline="true">
+                    </ejs-textbox>
+                    <span asp-validation-for="Comment" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <ejs-dropdownlist id="dlAuthorId" placeholder="@Localizer["Owner"].Value" readonly="true"
+                                      popupHeight="220px" ejs-for="AuthorId" floatLabelType="Always"
+                                      allowFiltering="true" filtering="onAuthorFiltering" filterType="Contains" ignoreAccent="true" ignoreCase="true">
+                        <e-data-manager adaptor="UrlAdaptor" url="@Url.Action("IndexFilter", "User")" crossDomain="false"></e-data-manager>
+                        <e-dropdownlist-fields value="Id" text="Name"></e-dropdownlist-fields>
+                    </ejs-dropdownlist>
+                    <span asp-validation-for="AuthorId" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <ejs-dropdownlist id="dlLoanId" placeholder="@Localizer["Loan"].Value" readonly="true"
+                                      popupHeight="220px" ejs-for="LoanId" floatLabelType="Always" itemTemplate="#loanOptionTemplate"
+                                      allowFiltering="true" filterType="Contains" ignoreAccent="true" ignoreCase="true">
+                        <e-data-manager adaptor="UrlAdaptor" url="@Url.Action("IndexFilter", "Loan")" crossDomain="false"></e-data-manager>
+                        <e-dropdownlist-fields value="Id" text="Id"></e-dropdownlist-fields>
+                    </ejs-dropdownlist>
+                    <span asp-validation-for="AuthorId" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <ejs-datetimepicker id="createdAt" ejs-for="CreatedAt" placeholder="@Localizer["Created at"].Value"
+                                        format="d.M.yyyy hh:mm" floatLabelType="Always">
+                    </ejs-datetimepicker>
+                    <span asp-validation-for="CreatedAt" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3">
+                    <ejs-datetimepicker id="updatedAt" ejs-for="UpdatedAt" placeholder="@Localizer["Updated at"].Value"
+                                        format="d.M.yyyy hh:mm" floatLabelType="Always">
+                    </ejs-datetimepicker>
+                    <span asp-validation-for="UpdatedAt" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<div class="container-fluid">
+    <div class="btn-toolbar form-toolbar mb-md-4 mb-sm-2">
+        <ejs-button id="save" cssClass="e-primary me-2" iconCss="bi bi-save" content="@Localizer["Save changes"].Value"
+                    isPrimary="true">
+        </ejs-button>
+
+        <ejs-button id="back" cssClass="e-link me-2" iconCss="bi bi-x" content="@Localizer["Cancel"].Value"></ejs-button>
+
+        <script>
+            document.getElementById('back').onclick = function () {
+                window.location.href='@Url.Action("Index", "Item")';
+            };
+            
+            document.getElementById('save').onclick = function () {
+                document.getElementById('review-form').submit();
+            };
+        </script>
+    </div>
+</div>
+
+@section Scripts {
+    <script id="loanOptionTemplate" type="text/x-template">
+        <span>@Localizer["Loan"] #${Id}</span>
+   </script>
+
+    <script>
+            function onAuthorFiltering(e) {
+                // Get the owner DropDownList instance
+                let dlOwnerId = document.getElementById('dlOwnerId').ej2_instances[0];
+                
+                // Create a new query
+                let query = new ej.data.Query();
+                
+                // Apply filter only if the text is not empty
+                if(e.text !== ''){
+                    let firstName, lastName;
+                    firstName = lastName = e.text;
+                    
+                    // Split the name so we can filter by first and last name
+                    let split = e.text.split(' ');
+                    
+                    // If there are more than one word, use the first as first name and the rest as last name
+                    if(split.length > 1){
+                        firstName = split[0];
+                        lastName = split.slice(1).join(' '); // Join the rest of the words as last name
+                    } 
+                    
+                    // Apply the filter
+                    query = query.where(
+                        new ej.data.Predicate("FirstName", dlOwnerId.filterType, firstName, dlOwnerId.ignoreCase, dlOwnerId.ignoreAccent)
+                        .or("LastName", dlOwnerId.filterType, lastName, dlOwnerId.ignoreCase, dlOwnerId.ignoreAccent));
+                }
+                
+                // Take only N records
+                query.take(20);
+                
+                // Update the data
+                e.updateData(dlOwnerId.dataSource, query);
+            }
+        </script>
+
+    <script>
+        function onOwnerFiltering(e) {
+            // Get the owner DropDownList instance
+            let dlOwnerId = document.getElementById('dlOwnerId').ej2_instances[0];
+            
+            // Create a new query
+            let query = new ej.data.Query();
+            
+            // Apply filter only if the text is not empty
+            if(e.text !== ''){
+                let firstName, lastName;
+                firstName = lastName = e.text;
+                
+                // Split the name so we can filter by first and last name
+                let split = e.text.split(' ');
+                
+                // If there are more than one word, use the first as first name and the rest as last name
+                if(split.length > 1){
+                    firstName = split[0];
+                    lastName = split.slice(1).join(' '); // Join the rest of the words as last name
+                } 
+                
+                // Apply the filter
+                query = query.where(
+                    new ej.data.Predicate("FirstName", dlOwnerId.filterType, firstName, dlOwnerId.ignoreCase, dlOwnerId.ignoreAccent)
+                    .or("LastName", dlOwnerId.filterType, lastName, dlOwnerId.ignoreCase, dlOwnerId.ignoreAccent));
+            }
+            
+            // Take only N records
+            query.take(20);
+            
+            // Update the data
+            e.updateData(dlOwnerId.dataSource, query);
+        }
+    </script>
+
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}
