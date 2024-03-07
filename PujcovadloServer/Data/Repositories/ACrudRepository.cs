@@ -34,6 +34,8 @@ namespace PujcovadloServer.Data.Repositories
             var query = GetFilteredQuery(dm);
             var operations = new DataOperations();
 
+            // todo: MAke select work
+
             if (dm.Skip != 0)
             {
                 query = operations.PerformSkip(query, dm.Skip); //Paging
@@ -85,6 +87,11 @@ namespace PujcovadloServer.Data.Repositories
             if (dm.Sorted != null && dm.Sorted.Count > 0) //Sorting
             {
                 query = operations.PerformSorting(query, dm.Sorted);
+            }
+            else
+            {
+                // Sort by id by default
+                query = query.OrderBy(e => e.Id);
             }
 
             if (dm.Where != null && dm.Where.Count > 0) //Filtering

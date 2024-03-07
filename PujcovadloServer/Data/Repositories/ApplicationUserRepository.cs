@@ -93,6 +93,11 @@ public class ApplicationUserRepository : IApplicationUserRepository
         {
             query = operations.PerformSorting(query, dm.Sorted);
         }
+        else
+        {
+            // Sort by registration date by default
+            query = query.OrderByDescending(x => x.CreatedAt);
+        }
 
         if (dm.Where != null && dm.Where.Count > 0) //Filtering
         {
