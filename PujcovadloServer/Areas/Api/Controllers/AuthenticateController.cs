@@ -1,16 +1,19 @@
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PujcovadloServer.Areas.Api.Filters;
 using PujcovadloServer.Authentication;
 using PujcovadloServer.Authentication.Exceptions;
 using PujcovadloServer.Business.Services.Interfaces;
+using PujcovadloServer.Responses;
 
 namespace PujcovadloServer.Areas.Api.Controllers;
 
 [Area("Api")]
-[Route("api/[controller]")]
+[Route("api")]
 [ApiController]
 [AllowAnonymous]
+[ServiceFilter(typeof(ExceptionFilter))]
 public class AuthenticateController : ControllerBase
 {
     private readonly IAuthenticateService _authenticateService;
@@ -47,7 +50,14 @@ public class AuthenticateController : ControllerBase
         }
         catch (AuthenticationFailedException e)
         {
-            return Unauthorized(e.Message);
+            var details = new ExceptionResponse
+            {
+                Title = "Unauthorized",
+                Status = StatusCodes.Status403Forbidden,
+                Errors = new List<string> { e.Message }
+            };
+
+            return Unauthorized(details);
         }
     }
 

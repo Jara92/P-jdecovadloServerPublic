@@ -6,7 +6,7 @@ public class LoginRequest
 {
     [Required(ErrorMessage = "Please enter your {0}.")]
     [Display(Name = "Username")]
-    [MaxLength(16)]
+    [MaxLength(128)]
     public string Username { get; set; } = null!;
 
     [Required(ErrorMessage = "Please enter your {0}.")]

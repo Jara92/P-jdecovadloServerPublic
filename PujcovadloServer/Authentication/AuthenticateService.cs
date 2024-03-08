@@ -1,10 +1,8 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Principal;
 using System.Text;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
-using Namotion.Reflection;
 using PujcovadloServer.Authentication.Exceptions;
 using PujcovadloServer.Business.Enums;
 using PujcovadloServer.Business.Services.Interfaces;
@@ -108,6 +106,12 @@ public class AuthenticateService : IAuthenticateService
         // Get user by username
         var user = await _userManager.FindByNameAsync(request.Username);
 
+        // try to find the user by email
+        if (user == null)
+        {
+            user = await _userManager.FindByEmailAsync(request.Username);
+        }
+
         // Check if user exists and password is correct
         if (user != null && await _userManager.CheckPasswordAsync(user, request.Password))
         {
@@ -148,7 +152,7 @@ public class AuthenticateService : IAuthenticateService
 
         throw new AuthenticationFailedException("Invalid username or password.");
     }
-    
+
     /// <inheritdoc cref="IAuthenticateService"/>
     public bool IsAuthenticated()
     {
@@ -160,7 +164,7 @@ public class AuthenticateService : IAuthenticateService
     {
         // Get user id from claims
         var userId = GetCurrentUserId();
-        
+
         // get the user
         var user = await _userManager.FindByIdAsync(userId);
 
@@ -177,7 +181,7 @@ public class AuthenticateService : IAuthenticateService
         // Return Id or throw and exception
         return id ?? throw new NotAuthenticatedException("User is not authenticated.");
     }
-    
+
     /// <inheritdoc cref="IAuthenticateService"/>
     public string? TryGetCurrentUserId()
     {
