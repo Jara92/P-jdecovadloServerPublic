@@ -54,6 +54,10 @@ public class Item : BaseEntity
 
     [DisplayName("Owner")] public virtual ApplicationUser Owner { get; set; } = default!;
 
+    public decimal? Latitude { get; set; }
+
+    public decimal? Longitude { get; set; }
+
     [DisplayName("Created at")]
     [ReadOnly(true)]
     public DateTime CreatedAt { get; set; } = DateTime.Now;

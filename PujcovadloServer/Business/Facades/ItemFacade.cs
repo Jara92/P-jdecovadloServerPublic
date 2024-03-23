@@ -69,10 +69,14 @@ public class ItemFacade
         item.Parameters = request.Parameters;
 
         // update prices
-        item.PricePerDay = request.PricePerDay.Value;
+        item.PricePerDay = request.PricePerDay ?? 0;
         item.RefundableDeposit = request.RefundableDeposit;
         item.PurchasePrice = request.PurchasePrice;
         item.SellingPrice = request.SellingPrice;
+
+        // Update location
+        item.Latitude = request.Latitude;
+        item.Longitude = request.Longitude;
 
         // New categories
         var categories = await _itemCategoryService.GetByIds(request.Categories);

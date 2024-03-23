@@ -2,11 +2,9 @@ namespace PujcovadloServer.Responses;
 
 public class ItemDetailResponse : ItemResponse
 {
+    public string Description { get; set; } = default!;
+
     public string Parameters { get; set; } = "";
-
-    public float? RefundableDeposit { get; set; }
-
-    public float? SellingPrice { get; set; }
 
     public virtual IList<ItemCategoryResponse> Categories { get; set; } = new List<ItemCategoryResponse>();
 

@@ -33,4 +33,8 @@ public class ItemRequest : EntityRequest
     [MaxLength(10)] public virtual IList<string> Tags { get; set; } = new List<string>();
 
     public int? MainImageId { get; set; }
+
+    public decimal? Latitude { get; set; }
+
+    public decimal? Longitude { get; set; }
 }

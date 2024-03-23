@@ -10,11 +10,13 @@ public class ItemResponse
 
     public string Alias { get; set; } = default!;
 
-    public string Description { get; set; } = default!;
-
     public ItemStatus Status { get; set; } = ItemStatus.Public;
 
     public float PricePerDay { get; set; }
+
+    public float? RefundableDeposit { get; set; }
+
+    public float? SellingPrice { get; set; }
 
     public UserResponse Owner { get; set; } = default!;
 
