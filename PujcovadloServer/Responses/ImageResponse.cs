@@ -8,5 +8,7 @@ public class ImageResponse
 
     public string Path { get; set; } = default!;
 
+    public string Url { get; set; } = default!;
+
     public IList<LinkResponse> _links { get; private set; } = new List<LinkResponse>();
 }

@@ -53,6 +53,7 @@ public class ReturnProtocolResponseGenerator : ABaseResponseGenerator
         for (var i = 0; i < protocol.Images.Count; i++)
         {
             var imageUrl = await _imageFacade.GetImagePath(protocol.Images[i]);
+            response.Images[i].Url = imageUrl;
             response.Images[i]._links.Add(new LinkResponse(imageUrl, "DATA", "GET"));
         }
 

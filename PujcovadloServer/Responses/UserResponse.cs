@@ -12,5 +12,7 @@ public class UserResponse
 
     public string Name => $"{FirstName} {LastName}";
 
+    public ProfileResponse? Profile { get; set; }
+
     public IList<LinkResponse> _links { get; private set; } = new List<LinkResponse>();
 }

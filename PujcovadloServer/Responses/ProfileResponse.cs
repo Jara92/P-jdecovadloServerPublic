@@ -8,8 +8,6 @@ public class ProfileResponse
 
     public ImageResponse? ProfileImage { get; set; }
 
-    public UserResponse User { get; set; } = default!;
-
     public IList<LinkResponse> _links { get; private set; } = new List<LinkResponse>();
 
     public ProfileAggregationsResponse? _aggregations { get; set; }

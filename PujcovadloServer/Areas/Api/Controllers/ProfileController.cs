@@ -32,17 +32,14 @@ public class ProfileController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<LoanResponse>> GetProfile(int id)
+    public async Task<ActionResult<UserResponse>> GetProfile(int id)
     {
         // Get profile and check permissions
         var profile = await _profileFacade.GetProfile(id);
         await _authorizationService.CheckPermissions(profile, ProfileOperations.Read);
 
-        // Get more detailed information about the profile
-        var profileAggregations = await _profileFacade.GetProfileAggregations(profile);
-
         // Generate response
-        var response = await _responseGenerator.GenerateProfileDetailResponse(profile, profileAggregations);
+        var response = await _responseGenerator.GenerateProfileDetailResponse(profile);
 
         return Ok(response);
     }
@@ -53,7 +50,7 @@ public class ProfileController : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ValidateIdFilter]
-    public async Task<ActionResult> UpdateLoan(int id, [FromBody] ProfileUpdateRequest request)
+    public async Task<ActionResult> UpdateProfile(int id, [FromBody] ProfileUpdateRequest request)
     {
         var profile = await _profileFacade.GetProfile(id);
 

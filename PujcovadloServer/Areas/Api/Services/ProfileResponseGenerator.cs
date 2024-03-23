@@ -1,7 +1,7 @@
 using AutoMapper;
 using PujcovadloServer.Areas.Api.Controllers;
 using PujcovadloServer.AuthorizationHandlers;
-using PujcovadloServer.Business.EntityAggregations;
+using PujcovadloServer.Business.Facades;
 using PujcovadloServer.Responses;
 using Profile = PujcovadloServer.Business.Entities.Profile;
 
@@ -9,19 +9,27 @@ namespace PujcovadloServer.Areas.Api.Services;
 
 public class ProfileResponseGenerator : ABaseResponseGenerator
 {
+    private readonly ProfileFacade _profileFacade;
     private readonly IMapper _mapper;
 
-    public ProfileResponseGenerator(IMapper mapper, LinkGenerator urlHelper,
+    public ProfileResponseGenerator(ProfileFacade profileFacade, IMapper mapper, LinkGenerator urlHelper,
         IHttpContextAccessor httpContextAccessor, AuthorizationService authorizationService) :
         base(httpContextAccessor, urlHelper, authorizationService)
     {
+        _profileFacade = profileFacade;
         _mapper = mapper;
     }
 
-    public async Task<ProfileResponse> GenerateProfileDetailResponse(Profile profile, ProfileAggregations? aggregations)
+    public async Task<UserResponse> GenerateProfileDetailResponse(Profile profile)
     {
-        var response = _mapper.Map<ProfileResponse>(profile);
-        response._aggregations = _mapper.Map<ProfileAggregationsResponse>(aggregations);
+        var response = _mapper.Map<UserResponse>(profile.User);
+
+        if (response.Profile != null)
+        {
+            // Get more detailed information about the profile
+            var aggregations = await _profileFacade.GetProfileAggregations(profile);
+            response.Profile._aggregations = _mapper.Map<ProfileAggregationsResponse>(aggregations);
+        }
 
         // User items link
         response._links.Add(new LinkResponse(

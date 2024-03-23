@@ -86,6 +86,8 @@ public class ItemResponseGenerator : ABaseResponseGenerator
 
         var imageUrl = await _imageFacade.GetImagePath(image);
 
+        imageResponse.Url = imageUrl;
+
         // Link to image data
         imageResponse._links.Add(new LinkResponse(imageUrl, "DATA", "GET"));
     }
