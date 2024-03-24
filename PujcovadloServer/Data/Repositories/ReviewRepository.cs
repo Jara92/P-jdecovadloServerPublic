@@ -59,4 +59,13 @@ public class ReviewRepository : ACrudRepository<Review, ReviewFilter>, IReviewRe
         // Return the average rating
         return query.AverageAsync(r => (float?)r.Rating);
     }
+
+    public Task<int> GetTotalReviewsCountForUser(string userId)
+    {
+        // Filter reviews by the target user
+        var query = GetQueryAllByTargetUser(userId, new ReviewFilter());
+
+        // Return the count of reviews
+        return query.CountAsync();
+    }
 }

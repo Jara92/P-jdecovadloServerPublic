@@ -18,4 +18,6 @@ public interface IReviewRepository : ICrudRepository<Review, ReviewFilter>
     Task<Review?> FindByLoanAndAuthor(Loan reviewLoan, ApplicationUser reviewAuthor);
 
     Task<float?> GetAverageRatingForUser(string userId);
+
+    Task<int> GetTotalReviewsCountForUser(string userId);
 }

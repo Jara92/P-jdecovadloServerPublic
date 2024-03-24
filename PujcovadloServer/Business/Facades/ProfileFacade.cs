@@ -50,11 +50,13 @@ public class ProfileFacade
         //TODO: Cache this information
         var publicItemsCount = await _itemService.GetPublicItemsCountByUser(profile.UserId);
         var averateRating = await _reviewService.GetAverageRatingForUser(profile.UserId);
+        var totalReviews = await _reviewService.GetTotalReviewsCountForUser(profile.UserId);
 
         return new ProfileAggregations
         {
             CountOfPublicItems = publicItemsCount,
-            AverageRating = averateRating
+            AverageRating = averateRating,
+            TotalReviews = totalReviews,
         };
     }
 }

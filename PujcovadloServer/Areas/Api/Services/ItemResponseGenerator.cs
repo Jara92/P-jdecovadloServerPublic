@@ -18,98 +18,19 @@ public class ItemResponseGenerator : ABaseResponseGenerator
 {
     private readonly ItemFacade _itemFacade;
     private readonly ImageFacade _imageFacade;
+    private readonly ProfileFacade _profileFacade;
     private readonly IMapper _mapper;
 
-    public ItemResponseGenerator(ItemFacade itemFacade, ImageFacade imageFacade, IMapper mapper,
-        LinkGenerator urlHelper,
+    public ItemResponseGenerator(ItemFacade itemFacade, ImageFacade imageFacade, ProfileFacade profileFacade,
+        IMapper mapper, LinkGenerator urlHelper,
         IHttpContextAccessor httpContextAccessor,
         AuthorizationService authorizationService) :
         base(httpContextAccessor, urlHelper, authorizationService)
     {
         _itemFacade = itemFacade;
         _imageFacade = imageFacade;
+        _profileFacade = profileFacade;
         _mapper = mapper;
-    }
-
-    /// <summary>
-    /// generates ItemResponse for single item.
-    /// </summary>
-    /// <param name="item">Item to be converted to a response</param>
-    /// <param name="owner">Is the response meant for the owner? </param>
-    /// <returns>ItemResponse which represents the Item.</returns>
-    private async Task<ItemResponse> GenerateSingleItemResponse(Item item)
-    {
-        var response = _mapper.Map<ItemResponse>(item);
-
-        // Link to item detail
-        response._links.Add(new LinkResponse(
-            _urlHelper.GetUriByAction(_httpContext, nameof(ItemController.Get), "Item", values: new { item.Id }),
-            "SELF", "GET"));
-
-        // item delete action if has permission
-        if (await _authorizationService.CanPerformOperation(item, ItemOperations.Delete))
-        {
-            response._links.Add(new LinkResponse(
-                _urlHelper.GetUriByAction(_httpContext, nameof(ItemController.Delete), "Item",
-                    values: new { item.Id }), "DELETE", "DELETE"));
-        }
-
-        // Link to item owner
-        if (item.Owner.Profile != null)
-        {
-            response._links.Add(new LinkResponse(
-                _urlHelper.GetUriByAction(_httpContext, nameof(ProfileController.GetProfile), "Profile",
-                    values: new { item.Owner.Profile.Id }), "OWNER", "GET"));
-        }
-
-        // Main image link
-        if (item.MainImage != null && response.MainImage != null)
-        {
-            await AddImageLinks(item, item.MainImage, response.MainImage);
-        }
-
-        // Image links
-        for (var i = 0; i < item.Images.Count; i++)
-        {
-            await AddImageLinks(item, item.Images[i], response.Images[i]);
-        }
-
-        return response;
-    }
-
-    private async Task AddImageLinks(Item item, Image image, ImageResponse imageResponse)
-    {
-        // LInk to image detail
-        imageResponse._links.Add(new LinkResponse(
-            _urlHelper.GetUriByAction(_httpContext, nameof(ImageController.GetImage), "Image",
-                values: new { id = imageResponse.Id }), "SELF", "GET"));
-
-        var imageUrl = await _imageFacade.GetImagePath(image);
-
-        imageResponse.Url = imageUrl;
-
-        // Link to image data
-        imageResponse._links.Add(new LinkResponse(imageUrl, "DATA", "GET"));
-    }
-
-    /// <summary>
-    /// Adds Item links which are common for all detailed responses of the item.
-    /// </summary>
-    /// <param name="item">Item which is the response about.</param>
-    /// <param name="response">Response for the links to be added.</param>
-    private async Task AddItemDetailLinks(Item item, ItemDetailResponse response)
-    {
-        // Main image link
-        if (item.MainImage != null && response.MainImage != null)
-        {
-            await AddImageLinks(item, item.MainImage, response.MainImage);
-        }
-
-        // Image links
-        for (var i = 0; i < item.Images.Count; i++)
-        {
-            await AddImageLinks(item, item.Images[i], response.Images[i]);
-        }
     }
 
     /// <summary>
@@ -119,7 +40,6 @@ public class ItemResponseGenerator : ABaseResponseGenerator
     /// <param name="filter">Filter used for retrieving the items.</param>
     /// <param name="action">Action to used for retrieving the items.</param>
     /// <param name="controller">Controller used for retrieving the items.</param>
-    /// <param name="owner">Is the response meant for the owner? </param>
     /// <returns></returns>
     public async Task<ResponseList<ItemResponse>> GenerateResponseList(PaginatedList<Item> items, ItemFilter filter,
         string action, string controller)
@@ -146,6 +66,83 @@ public class ItemResponseGenerator : ABaseResponseGenerator
     }
 
     /// <summary>
+    /// generates ItemResponse for single item.
+    /// </summary>
+    /// <param name="item">Item to be converted to a response</param>
+    /// <returns>ItemResponse which represents the Item.</returns>
+    private async Task<ItemResponse> GenerateSingleItemResponse(Item item)
+    {
+        var response = _mapper.Map<ItemResponse>(item);
+
+        // Link to item detail
+        response._links.Add(new LinkResponse(
+            _urlHelper.GetUriByAction(_httpContext, nameof(ItemController.Get), "Item", values: new { item.Id }),
+            "SELF", "GET"));
+
+        // item delete action if has permission
+        if (await _authorizationService.CanPerformOperation(item, ItemOperations.Delete))
+        {
+            response._links.Add(new LinkResponse(
+                _urlHelper.GetUriByAction(_httpContext, nameof(ItemController.Delete), "Item",
+                    values: new { item.Id }), "DELETE", "DELETE"));
+        }
+
+        // Link to item owner
+        if (item.Owner.Profile != null)
+        {
+            response._links.Add(new LinkResponse(
+                _urlHelper.GetUriByAction(_httpContext, nameof(ProfileController.GetProfile), "Profile",
+                    values: new { item.Owner.Profile.Id }), "OWNER", "GET"));
+        }
+
+        await AddCommonLinks(item, response);
+
+        return response;
+    }
+
+    private async Task AddImageLinks(Item item, Image image, ImageResponse imageResponse)
+    {
+        // LInk to image detail
+        imageResponse._links.Add(new LinkResponse(
+            _urlHelper.GetUriByAction(_httpContext, nameof(ImageController.GetImage), "Image",
+                values: new { id = imageResponse.Id }), "SELF", "GET"));
+
+        var imageUrl = await _imageFacade.GetImagePath(image);
+
+        imageResponse.Url = imageUrl;
+
+        // Link to image data
+        imageResponse._links.Add(new LinkResponse(imageUrl, "DATA", "GET"));
+    }
+
+    /// <summary>
+    /// Adds Item links which are common for all detailed responses of the item.
+    /// </summary>
+    /// <param name="item">Item which is the response about.</param>
+    /// <param name="response">Response for the links to be added.</param>
+    private async Task AddCommonLinks(Item item, ItemResponse response)
+    {
+        // Main image link
+        if (item.MainImage != null && response.MainImage != null)
+        {
+            await AddImageLinks(item, item.MainImage, response.MainImage);
+        }
+
+        // Image links
+        for (var i = 0; i < item.Images.Count; i++)
+        {
+            await AddImageLinks(item, item.Images[i], response.Images[i]);
+        }
+
+        var profile = item.Owner.Profile;
+        if (profile != null && response.Owner.Profile != null)
+        {
+            var aggregations = await _profileFacade.GetProfileAggregations(profile);
+            response.Owner.Profile._aggregations = _mapper.Map<ProfileAggregationsResponse>(aggregations);
+        }
+    }
+
+    /// <summary>
     /// generates itemDetailResponse with detailed information about the item.
     /// </summary>
     /// <param name="item">Item to be converted to a response.</param>
@@ -155,7 +152,7 @@ public class ItemResponseGenerator : ABaseResponseGenerator
         var response = _mapper.Map<ItemDetailResponse>(item);
 
         // Add link for detailed response
-        await AddItemDetailLinks(item, response);
+        await AddCommonLinks(item, response);
 
         // Add links for detailed reponse
         response._links.Add(new LinkResponse(
@@ -174,7 +171,7 @@ public class ItemResponseGenerator : ABaseResponseGenerator
         var response = _mapper.Map<ItemOwnerResponse>(item);
 
         // Add links for detailed response
-        await AddItemDetailLinks(item, response);
+        await AddCommonLinks(item, response);
 
         // Add links for owner
         response._links.Add(new LinkResponse(

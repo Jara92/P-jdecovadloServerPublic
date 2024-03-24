@@ -47,4 +47,9 @@ public class ReviewService(IReviewRepository repository)
     {
         return _repository.GetAverageRatingForUser(userId);
     }
+
+    public Task<int> GetTotalReviewsCountForUser(string userId)
+    {
+        return _repository.GetTotalReviewsCountForUser(userId);
+    }
 }
