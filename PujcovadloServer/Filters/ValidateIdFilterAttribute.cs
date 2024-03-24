@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using PujcovadloServer.Requests;
 
-namespace PujcovadloServer.Business.Filters;
+namespace PujcovadloServer.Filters;
 
 public class ValidateIdFilterAttribute : ActionFilterAttribute
 {

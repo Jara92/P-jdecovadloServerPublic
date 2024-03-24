@@ -9,7 +9,7 @@ using PujcovadloServer.Areas.Admin.Requests;
 using PujcovadloServer.Areas.Admin.Responses;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Enums;
-using PujcovadloServer.Business.Filters;
+using PujcovadloServer.Filters;
 using Syncfusion.EJ2.Base;
 
 namespace PujcovadloServer.Areas.Admin.Controllers;

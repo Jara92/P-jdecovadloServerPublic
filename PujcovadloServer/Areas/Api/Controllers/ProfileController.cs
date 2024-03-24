@@ -4,7 +4,7 @@ using PujcovadloServer.Areas.Api.Services;
 using PujcovadloServer.AuthorizationHandlers;
 using PujcovadloServer.AuthorizationHandlers.Profile;
 using PujcovadloServer.Business.Facades;
-using PujcovadloServer.Business.Filters;
+using PujcovadloServer.Filters;
 using PujcovadloServer.Requests;
 using PujcovadloServer.Responses;
 

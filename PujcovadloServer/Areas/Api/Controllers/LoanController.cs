@@ -7,6 +7,7 @@ using PujcovadloServer.AuthorizationHandlers.Loan;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Facades;
 using PujcovadloServer.Business.Filters;
+using PujcovadloServer.Filters;
 using PujcovadloServer.Requests;
 using PujcovadloServer.Responses;
 

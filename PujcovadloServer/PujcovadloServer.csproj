@@ -46,6 +46,7 @@
 
     <ItemGroup>
         <Folder Include="Areas\Admin\Business\Objects\"/>
+        <Folder Include="Areas\Admin\Filters\"/>
         <Folder Include="Areas\Admin\Resources\"/>
         <Folder Include="Areas\Admin\wwwroot\assets\"/>
       <Folder Include="Migrations\" />

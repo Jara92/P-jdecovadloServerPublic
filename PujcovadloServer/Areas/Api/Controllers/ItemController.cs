@@ -9,6 +9,7 @@ using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Enums;
 using PujcovadloServer.Business.Facades;
 using PujcovadloServer.Business.Filters;
+using PujcovadloServer.Filters;
 using PujcovadloServer.Requests;
 using PujcovadloServer.Responses;
 

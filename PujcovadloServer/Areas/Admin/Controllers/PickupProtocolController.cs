@@ -8,7 +8,7 @@ using PujcovadloServer.Areas.Admin.Enums;
 using PujcovadloServer.Areas.Admin.Requests;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Enums;
-using PujcovadloServer.Business.Filters;
+using PujcovadloServer.Filters;
 
 namespace PujcovadloServer.Areas.Admin.Controllers;
 
