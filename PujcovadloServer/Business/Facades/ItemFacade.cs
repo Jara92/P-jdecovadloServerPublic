@@ -1,4 +1,5 @@
 using AutoMapper;
+using Microsoft.IdentityModel.Tokens;
 using NuGet.Packaging;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Enums;
@@ -235,6 +236,12 @@ public class ItemFacade
         // Create using image facade
         await _imageFacade.CreateImage(image, filePath);
 
+        // Set main image if there is none yet.
+        if (item.Images.IsNullOrEmpty())
+        {
+            item.MainImage = image;
+        }
+
         // Update item
         await _itemService.Update(item);
     }
@@ -277,8 +284,12 @@ public class ItemFacade
         // Make main image null if the image is the main image
         if (image.Item.MainImageId == image.Id)
         {
-            image.Item.MainImage = null;
-            image.Item.MainImageId = null;
+            // Select random image as new main image
+            var newMainImage = image.Item.Images.FirstOrDefault(i => i.Id != image.Id);
+
+            // Set the new main image
+            image.Item.MainImage = newMainImage;
+            image.Item.MainImageId = newMainImage?.Id;
         }
 
         // Delete the image

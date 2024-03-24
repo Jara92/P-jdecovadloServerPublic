@@ -881,18 +881,43 @@ public class ItemFacadeTest
     }
 
     [Test]
-    public async Task DeleteImage_ImageWasTheMainImageOfTheItem_SuccessAndMainImageWasSetToNull()
+    public async Task DeleteImage_ImageWasTheMainImageOfTheItemAndThereIsNoOtherImage_SuccessAndMainImageWasSetToNull()
     {
         // Arrange
         var image = new Image { Id = 1, Item = _item };
         _item.MainImage = image;
         _item.MainImageId = image.Id;
+        _item.Images = new List<Image> { image };
 
         // Act - delete the image
         await _itemFacade.DeleteImage(image);
 
         // Verify that the main image was set to null
         Assert.That(_item.MainImage, Is.Null);
+
+        // Verify that the item was updated
+        _itemService.Verify(s => s.Update(_item), Times.Once);
+
+        // Verify that DeleteImage was called
+        _imageFacade.Verify(o => o.DeleteImage(image), Times.Once);
+    }
+
+    [Test]
+    public async Task DeleteImage_ImageWasTheMainImageOfTheItem_SuccessAndMainImageWasSetToTheOther()
+    {
+        // Arrange
+        var image = new Image { Id = 1, Item = _item };
+        var newMainImage = new Image { Id = 2, Item = _item };
+
+        _item.MainImage = image;
+        _item.MainImageId = image.Id;
+        _item.Images = new List<Image> { image, newMainImage };
+
+        // Act - delete the image
+        await _itemFacade.DeleteImage(image);
+
+        // Verify that the main image was set to null
+        Assert.That(_item.MainImage.Id, Is.EqualTo(newMainImage.Id));
 
         // Verify that the item was updated
         _itemService.Verify(s => s.Update(_item), Times.Once);
