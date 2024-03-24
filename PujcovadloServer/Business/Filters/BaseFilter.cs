@@ -16,7 +16,7 @@ public class BaseFilter
         SortOrder = filter.SortOrder;
     }
 
-    public BaseFilter Clone()
+    public virtual BaseFilter Clone()
     {
         return new BaseFilter(this);
     }

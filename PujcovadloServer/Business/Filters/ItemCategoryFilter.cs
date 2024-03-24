@@ -5,16 +5,13 @@ public class ItemCategoryFilter : BaseFilter
     public ItemCategoryFilter()
     {
     }
-    
+
     public ItemCategoryFilter(ItemCategoryFilter filter) : base(filter)
     {
-       
     }
 
-    public ItemCategoryFilter Clone()
+    public override ItemCategoryFilter Clone()
     {
         return new ItemCategoryFilter(this);
     }
-    
-    
 }

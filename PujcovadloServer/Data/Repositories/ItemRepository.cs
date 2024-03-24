@@ -33,7 +33,10 @@ public class ItemRepository : ACrudRepository<Item, ItemFilter>, IItemRepository
 
         // Search by name or description
         if (filter.Search != null)
-            query = query.Where(i => i.Name.Contains(filter.Search) || i.Description.Contains(filter.Search));
+            query = query.Where(i =>
+                i.Name.IndexOf(filter.Search, StringComparison.OrdinalIgnoreCase) >= 0 ||
+                i.Description.IndexOf(filter.Search, StringComparison.OrdinalIgnoreCase) >= 0
+            );
 
         // Search by owner
         if (filter.OwnerId != null)

@@ -5,16 +5,13 @@ public class ItemTagFilter : BaseFilter
     public ItemTagFilter()
     {
     }
-    
+
     public ItemTagFilter(ItemTagFilter filter) : base(filter)
     {
-       
     }
 
-    public ItemTagFilter Clone()
+    public override ItemTagFilter Clone()
     {
         return new ItemTagFilter(this);
     }
-    
-    
 }
