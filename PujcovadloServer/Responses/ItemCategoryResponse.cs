@@ -11,6 +11,7 @@ public class ItemCategoryResponse
     //public string Description { get; set; } = default!;
 
     //public virtual ItemCategoryResponse? Parent { get; set; }
+    public int? ParentId { get; set; }
 
     public IList<LinkResponse> _links { get; set; } = new List<LinkResponse>();
 }
