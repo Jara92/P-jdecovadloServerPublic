@@ -33,10 +33,15 @@ public class ItemRepository : ACrudRepository<Item, ItemFilter>, IItemRepository
 
         // Search by name or description
         if (filter.Search != null)
+        {
+            // TODO: Optimize search and case insensitive search
+            var search = filter.Search.ToLower();
+
             query = query.Where(i =>
-                i.Name.IndexOf(filter.Search, StringComparison.OrdinalIgnoreCase) >= 0 ||
-                i.Description.IndexOf(filter.Search, StringComparison.OrdinalIgnoreCase) >= 0
+                i.Name.ToLower().Contains(search) ||
+                i.Description.ToLower().Contains(search)
             );
+        }
 
         // Search by owner
         if (filter.OwnerId != null)
