@@ -2,8 +2,10 @@ using AutoMapper;
 using PujcovadloServer.Areas.Admin.Requests;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Exceptions;
+using PujcovadloServer.Business.Filters;
 using PujcovadloServer.Business.Objects;
 using PujcovadloServer.Business.Services;
+using PujcovadloServer.Lib;
 
 namespace PujcovadloServer.Areas.Admin.Business.Facades;
 
@@ -16,6 +18,14 @@ public class ItemTagFacade
     {
         _itemTagService = itemTagService;
         _mapper = mapper;
+    }
+
+    public Task<PaginatedList<ItemTag>> GetAll(ItemTagFilter filter)
+    {
+        // Display only approved items
+        filter.OnlyApproved = true;
+
+        return _itemTagService.GetAll(filter);
     }
 
     public async Task<ItemTag> Get(int id)
