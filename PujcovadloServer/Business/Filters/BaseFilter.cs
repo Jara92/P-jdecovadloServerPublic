@@ -30,7 +30,7 @@ public class BaseFilter
     /// Page size.
     /// </summary>
     [Range(1, 100)]
-    public virtual int PageSize { get; set; } = 2;
+    public int PageSize { get; set; } = 2;
 
     /// <summary>
     /// Column to sort the result by.
