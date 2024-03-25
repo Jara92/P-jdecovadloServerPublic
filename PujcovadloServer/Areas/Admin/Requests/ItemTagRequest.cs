@@ -7,7 +7,7 @@ public class ItemTagRequest
     public int? Id { get; set; }
 
     [Required]
-    [StringLength(32, MinimumLength = 4)]
+    [StringLength(40, MinimumLength = 4)]
     public string Name { get; set; }
 
     [Required] public bool IsApproved { get; set; }

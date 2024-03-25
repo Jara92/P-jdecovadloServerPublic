@@ -30,7 +30,7 @@ public class ItemRequest : EntityRequest
 
     [MaxLength(5)] public virtual IList<int> Categories { get; set; } = new List<int>();
 
-    [MaxLength(10)] public virtual IList<string> Tags { get; set; } = new List<string>();
+    [MaxLength(10)] [ItemsLength(0, 40)] public virtual IList<string> Tags { get; set; } = new List<string>();
 
     public int? MainImageId { get; set; }
 
