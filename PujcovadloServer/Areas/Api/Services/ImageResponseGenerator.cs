@@ -52,6 +52,7 @@ public class ImageResponseGenerator : ABaseResponseGenerator
     {
         // Add link to the image data
         var imageUrl = await _imageFacade.GetImagePath(image);
+        response.Url = imageUrl;
         response._links.Add(new LinkResponse(imageUrl, "DATA", "GET"));
 
         // Image item
@@ -128,7 +129,7 @@ public class ImageResponseGenerator : ABaseResponseGenerator
     {
         var response = _mapper.Map<ImageResponse>(loan);
 
-        AddCommonLinks(response, loan);
+        await AddCommonLinks(response, loan);
 
         return response;
     }

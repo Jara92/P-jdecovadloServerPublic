@@ -150,7 +150,7 @@ public class TenantFacadeTest
         // Expected item 
         var item = new Item
         {
-            Id = request.Id,
+            Id = request.ItemId,
             PricePerDay = 100,
             RefundableDeposit = 2000
         };
@@ -230,7 +230,7 @@ public class TenantFacadeTest
         // Expected item 
         var item = new Item
         {
-            Id = request.Id,
+            Id = request.ItemId,
             PricePerDay = 100,
             RefundableDeposit = 2000,
             Owner = _user
@@ -291,7 +291,7 @@ public class TenantFacadeTest
         // Expected item 
         var item = new Item
         {
-            Id = request.Id,
+            Id = request.ItemId,
             PricePerDay = 100,
             RefundableDeposit = 2000,
             Status = ItemStatus.Approving

@@ -100,19 +100,24 @@ public class ItemResponseGenerator : ABaseResponseGenerator
         return response;
     }
 
-    private async Task AddImageLinks(Item item, Image image, ImageResponse imageResponse)
+    private async Task AddImageLinks(Item item, Image image, ImageResponse imageResponse, bool canUpdate)
     {
+        // Get image url
+        var imageUrl = await _imageFacade.GetImagePath(image);
+        imageResponse.Url = imageUrl;
+
         // LInk to image detail
         imageResponse._links.Add(new LinkResponse(
             _urlHelper.GetUriByAction(_httpContext, nameof(ImageController.GetImage), "Image",
                 values: new { id = imageResponse.Id }), "SELF", "GET"));
 
-        var imageUrl = await _imageFacade.GetImagePath(image);
-
-        imageResponse.Url = imageUrl;
-
-        // Link to image data
-        imageResponse._links.Add(new LinkResponse(imageUrl, "DATA", "GET"));
+        // Add edit links
+        if (canUpdate)
+        {
+            imageResponse._links.Add(new LinkResponse(
+                _urlHelper.GetUriByAction(_httpContext, nameof(ItemController.DeleteImage), "Item",
+                    values: new { itemId = item.Id, imageId = image.Id }), "DELETE", "DELETE"));
+        }
     }
 
     /// <summary>
@@ -122,16 +127,18 @@ public class ItemResponseGenerator : ABaseResponseGenerator
     /// <param name="response">Response for the links to be added.</param>
     private async Task AddCommonLinks(Item item, ItemResponse response)
     {
+        bool canUpdate = await _authorizationService.CanPerformOperation(item, ItemOperations.Update);
+
         // Main image link
         if (item.MainImage != null && response.MainImage != null)
         {
-            await AddImageLinks(item, item.MainImage, response.MainImage);
+            await AddImageLinks(item, item.MainImage, response.MainImage, canUpdate);
         }
 
         // Image links
         for (var i = 0; i < item.Images.Count; i++)
         {
-            await AddImageLinks(item, item.Images[i], response.Images[i]);
+            await AddImageLinks(item, item.Images[i], response.Images[i], canUpdate);
         }
 
         var profile = item.Owner.Profile;
@@ -154,9 +161,8 @@ public class ItemResponseGenerator : ABaseResponseGenerator
         // Add link for detailed response
         await AddCommonLinks(item, response);
 
-        // Add links for detailed reponse
-        response._links.Add(new LinkResponse(
-            _urlHelper.GetUriByAction(_httpContext, nameof(ItemController.Index), "Item"), "LIST", "GET"));
+        // Generate links specific for detail response
+        await GenerateDetailLinks(item, response);
 
         return response;
     }
@@ -173,6 +179,14 @@ public class ItemResponseGenerator : ABaseResponseGenerator
         // Add links for detailed response
         await AddCommonLinks(item, response);
 
+        // Generate links specific for detail response
+        await GenerateDetailLinks(item, response);
+
+        return response;
+    }
+
+    public async Task GenerateDetailLinks(Item item, ItemDetailResponse response)
+    {
         // Add links for owner
         response._links.Add(new LinkResponse(
             _urlHelper.GetUriByAction(_httpContext, nameof(ItemController.Index), "Item"), "LIST", "GET"));
@@ -194,6 +208,12 @@ public class ItemResponseGenerator : ABaseResponseGenerator
                     values: new { item.Id }), "DELETE", "DELETE"));
         }
 
-        return response;
+        // Add link for new image
+        if (await _authorizationService.CanPerformOperation(item, ItemOperations.CreateImage))
+        {
+            response._links.Add(new LinkResponse(
+                _urlHelper.GetUriByAction(_httpContext, nameof(ItemController.AddImage), "Item",
+                    values: new { id = item.Id }), "CREATE_IMAGE", "POST"));
+        }
     }
 }
