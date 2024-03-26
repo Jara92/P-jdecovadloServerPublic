@@ -11,6 +11,7 @@ public class FileUploadService
     /// </summary>
     private readonly Dictionary<string, List<Byte[]>> _fileSignatures = new()
     {
+        // https://sceweb.sce.uhcl.edu/abeysekera/itec3831/labs/FILE%20SIGNATURES%20TABLE.pdf
         {
             ".jpeg", new List<byte[]>
             {
@@ -22,6 +23,7 @@ public class FileUploadService
         {
             ".jpg", new List<byte[]>
             {
+                new byte[] { 0xFF, 0xD8 },
                 new byte[] { 0xFF, 0xD8, 0xFF, 0xDB },
                 new byte[] { 0xFF, 0xD8, 0xFF, 0xE0 },
                 new byte[] { 0xFF, 0xD8, 0xFF, 0xEE },
