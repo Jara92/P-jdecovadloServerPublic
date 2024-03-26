@@ -166,7 +166,7 @@ builder.Services.AddAuthentication(options =>
 
 // Minio object storage configuration
 builder.Services.AddMinio(configureClient => configureClient
-    .WithSSL(false)
+    .WithSSL(builder.Configuration.GetValue<bool>("Minio:UseSSL"))
     .WithEndpoint(builder.Configuration["Minio:Endpoint"])
     .WithCredentials(builder.Configuration["Minio:AccessKey"], builder.Configuration["Minio:SecretKey"])
 );
