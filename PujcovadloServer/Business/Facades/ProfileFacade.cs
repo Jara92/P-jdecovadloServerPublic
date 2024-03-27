@@ -13,16 +13,19 @@ public class ProfileFacade
     private readonly ProfileService _profileService;
     private readonly ItemService _itemService;
     private readonly ReviewService _reviewService;
+    private readonly LoanService _loanService;
     private readonly IAuthenticateService _authenticateService;
     private readonly IMapper _mapper;
     private readonly PujcovadloServerConfiguration _configuration;
 
     public ProfileFacade(ProfileService profileService, ItemService itemService, ReviewService reviewService,
-        IAuthenticateService authenticateService, IMapper mapper, PujcovadloServerConfiguration configuration)
+        LoanService loanService, IAuthenticateService authenticateService, IMapper mapper,
+        PujcovadloServerConfiguration configuration)
     {
         _profileService = profileService;
         _itemService = itemService;
         _reviewService = reviewService;
+        _loanService = loanService;
         _authenticateService = authenticateService;
         _mapper = mapper;
         _configuration = configuration;
@@ -51,10 +54,14 @@ public class ProfileFacade
         var publicItemsCount = await _itemService.GetPublicItemsCountByUser(profile.UserId);
         var averateRating = await _reviewService.GetAverageRatingForUser(profile.UserId);
         var totalReviews = await _reviewService.GetTotalReviewsCountForUser(profile.UserId);
+        var borrowedItemsCount = await _loanService.GetBorrovedItemsCountByUser(profile.UserId);
+        var lentItemsCount = await _loanService.GetLentItemsCountByUser(profile.UserId);
 
         return new ProfileAggregations
         {
             CountOfPublicItems = publicItemsCount,
+            CountOfBorrowedItems = borrowedItemsCount,
+            CountOfLentItems = lentItemsCount,
             AverageRating = averateRating,
             TotalReviews = totalReviews,
         };

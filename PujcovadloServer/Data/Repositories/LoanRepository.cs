@@ -60,4 +60,18 @@ public class LoanRepository : ACrudRepository<Loan, LoanFilter>, ILoanRepository
 
         return base.GetAll(query, filter);
     }
+
+    public Task<int> GetBorrovedItemsCountByUser(string userId)
+    {
+        return _dbSet.Where(l => l.TenantId == userId)
+            .Where(l => _finalStatuses.Contains(l.Status))
+            .CountAsync();
+    }
+
+    public Task<int> GetLentItemsCountByUser(string userId)
+    {
+        return _dbSet.Where(l => l.Item.OwnerId == userId)
+            .Where(l => _finalStatuses.Contains(l.Status))
+            .CountAsync();
+    }
 }

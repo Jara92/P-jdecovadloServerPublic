@@ -60,4 +60,14 @@ public class LoanService : ACrudService<Loan, ILoanRepository, LoanFilter>
 
         return Task.FromResult(statuses);
     }
+
+    public Task<int> GetBorrovedItemsCountByUser(string userId)
+    {
+        return _repository.GetBorrovedItemsCountByUser(userId);
+    }
+
+    public Task<int> GetLentItemsCountByUser(string userId)
+    {
+        return _repository.GetLentItemsCountByUser(userId);
+    }
 }

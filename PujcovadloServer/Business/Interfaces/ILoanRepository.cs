@@ -10,4 +10,6 @@ public interface ILoanRepository : ICrudRepository<Loan, LoanFilter>
 
     public Task<int> GetRunningLoansCountByItem(Item item);
     Task<PaginatedList<Loan>> GetAllByUserId(string userId, LoanFilter filter);
+    Task<int> GetBorrovedItemsCountByUser(string userId);
+    Task<int> GetLentItemsCountByUser(string userId);
 }

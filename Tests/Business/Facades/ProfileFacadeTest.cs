@@ -16,6 +16,7 @@ public class ProfileFacadeTest
     private Mock<ProfileService> _profileService;
     private Mock<ItemService> _itemService;
     private Mock<ReviewService> _reviewService;
+    private Mock<LoanService> _loanService;
     private Mock<IAuthenticateService> _authenticateService;
     private Mock<IMapper> _mapper;
     private Mock<PujcovadloServerConfiguration> _configuration;
@@ -34,12 +35,13 @@ public class ProfileFacadeTest
         _profileService = new Mock<ProfileService>(null);
         _itemService = new Mock<ItemService>(null);
         _reviewService = new Mock<ReviewService>(null);
+        _loanService = new Mock<LoanService>(null);
         _authenticateService = new Mock<IAuthenticateService>();
         _mapper = new Mock<IMapper>();
         _configuration = new Mock<PujcovadloServerConfiguration>(null);
 
         _profileFacade = new ProfileFacade(_profileService.Object, _itemService.Object, _reviewService.Object,
-            _authenticateService.Object, _mapper.Object, _configuration.Object);
+            _loanService.Object, _authenticateService.Object, _mapper.Object, _configuration.Object);
 
         _user = new ApplicationUser() { Id = "1" };
 
