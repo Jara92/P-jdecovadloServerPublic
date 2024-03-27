@@ -29,7 +29,11 @@ public class MappingProfile : Profile
 
         CreateMap<ApplicationUser, UserResponse>();
 
-        CreateMap<Loan, LoanResponse>();
+        CreateMap<Loan, LoanResponse>()
+            .ForMember(r => r.Owner, opt => opt.MapFrom(l => l.Item.Owner))
+            .ForMember(r => r.ItemName, opt => opt.MapFrom(l => l.Item.Name))
+            .ForMember(r => r.ItemImage, opt => opt.MapFrom(l => l.Item.MainImage))
+            ;
         CreateMap<LoanRequest, Loan>()
             // Ignore item because it need to be handled separately
             .ForMember(r => r.Item, opt => opt.Ignore());

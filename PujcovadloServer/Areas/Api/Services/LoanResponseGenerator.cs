@@ -16,13 +16,16 @@ namespace PujcovadloServer.Areas.Api.Services;
 /// </summary>
 public class LoanResponseGenerator : ABaseResponseGenerator
 {
+    private readonly ImageResponseGenerator _imageResponseGenerator;
     private readonly IMapper _mapper;
     private readonly ReviewFacade _reviewFacade;
 
-    public LoanResponseGenerator(ReviewFacade reviewFacade, IMapper mapper, LinkGenerator urlHelper,
+    public LoanResponseGenerator(ImageResponseGenerator imageResponseGenerator, ReviewFacade reviewFacade,
+        IMapper mapper, LinkGenerator urlHelper,
         IHttpContextAccessor httpContextAccessor, AuthorizationService authorizationService) :
         base(httpContextAccessor, urlHelper, authorizationService)
     {
+        _imageResponseGenerator = imageResponseGenerator;
         _reviewFacade = reviewFacade;
         _mapper = mapper;
     }
@@ -39,7 +42,7 @@ public class LoanResponseGenerator : ABaseResponseGenerator
         // Add link to detail
         response._links.Add(new LinkResponse(GetLink(loan), "SELF", "GET"));
 
-        AddCommonLinks(response, loan);
+        await AddCommonLinks(response, loan);
 
         return response;
     }
@@ -49,8 +52,14 @@ public class LoanResponseGenerator : ABaseResponseGenerator
     /// </summary>
     /// <param name="response">Response to be advanced.</param>
     /// <param name="loan">Loan which is the response about.</param>
-    private void AddCommonLinks(LoanResponse response, Loan loan)
+    private async Task AddCommonLinks(LoanResponse response, Loan loan)
     {
+        // Add image links
+        if (loan.Item.MainImage != null)
+        {
+            response.ItemImage = await _imageResponseGenerator.GenerateImageDetailResponse(loan.Item.MainImage);
+        }
+
         // Link to loan owner
         if (loan.Item.Owner.Profile != null)
         {
@@ -119,7 +128,7 @@ public class LoanResponseGenerator : ABaseResponseGenerator
     {
         var response = _mapper.Map<LoanResponse>(loan);
 
-        AddCommonLinks(response, loan);
+        await AddCommonLinks(response, loan);
 
         // Add link to all loans where the user participates
         response._links.Add(new LinkResponse(

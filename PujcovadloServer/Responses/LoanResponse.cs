@@ -24,7 +24,11 @@ public class LoanResponse
 
     public UserResponse Tenant { get; set; } = default!;
 
-    public ItemResponse Item { get; set; } = default!;
+    public UserResponse Owner { get; set; } = default!;
+
+    public ImageResponse? ItemImage { get; set; }
+
+    public string ItemName { get; set; } = default!;
 
     public IList<ReviewResponse> Reviews { get; private set; } = new List<ReviewResponse>();
 
