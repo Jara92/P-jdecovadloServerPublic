@@ -24,11 +24,12 @@ public class LoanController : ACrudController<Loan>
     private readonly OwnerFacade _ownerFacade;
     private readonly ItemFacade _itemFacade;
     private readonly ReviewFacade _reviewFacade;
+    private readonly ProfileFacade _profileFacade;
     private readonly LoanResponseGenerator _responseGenerator;
     private readonly ReviewResponseGenerator _reviewResponseGenerator;
 
     public LoanController(LoanFacade loanFacade, TenantFacade tenantFacade, OwnerFacade ownerFacade,
-        ItemFacade itemFacade, ReviewFacade reviewFacade,
+        ItemFacade itemFacade, ReviewFacade reviewFacade, ProfileFacade profileFacade,
         LoanResponseGenerator responseGenerator, ReviewResponseGenerator reviewResponseGenerator,
         AuthorizationService authorizationService, LinkGenerator urlHelper) : base(authorizationService, urlHelper)
     {
@@ -37,6 +38,7 @@ public class LoanController : ACrudController<Loan>
         _ownerFacade = ownerFacade;
         _itemFacade = itemFacade;
         _reviewFacade = reviewFacade;
+        _profileFacade = profileFacade;
         _responseGenerator = responseGenerator;
         _reviewResponseGenerator = reviewResponseGenerator;
     }
@@ -47,6 +49,23 @@ public class LoanController : ACrudController<Loan>
     public async Task<ActionResult<List<LoanResponse>>> GetLoans([FromQuery] LoanFilter filter)
     {
         var loans = await _loanFacade.GetLoans(filter);
+
+        foreach (var loan in loans)
+        {
+            // Set aggregations for the owner
+            var ownerProfile = loan.Item.Owner.Profile;
+            if (ownerProfile != null)
+            {
+                ownerProfile.Aggregations = await _profileFacade.GetProfileAggregations(ownerProfile);
+            }
+
+            // Set aggregations for the tenant
+            var tenantProfile = loan.Tenant.Profile;
+            if (tenantProfile != null)
+            {
+                tenantProfile.Aggregations = await _profileFacade.GetProfileAggregations(tenantProfile);
+            }
+        }
 
         // generate response list
         var response = await _responseGenerator.GenerateResponseList(loans, filter, nameof(GetLoans), "Loan");

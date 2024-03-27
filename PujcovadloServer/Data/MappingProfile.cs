@@ -47,7 +47,9 @@ public class MappingProfile : Profile
         CreateMap<Review, ReviewResponse>();
         CreateMap<ReviewRequest, Review>();
 
-        CreateMap<PujcovadloServer.Business.Entities.Profile, ProfileResponse>();
+        CreateMap<PujcovadloServer.Business.Entities.Profile, ProfileResponse>()
+            .ForMember(p => p._aggregations, opt => opt.MapFrom(p => p.Aggregations))
+            ;
         CreateMap<ProfileUpdateRequest, PujcovadloServer.Business.Entities.Profile>();
 
         CreateMap<ProfileAggregations, ProfileAggregationsResponse>();
