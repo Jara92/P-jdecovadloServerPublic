@@ -14,7 +14,7 @@ public class LoanResponse
 
     public int Days { get; set; }
 
-    public float PricePerUnit { get; set; }
+    public float PricePerDay { get; set; }
 
     public float ExpectedPrice { get; set; }
 
