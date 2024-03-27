@@ -26,6 +26,10 @@ public class LoanRepository : ACrudRepository<Loan, LoanFilter>, ILoanRepository
     {
         var query = _dbSet.AsQueryable();
 
+        // Search
+        if (!string.IsNullOrEmpty(filter.Search))
+            query = query.Where(l => l.Item.Name.ToLower().Contains(filter.Search.ToLower()));
+
         // Filter by tenant
         if (filter.TenantId != null)
             query = query.Where(l => l.TenantId == filter.TenantId);

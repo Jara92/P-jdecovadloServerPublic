@@ -1,5 +1,3 @@
-using System.ComponentModel;
-
 namespace PujcovadloServer.Business.Filters;
 
 public class LoanFilter : BaseFilter
@@ -10,6 +8,7 @@ public class LoanFilter : BaseFilter
 
     public LoanFilter(LoanFilter filter) : base(filter)
     {
+        Search = filter.Search;
         TenantId = filter.TenantId;
         OwnerId = filter.OwnerId;
     }
@@ -20,7 +19,9 @@ public class LoanFilter : BaseFilter
         return new LoanFilter(this);
     }
 
-    [ReadOnly(true)] public string? TenantId { get; set; }
+    public string? Search { get; set; }
 
-    [ReadOnly(true)] public string? OwnerId { get; set; }
+    public string? TenantId { get; set; }
+
+    public string? OwnerId { get; set; }
 }
