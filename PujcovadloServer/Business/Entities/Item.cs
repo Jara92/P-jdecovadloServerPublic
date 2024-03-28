@@ -27,7 +27,7 @@ public class Item : BaseEntity
     [DisplayName("Status")]
     public ItemStatus Status { get; set; } = ItemStatus.Public;
 
-    [DisplayName("Parameters")] public string Parameters { get; set; } = "";
+    [DisplayName("Parameters")] public string? Parameters { get; set; } = "";
 
     [Required]
     [DisplayName("Price per day")]

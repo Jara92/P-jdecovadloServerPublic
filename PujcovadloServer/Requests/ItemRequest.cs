@@ -16,7 +16,7 @@ public class ItemRequest : EntityRequest
 
     // todo: this is not a good way to represent parameters so this field is not required not
     /*[Required]*/
-    [StringLength(256, MinimumLength = 0)] public string Parameters { get; set; } = "";
+    [StringLength(256, MinimumLength = 0)] public string? Parameters { get; set; } = "";
 
     [Required] [Price(0, 1000000)] public float? PricePerDay { get; set; }
 

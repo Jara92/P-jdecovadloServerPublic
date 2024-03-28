@@ -35,7 +35,7 @@ public class ProfileFacadeTest
         _profileService = new Mock<ProfileService>(null);
         _itemService = new Mock<ItemService>(null);
         _reviewService = new Mock<ReviewService>(null);
-        _loanService = new Mock<LoanService>(null);
+        _loanService = new Mock<LoanService>(null, null);
         _authenticateService = new Mock<IAuthenticateService>();
         _mapper = new Mock<IMapper>();
         _configuration = new Mock<PujcovadloServerConfiguration>(null);

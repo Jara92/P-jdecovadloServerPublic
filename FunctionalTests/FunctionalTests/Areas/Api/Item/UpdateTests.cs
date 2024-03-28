@@ -245,7 +245,7 @@ public class UpdateTests : IClassFixture<CustomWebApplicationFactory<Program>>
     }
 
     [Fact]
-    public async Task Update_InvalidParameters_BadRequest()
+    public async Task Update_NoParameters_Ok()
     {
         UserHelper.SetAuthorizationHeader(_client, UserHelper.OwnerToken);
 
@@ -256,7 +256,7 @@ public class UpdateTests : IClassFixture<CustomWebApplicationFactory<Program>>
         var response = await _client.PutAsJsonAsync("/api/items/" + _itemRequest.Id, _itemRequest);
 
         // Check http status
-        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NoContent));
 
         // Null parameters
         _itemRequest.Parameters = null;
@@ -265,7 +265,7 @@ public class UpdateTests : IClassFixture<CustomWebApplicationFactory<Program>>
         response = await _client.PutAsJsonAsync("/api/items/" + _itemRequest.Id, _itemRequest);
 
         // Check http status
-        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NoContent));
     }
 
     [Fact]

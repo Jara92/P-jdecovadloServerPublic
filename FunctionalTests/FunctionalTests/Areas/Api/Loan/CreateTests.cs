@@ -111,7 +111,9 @@ public class CreateTests : IClassFixture<CustomWebApplicationFactory<Program>>
         var loan = await response.Content.ReadAsAsync<LoanResponse>();
         Assert.That(loan, Is.Not.Null);
         Assert.That(loan.Id, Is.GreaterThan(0));
-        Assert.That(loan.Item.Id, Is.EqualTo(_loanRequest.ItemId));
+        //Assert.That(loan.ItemId.Id, Is.EqualTo(_loanRequest.ItemId));
+        Assert.That(loan.ItemImage?.Id, Is.EqualTo(_data.Item1.MainImage?.Id));
+        Assert.That(loan.ItemName, Is.EqualTo(_data.Item1.Name));
         Assert.That(loan.From, Is.EqualTo(_loanRequest.From));
         Assert.That(loan.TenantNote, Is.EqualTo(_loanRequest.TenantNote));
         Assert.That(loan.Tenant.Id, Is.EqualTo(UserHelper.TenantId));

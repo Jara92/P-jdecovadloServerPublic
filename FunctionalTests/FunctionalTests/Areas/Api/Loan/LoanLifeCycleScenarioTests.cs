@@ -88,7 +88,7 @@ public class LoanLifeCycleScenarioTests : IClassFixture<CustomWebApplicationFact
         Assert.That(reviews, Has.Count.EqualTo(1));
         Assert.That(reviews[0].Comment, Is.EqualTo(ownerReview.Comment));
         Assert.That(reviews[0].Rating, Is.EqualTo(ownerReview.Rating));
-        Assert.That(reviews[0].Author.Id, Is.EqualTo(tenantsLoan.Item.Owner.Id));
+        Assert.That(reviews[0].Author.Id, Is.EqualTo(tenantsLoan.Owner.Id));
 
         // tenant adds a review
         UserHelper.SetAuthorizationHeader(_client, UserHelper.TenantToken);
@@ -356,7 +356,9 @@ public class LoanLifeCycleScenarioTests : IClassFixture<CustomWebApplicationFact
         // Check data
         Assert.That(loan, Is.Not.Null);
         Assert.That(loan.Id, Is.GreaterThan(0));
-        Assert.That(loan.Item.Id, Is.EqualTo(newLoanRequest.ItemId));
+        //Assert.That(loan.Item.Id, Is.EqualTo(newLoanRequest.ItemId));
+        Assert.That(loan.ItemImage?.Id, Is.EqualTo(_data.Item1.MainImage?.Id));
+        Assert.That(loan.ItemName, Is.EqualTo(_data.Item1.Name));
         Assert.That(loan.From, Is.EqualTo(newLoanRequest.From));
         Assert.That(loan.To, Is.EqualTo(newLoanRequest.To));
         Assert.That(loan.TenantNote, Is.EqualTo(newLoanRequest.TenantNote));
