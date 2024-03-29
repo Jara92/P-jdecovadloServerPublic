@@ -42,10 +42,11 @@ public class AuthenticateController : ControllerBase
             var token = await _authenticateService.Login(request);
 
             // Return token
+            // TODO: make response for this
             return Ok(new
             {
-                token = new JwtSecurityTokenHandler().WriteToken(token),
-                expiration = token.ValidTo
+                AccessToken = new JwtSecurityTokenHandler().WriteToken(token),
+                AccessTokenExpiration = token.ValidTo
             });
         }
         catch (AuthenticationFailedException e)
