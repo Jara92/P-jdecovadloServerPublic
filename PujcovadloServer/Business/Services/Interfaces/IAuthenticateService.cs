@@ -1,9 +1,6 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Security.Principal;
 using PujcovadloServer.Authentication;
 using PujcovadloServer.Authentication.Exceptions;
-using PujcovadloServer.Business.Enums;
+using PujcovadloServer.Authentication.Objects;
 
 namespace PujcovadloServer.Business.Services.Interfaces;
 
@@ -29,16 +26,16 @@ public interface IAuthenticateService
     /// Performs user login and returns JWT token
     /// </summary>
     /// <param name="request">Login request</param>
-    /// <returns>JWT token for the client.</returns>
+    /// <returns>Login result data.</returns>
     /// <exception cref="AuthenticationFailedException">Thrown when entered credentials are not valid.</exception>
-    public Task<JwtSecurityToken> Login(LoginRequest request);
+    public Task<LoginResult> Login(LoginRequest request);
 
     /// <summary>
     /// Is user authenticated?
     /// </summary>
     /// <returns>true is user is authenticated.</returns>
     public bool IsAuthenticated();
-    
+
     /// <summary>
     /// Returns current user.
     /// </summary>
@@ -52,7 +49,7 @@ public interface IAuthenticateService
     /// <returns>Authenticated user id.</returns>
     /// <exception cref="NotAuthenticatedException">Thrown if user is not authenticated.</exception>
     public string GetCurrentUserId();
-    
+
     /// <summary>
     /// Returns ID of the current user or null if not authenticated.
     /// </summary>

@@ -39,14 +39,15 @@ public class AuthenticateController : ControllerBase
         try
         {
             // Try to login and get JWT token
-            var token = await _authenticateService.Login(request);
+            var result = await _authenticateService.Login(request);
 
             // Return token
             // TODO: make response for this
             return Ok(new
             {
-                AccessToken = new JwtSecurityTokenHandler().WriteToken(token),
-                AccessTokenExpiration = token.ValidTo
+                AccessToken = new JwtSecurityTokenHandler().WriteToken(result.Token),
+                AccessTokenExpiration = result.Token.ValidTo,
+                UserId = result.CurrentUser.Id
             });
         }
         catch (AuthenticationFailedException e)
@@ -54,7 +55,7 @@ public class AuthenticateController : ControllerBase
             var details = new ExceptionResponse
             {
                 Title = "Unauthorized",
-                Status = StatusCodes.Status403Forbidden,
+                Status = StatusCodes.Status401Unauthorized,
                 Errors = new List<string> { e.Message }
             };
 

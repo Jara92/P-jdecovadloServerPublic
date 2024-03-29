@@ -4,6 +4,7 @@ using System.Text;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using PujcovadloServer.Authentication.Exceptions;
+using PujcovadloServer.Authentication.Objects;
 using PujcovadloServer.Business.Enums;
 using PujcovadloServer.Business.Services.Interfaces;
 
@@ -101,7 +102,7 @@ public class AuthenticateService : IAuthenticateService
     }
 
     /// <inheritdoc cref="IAuthenticateService"/>
-    public async Task<JwtSecurityToken> Login(LoginRequest request)
+    public async Task<LoginResult> Login(LoginRequest request)
     {
         // Get user by username
         var user = await _userManager.FindByNameAsync(request.Username);
@@ -147,7 +148,7 @@ public class AuthenticateService : IAuthenticateService
                 signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
             );
 
-            return token;
+            return new LoginResult(token, user);
         }
 
         throw new AuthenticationFailedException("Invalid username or password.");
