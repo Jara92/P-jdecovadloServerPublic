@@ -19,14 +19,16 @@ public class LoanResponseGenerator : ABaseResponseGenerator
     private readonly ImageResponseGenerator _imageResponseGenerator;
     private readonly IMapper _mapper;
     private readonly ReviewFacade _reviewFacade;
+    private readonly ProfileFacade _profileFacade;
 
     public LoanResponseGenerator(ImageResponseGenerator imageResponseGenerator, ReviewFacade reviewFacade,
-        IMapper mapper, LinkGenerator urlHelper,
+        ProfileFacade profileFacade, IMapper mapper, LinkGenerator urlHelper,
         IHttpContextAccessor httpContextAccessor, AuthorizationService authorizationService) :
         base(httpContextAccessor, urlHelper, authorizationService)
     {
         _imageResponseGenerator = imageResponseGenerator;
         _reviewFacade = reviewFacade;
+        _profileFacade = profileFacade;
         _mapper = mapper;
     }
 
@@ -103,6 +105,7 @@ public class LoanResponseGenerator : ABaseResponseGenerator
 
         foreach (var loan in loans)
         {
+            await AddUserAggregations(loan);
             responseItems.Add(await GenerateSingleLoanResponse(loan));
         }
 
@@ -126,6 +129,8 @@ public class LoanResponseGenerator : ABaseResponseGenerator
     /// <returns>LoanResponse which represents the loan</returns>
     public async Task<LoanResponse> GenerateLoanDetailResponse(Loan loan)
     {
+        await AddUserAggregations(loan);
+
         var response = _mapper.Map<LoanResponse>(loan);
 
         await AddCommonLinks(response, loan);
@@ -150,5 +155,22 @@ public class LoanResponseGenerator : ABaseResponseGenerator
     public string? GetLink(Loan loan)
     {
         return _urlHelper.GetUriByAction(_httpContext, nameof(LoanController.GetLoan), "Loan", values: loan.Id);
+    }
+
+    private async Task AddUserAggregations(Loan loan)
+    {
+        // Set aggregations for the owner
+        var ownerProfile = loan.Item.Owner.Profile;
+        if (ownerProfile != null)
+        {
+            ownerProfile.Aggregations = await _profileFacade.GetProfileAggregations(ownerProfile);
+        }
+
+        // Set aggregations for the tenant
+        var tenantProfile = loan.Tenant.Profile;
+        if (tenantProfile != null)
+        {
+            tenantProfile.Aggregations = await _profileFacade.GetProfileAggregations(tenantProfile);
+        }
     }
 }
