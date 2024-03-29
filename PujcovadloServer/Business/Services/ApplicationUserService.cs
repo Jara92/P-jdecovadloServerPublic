@@ -38,7 +38,7 @@ public class ApplicationUserService
         return _repository.GetCount(dm);
     }
 
-    public Task<ApplicationUser?> Get(string id)
+    public virtual Task<ApplicationUser?> Get(string id)
     {
         return _repository.Get(id);
     }

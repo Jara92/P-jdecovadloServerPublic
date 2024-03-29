@@ -66,8 +66,8 @@ public class LoanResponseGenerator : ABaseResponseGenerator
         if (loan.Item.Owner.Profile != null)
         {
             response._links.Add(new LinkResponse(
-                _urlHelper.GetUriByAction(_httpContext, nameof(ProfileController.GetProfile), "Profile",
-                    values: new { loan.Item.Owner.Profile.Id }),
+                _urlHelper.GetUriByAction(_httpContext, nameof(UserController.GetUser), "User",
+                    values: new { loan.Item.Owner.Id }),
                 "OWNER", "GET"));
         }
 
@@ -75,8 +75,8 @@ public class LoanResponseGenerator : ABaseResponseGenerator
         if (loan.Tenant.Profile != null)
         {
             response._links.Add(new LinkResponse(
-                _urlHelper.GetUriByAction(_httpContext, nameof(ProfileController.GetProfile), "Profile",
-                    values: new { loan.Tenant.Profile.Id }),
+                _urlHelper.GetUriByAction(_httpContext, nameof(UserController.GetUser), "User",
+                    values: new { loan.Tenant.Id }),
                 "TENANT", "GET"));
         }
 

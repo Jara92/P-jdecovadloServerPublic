@@ -13,6 +13,7 @@ namespace Tests.Business.Facades;
 public class ProfileFacadeTest
 {
     private ProfileFacade _profileFacade;
+    private Mock<ApplicationUserService> _userService;
     private Mock<ProfileService> _profileService;
     private Mock<ItemService> _itemService;
     private Mock<ReviewService> _reviewService;
@@ -27,12 +28,15 @@ public class ProfileFacadeTest
 
     private ApplicationUser _tenant;
 
+    private ApplicationUser _userEntity;
+
     private PujcovadloServer.Business.Entities.Profile _userProfile;
 
     [SetUp]
     public void Setup()
     {
         _profileService = new Mock<ProfileService>(null);
+        _userService = new Mock<ApplicationUserService>(null);
         _itemService = new Mock<ItemService>(null);
         _reviewService = new Mock<ReviewService>(null);
         _loanService = new Mock<LoanService>(null, null);
@@ -40,7 +44,8 @@ public class ProfileFacadeTest
         _mapper = new Mock<IMapper>();
         _configuration = new Mock<PujcovadloServerConfiguration>(null);
 
-        _profileFacade = new ProfileFacade(_profileService.Object, _itemService.Object, _reviewService.Object,
+        _profileFacade = new ProfileFacade(_profileService.Object, _userService.Object, _itemService.Object,
+            _reviewService.Object,
             _loanService.Object, _authenticateService.Object, _mapper.Object, _configuration.Object);
 
         _user = new ApplicationUser() { Id = "1" };
@@ -55,48 +60,58 @@ public class ProfileFacadeTest
             Description = "Popis profilu",
             ProfileImage = new Image { Id = 20 }
         };
+
+        _userEntity = new ApplicationUser
+        {
+            Id = "1",
+            FirstName = "Pavel",
+            LastName = "Tester",
+            Email = "pavel.tester@test.com",
+            Profile = _userProfile
+        };
     }
 
     #region GetProfile
 
     [Test]
-    public async Task GetProfile_ProfileDoesNotExist_ThrowsException()
+    public async Task GetProfile_UserDoesNotExist_ThrowsException()
     {
         // Arrange
-        var id = 1;
-        _profileService
-            .Setup(o => o.Get(id, true))
-            .ThrowsAsync(new EntityNotFoundException());
+        var userId = "1";
+        _userService
+            .Setup(o => o.Get(userId))
+            .ReturnsAsync((ApplicationUser?)null);
 
         // Must throw ItemNotFoundException because the item does not exist
-        Assert.ThrowsAsync<EntityNotFoundException>(async () => await _profileFacade.GetProfile(id));
+        Assert.ThrowsAsync<EntityNotFoundException>(async () => await _profileFacade.GetUserProfile(userId));
 
         // Verify that GetById was called
-        _profileService.Verify(o => o.Get(id, true), Times.Once);
+        _userService.Verify(o => o.Get(userId), Times.Once);
     }
 
     [Test]
     public async Task GetProfile_ProfileExists_ReturnsItem()
     {
         // Arrange
-        var id = 1;
-        _userProfile.Id = id;
+        var userId = "1";
+        _userEntity.Id = userId;
 
-        _profileService
-            .Setup(o => o.Get(id, true))
-            .ReturnsAsync(_userProfile);
+        _userService
+            .Setup(o => o.Get(userId))
+            .ReturnsAsync(_userEntity);
 
         // Must return the created item
-        var result = await _profileFacade.GetProfile(id);
+        var result = await _profileFacade.GetUserProfile(userId);
 
         // assert
-        Assert.That(result.Id, Is.EqualTo(id));
-        Assert.That(result.Description, Is.EqualTo(_userProfile.Description));
-        Assert.That(result.User.Id, Is.EqualTo(_userProfile.User.Id));
-        Assert.That(result.ProfileImage.Id, Is.EqualTo(_userProfile.ProfileImage.Id));
+        Assert.That(result.Id, Is.EqualTo(userId));
+        Assert.That(result.Profile, Is.Not.Null);
+        Assert.That(result.Profile.Description, Is.EqualTo(_userProfile.Description));
+        Assert.That(result.Profile.User.Id, Is.EqualTo(_userProfile.User.Id));
+        Assert.That(result.Profile.ProfileImage.Id, Is.EqualTo(_userProfile.ProfileImage.Id));
 
         // Verify that GetById was called
-        _profileService.Verify(o => o.Get(id, true), Times.Once);
+        _userService.Verify(o => o.Get(userId), Times.Once);
     }
 
     #endregion
@@ -121,13 +136,14 @@ public class ProfileFacadeTest
         };
 
         // Must return the created item
-        await _profileFacade.UpdateProfile(_userProfile, request);
+        await _profileFacade.UpdateUserProfile(_userEntity, request);
 
         // assert
-        Assert.That(_userProfile.Id, Is.EqualTo(expectedProfile.Id));
-        Assert.That(_userProfile.Description, Is.EqualTo(expectedProfile.Description));
-        Assert.That(_userProfile.User.Id, Is.EqualTo(expectedProfile.User.Id));
-        Assert.That(_userProfile.ProfileImage.Id, Is.EqualTo(expectedProfile.ProfileImage.Id));
+        Assert.That(_userEntity.Profile.Id, Is.EqualTo(expectedProfile.Id));
+        Assert.That(_userEntity.Profile, Is.Not.Null);
+        Assert.That(_userEntity.Profile.Description, Is.EqualTo(expectedProfile.Description));
+        Assert.That(_userEntity.Profile.User.Id, Is.EqualTo(expectedProfile.User.Id));
+        Assert.That(_userEntity.Profile.ProfileImage.Id, Is.EqualTo(expectedProfile.ProfileImage.Id));
 
         // Verify that Update was called
         _profileService.Verify(o => o.Update(_userProfile), Times.Once);

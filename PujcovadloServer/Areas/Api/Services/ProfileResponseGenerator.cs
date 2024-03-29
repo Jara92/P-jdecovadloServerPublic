@@ -1,9 +1,9 @@
 using AutoMapper;
 using PujcovadloServer.Areas.Api.Controllers;
+using PujcovadloServer.Authentication;
 using PujcovadloServer.AuthorizationHandlers;
 using PujcovadloServer.Business.Facades;
 using PujcovadloServer.Responses;
-using Profile = PujcovadloServer.Business.Entities.Profile;
 
 namespace PujcovadloServer.Areas.Api.Services;
 
@@ -20,21 +20,21 @@ public class ProfileResponseGenerator : ABaseResponseGenerator
         _mapper = mapper;
     }
 
-    public async Task<UserResponse> GenerateProfileDetailResponse(Profile profile)
+    public async Task<UserResponse> GenerateProfileDetailResponse(ApplicationUser user)
     {
-        var response = _mapper.Map<UserResponse>(profile.User);
+        var response = _mapper.Map<UserResponse>(user);
 
-        if (response.Profile != null)
+        if (user.Profile != null && response.Profile != null)
         {
             // Get more detailed information about the profile
-            var aggregations = await _profileFacade.GetProfileAggregations(profile);
+            var aggregations = await _profileFacade.GetProfileAggregations(user.Profile);
             response.Profile._aggregations = _mapper.Map<ProfileAggregationsResponse>(aggregations);
         }
 
         // User items link
         response._links.Add(new LinkResponse(
             _urlHelper.GetUriByAction(_httpContext, nameof(ItemController.Index), "Item",
-                values: new { ownerId = profile.UserId }), "ITEMS", "GET"));
+                values: new { ownerId = user.Id }), "ITEMS", "GET"));
 
         // todo: more links
 

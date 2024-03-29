@@ -10,17 +10,20 @@ using PujcovadloServer.Responses;
 
 namespace PujcovadloServer.Areas.Api.Controllers;
 
+/// <summary>
+///  TODO: this sucks: make UserController and accept userid instead. It is ok if user has no profile.
+/// </summary>
 [Area("Api")]
 [ApiController]
-[Route("api/profiles")]
+[Route("api/users")]
 [ServiceFilter(typeof(ExceptionFilter))]
-public class ProfileController : ControllerBase
+public class UserController : ControllerBase
 {
     private readonly ProfileFacade _profileFacade;
     private readonly ProfileResponseGenerator _responseGenerator;
     private readonly AuthorizationService _authorizationService;
 
-    public ProfileController(ProfileFacade profileFacade, ProfileResponseGenerator responseGenerator,
+    public UserController(ProfileFacade profileFacade, ProfileResponseGenerator responseGenerator,
         AuthorizationService authorizationService)
     {
         _profileFacade = profileFacade;
@@ -32,14 +35,19 @@ public class ProfileController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<UserResponse>> GetProfile(int id)
+    public async Task<ActionResult<UserResponse>> GetUser(string id)
     {
         // Get profile and check permissions
-        var profile = await _profileFacade.GetProfile(id);
-        await _authorizationService.CheckPermissions(profile, ProfileOperations.Read);
+        var user = await _profileFacade.GetUserProfile(id);
+
+        // Use is not visible if has no profile
+        if (user.Profile == null) return NotFound();
+
+        // Check that profile can be returned
+        await _authorizationService.CheckPermissions(user.Profile, ProfileOperations.Read);
 
         // Generate response
-        var response = await _responseGenerator.GenerateProfileDetailResponse(profile);
+        var response = await _responseGenerator.GenerateProfileDetailResponse(user);
 
         return Ok(response);
     }
@@ -50,13 +58,17 @@ public class ProfileController : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ValidateIdFilter]
-    public async Task<ActionResult> UpdateProfile(int id, [FromBody] ProfileUpdateRequest request)
+    public async Task<ActionResult> UpdateProfile(string id, [FromBody] ProfileUpdateRequest request)
     {
-        var profile = await _profileFacade.GetProfile(id);
+        var user = await _profileFacade.GetUserProfile(id);
 
-        await _authorizationService.CheckPermissions(profile, ProfileOperations.Update);
+        // Cannot update user without a profile
+        if (user.Profile == null) return BadRequest();
 
-        await _profileFacade.UpdateProfile(profile, request);
+        // Check that user can update the profile
+        await _authorizationService.CheckPermissions(user.Profile, ProfileOperations.Update);
+
+        await _profileFacade.UpdateUserProfile(user, request);
 
         return NoContent();
     }

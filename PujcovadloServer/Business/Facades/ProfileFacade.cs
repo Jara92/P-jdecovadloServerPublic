@@ -1,4 +1,5 @@
 using AutoMapper;
+using PujcovadloServer.Authentication;
 using PujcovadloServer.Business.EntityAggregations;
 using PujcovadloServer.Business.Exceptions;
 using PujcovadloServer.Business.Services;
@@ -11,6 +12,7 @@ namespace PujcovadloServer.Business.Facades;
 public class ProfileFacade
 {
     private readonly ProfileService _profileService;
+    private readonly ApplicationUserService _userService;
     private readonly ItemService _itemService;
     private readonly ReviewService _reviewService;
     private readonly LoanService _loanService;
@@ -18,11 +20,13 @@ public class ProfileFacade
     private readonly IMapper _mapper;
     private readonly PujcovadloServerConfiguration _configuration;
 
-    public ProfileFacade(ProfileService profileService, ItemService itemService, ReviewService reviewService,
+    public ProfileFacade(ProfileService profileService, ApplicationUserService userService, ItemService itemService,
+        ReviewService reviewService,
         LoanService loanService, IAuthenticateService authenticateService, IMapper mapper,
         PujcovadloServerConfiguration configuration)
     {
         _profileService = profileService;
+        _userService = userService;
         _itemService = itemService;
         _reviewService = reviewService;
         _loanService = loanService;
@@ -31,17 +35,21 @@ public class ProfileFacade
         _configuration = configuration;
     }
 
-    public async Task<Profile> GetProfile(int profileId)
+    public async Task<ApplicationUser> GetUserProfile(string userId)
     {
-        // Get image and check that it is not null
-        var profile = await _profileService.Get(profileId);
-        if (profile == null) throw new EntityNotFoundException("Image not found");
+        var user = await _userService.Get(userId);
+        if (user == null) throw new EntityNotFoundException("User not found");
 
-        return profile;
+        return user;
     }
 
-    public async Task UpdateProfile(Profile profile, ProfileUpdateRequest request)
+    public async Task UpdateUserProfile(ApplicationUser user, ProfileUpdateRequest request)
     {
+        var profile = user.Profile;
+
+        // Just make sure profile is not null
+        if (profile == null) throw new OperationNotAllowedException("Cannot update user without a profile");
+
         // Update profile
         profile.Description = request.Description;
 

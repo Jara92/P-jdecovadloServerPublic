@@ -91,8 +91,8 @@ public class ItemResponseGenerator : ABaseResponseGenerator
         if (item.Owner.Profile != null)
         {
             response._links.Add(new LinkResponse(
-                _urlHelper.GetUriByAction(_httpContext, nameof(ProfileController.GetProfile), "Profile",
-                    values: new { item.Owner.Profile.Id }), "OWNER", "GET"));
+                _urlHelper.GetUriByAction(_httpContext, nameof(UserController.GetUser), "User",
+                    values: new { item.Owner.Id }), "OWNER", "GET"));
         }
 
         await AddCommonLinks(item, response);
