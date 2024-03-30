@@ -18,6 +18,10 @@ public class ItemResponse
 
     public float? SellingPrice { get; set; }
 
+    public decimal? Latitude { get; set; }
+
+    public decimal? Longitude { get; set; }
+
     public UserResponse Owner { get; set; } = default!;
 
     public ImageResponse? MainImage { get; set; }
