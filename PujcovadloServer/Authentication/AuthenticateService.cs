@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using PujcovadloServer.Authentication.Exceptions;
 using PujcovadloServer.Authentication.Objects;
+using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Enums;
 using PujcovadloServer.Business.Services.Interfaces;
 
@@ -79,7 +80,8 @@ public class AuthenticateService : IAuthenticateService
             DateOfBirth = request.DateOfBirth,
             Email = request.Email,
             SecurityStamp = Guid.NewGuid().ToString(),
-            UserName = request.Username
+            UserName = request.Username,
+            Profile = new Profile(),
         };
 
         // Create user in database
