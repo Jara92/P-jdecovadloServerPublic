@@ -80,9 +80,17 @@ public class AuthenticateController : ControllerBase
     {
         try
         {
-            await _authenticateService.RegisterUser(request);
+            // Try register the user and get login request
+            var result = await _authenticateService.RegisterUser(request);
 
-            return Ok();
+            // Return token
+            // TODO: make response for this
+            return Ok(new
+            {
+                AccessToken = new JwtSecurityTokenHandler().WriteToken(result.Token),
+                AccessTokenExpiration = result.Token.ValidTo,
+                UserId = result.CurrentUser.Id
+            });
         }
         catch (UserAlreadyExistsException e)
         {

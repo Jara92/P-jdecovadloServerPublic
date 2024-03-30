@@ -55,7 +55,7 @@ public class AuthenticateService : IAuthenticateService
     }
 
     /// <inheritdoc cref="IAuthenticateService"/>
-    public async Task RegisterUser(RegisterRequest request)
+    public async Task<LoginResult> RegisterUser(RegisterRequest request)
     {
         // Check if user exists
         var usernameExists = await _userManager.FindByNameAsync(request.Username);
@@ -99,6 +99,13 @@ public class AuthenticateService : IAuthenticateService
         //await AddRole(user, UserRoles.Admin);
         await AddRole(user, UserRoles.Tenant);
         await AddRole(user, UserRoles.Owner);
+
+        // Log in the user automatically and return the LoginResponse
+        return await Login(new LoginRequest
+        {
+            Username = user.UserName,
+            Password = request.Password
+        });
     }
 
     /// <inheritdoc cref="IAuthenticateService"/>

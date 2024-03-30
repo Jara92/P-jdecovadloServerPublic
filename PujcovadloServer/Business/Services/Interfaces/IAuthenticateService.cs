@@ -18,9 +18,9 @@ public interface IAuthenticateService
     /// Registers a new user in the database.
     /// </summary>
     /// <param name="request">Registration request</param>
-    /// <exception cref="UserAlreadyExistsException">User with given credentials already exists.</exception>
+    /// <exception cref="UsernameAlreadyExistsException">User with given credentials already exists.</exception>
     /// <exception cref="RegistrationFailedException">Thrown when some other problem occurs.</exception>
-    public Task RegisterUser(RegisterRequest request);
+    public Task<LoginResult> RegisterUser(RegisterRequest request);
 
     /// <summary>
     /// Performs user login and returns JWT token
