@@ -92,9 +92,39 @@ public class AuthenticateController : ControllerBase
                 UserId = result.CurrentUser.Id
             });
         }
-        catch (UserAlreadyExistsException e)
+        catch (UsernameAlreadyExistsException e)
         {
-            return Conflict(e.Message);
+            //ModelState.AddModelError(request.Username, "Username already exists");
+            //return Conflict(ModelState);
+            /*var details = new ExceptionResponse
+            {
+                Title = "Conflict",
+                Status = StatusCodes.Status409Conflict,
+                Errors = new List<Dictionary<>> { e.Message }
+            };*/
+
+            // TODO
+            return Conflict(new
+            {
+                Errors = new Dictionary<String, List<String>>()
+                {
+                    {
+                        nameof(request.Username), new List<String> { "Username is already taken." }
+                    }
+                }
+            });
+        }
+        catch (EmailAlreadyExistsException)
+        {
+            return Conflict(new
+            {
+                Errors = new Dictionary<String, List<String>>()
+                {
+                    {
+                        nameof(request.Email), new List<String> { "Email is already taken." }
+                    }
+                }
+            });
         }
         catch (RegistrationFailedException e)
         {

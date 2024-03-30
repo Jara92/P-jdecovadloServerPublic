@@ -62,10 +62,10 @@ public class AuthenticateService : IAuthenticateService
         var emailExists = await _userManager.FindByEmailAsync(request.Email);
 
         if (usernameExists != null)
-            throw new UserAlreadyExistsException($"Username {request.Username} already exists!");
+            throw new UsernameAlreadyExistsException($"Username {request.Username} already exists!");
 
         if (emailExists != null)
-            throw new UserAlreadyExistsException($"Email {request.Email} already exists!");
+            throw new EmailAlreadyExistsException($"Email {request.Email} already exists!");
 
         // Check if passwords match
         if (request.Password != request.PasswordConfirmation)
