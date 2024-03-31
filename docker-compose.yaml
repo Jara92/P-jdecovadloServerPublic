@@ -1,5 +1,6 @@
 version: '3'
 services:
+
   pujcovadlo_mini:
     image: quay.io/minio/minio
     command: server /data --console-address ":9001"
@@ -11,3 +12,33 @@ services:
     environment:
       MINIO_ROOT_USER: root
       MINIO_ROOT_PASSWORD: password
+
+  db:
+    image: pujcovadlo/postgres
+    build:
+        context: .
+        dockerfile: postgres.Dockerfile
+    #image: postgres
+    restart: always
+    # set shared memory limit when using docker-compose
+    shm_size: 128mb
+    # or set shared memory limit when deploy via swarm stack
+    volumes:
+      - /var/pujcovadlo_postgres:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: pujcovadlo
+      PGDATA: /var/lib/postgresql/data/pgdata
+      
+      #LANG: cs_CZ.utf8
+      #POSTGRES_INITDB_ARGS: --locale-provider=icu --icu-locale=de-DE
+      #POSTGRES_INITDB_ARGS: "--locale-provider=icu --icu-locale=cs-CZ"
+    ports: 
+      - 5432:5432
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080

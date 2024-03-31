@@ -34,6 +34,7 @@
         <PackageReference Include="Microsoft.Extensions.Localization" Version="8.0.1"/>
         <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.0" />
         <PackageReference Include="Minio" Version="6.0.2"/>
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0"/>
         <PackageReference Include="NSwag.AspNetCore" Version="14.0.2" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0"/>
         <!-- Runtime recompile razor templates when debugind -->
