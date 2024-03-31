@@ -82,9 +82,8 @@ builder.Services.AddRazorPages();
 // Development environment
 if (builder.Environment.IsDevelopment())
 {
-    builder.Services.AddEntityFrameworkNpgsql().AddDbContext<PujcovadloServerContext>(options =>
+    builder.Services.AddDbContext<PujcovadloServerContext>(options =>
         options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
-    AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 }
 // Production environment
 else
