@@ -8,9 +8,9 @@ public class ReviewResponse
 
     public float Rating { get; set; }
 
-    // TODO: Add item rating?
+    public int LoanId { get; set; }
 
-    public UserResponse Author { get; set; } = null!;
+    public string AuthorId { get; set; }
 
     public DateTime CreatedAt { get; set; } = DateTime.Now;
 
