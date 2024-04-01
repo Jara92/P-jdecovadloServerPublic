@@ -84,6 +84,7 @@ if (builder.Environment.IsDevelopment())
 {
     builder.Services.AddDbContext<PujcovadloServerContext>(options =>
         options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 }
 // Production environment
 else
