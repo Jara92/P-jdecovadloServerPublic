@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using NetTopologySuite.Geometries;
 using PujcovadloServer.Authentication;
 using PujcovadloServer.Business.Enums;
 
@@ -54,9 +55,7 @@ public class Item : BaseEntity
 
     [DisplayName("Owner")] public virtual ApplicationUser Owner { get; set; } = default!;
 
-    public decimal? Latitude { get; set; }
-
-    public decimal? Longitude { get; set; }
+    [Column(TypeName = "geography")] public Point Location { get; set; }
 
     [DisplayName("Created at")]
     [ReadOnly(true)]
@@ -73,4 +72,6 @@ public class Item : BaseEntity
     [DisplayName("Deleted at")]
     [ReadOnly(true)]
     public DateTime? DeletedAt { get; set; }
+
+    [NotMapped] public double? Distance { get; set; }
 }

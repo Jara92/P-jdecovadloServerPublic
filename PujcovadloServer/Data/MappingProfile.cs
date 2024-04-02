@@ -11,9 +11,19 @@ public class MappingProfile : Profile
 {
     public MappingProfile()
     {
-        CreateMap<Item, ItemResponse>();
-        CreateMap<Item, ItemDetailResponse>();
-        CreateMap<Item, ItemOwnerResponse>();
+        CreateMap<Item, ItemResponse>()
+            // https://learn.microsoft.com/en-us/ef/core/modeling/spatial#longitude-and-latitude
+            .ForMember(r => r.Latitude, opt => opt.MapFrom(i => i.Location.Y))
+            .ForMember(r => r.Longitude, opt => opt.MapFrom(i => i.Location.X));
+        CreateMap<Item, ItemDetailResponse>()
+            // https://learn.microsoft.com/en-us/ef/core/modeling/spatial#longitude-and-latitude
+            .ForMember(r => r.Latitude, opt => opt.MapFrom(i => i.Location.Y))
+            .ForMember(r => r.Longitude, opt => opt.MapFrom(i => i.Location.X));
+        CreateMap<Item, ItemOwnerResponse>()
+            // https://learn.microsoft.com/en-us/ef/core/modeling/spatial#longitude-and-latitude
+            .ForMember(r => r.Latitude, opt => opt.MapFrom(i => i.Location.Y))
+            .ForMember(r => r.Longitude, opt => opt.MapFrom(i => i.Location.X));
+
         CreateMap<ItemRequest, Item>()
             // Ignore categories and tags because they are handled separately
             .ForMember(r => r.Categories, opt => opt.Ignore())

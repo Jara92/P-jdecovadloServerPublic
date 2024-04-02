@@ -34,7 +34,7 @@ public class ItemRequest : EntityRequest
 
     public int? MainImageId { get; set; }
 
-    public decimal? Latitude { get; set; }
+    [Required] public decimal Latitude { get; set; }
 
-    public decimal? Longitude { get; set; }
+    [Required] public decimal Longitude { get; set; }
 }

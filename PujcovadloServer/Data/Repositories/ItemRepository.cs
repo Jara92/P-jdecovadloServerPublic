@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using NetTopologySuite.Geometries;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Enums;
 using PujcovadloServer.Business.Exceptions;
@@ -45,17 +46,21 @@ public class ItemRepository : ACrudRepository<Item, ItemFilter>, IItemRepository
                 // Search in tags using text
                 i.Tags.Any(t => t.Name.ToLower().Contains(search))
             );
-
-            // Search in categories using text
-            query = query.Where(i => i.Categories.Any(c => c.Name.ToLower().Contains(search)));
-
-            // Search in tags using text
-            query = query.Where(i => i.Tags.Any(t => t.Name.ToLower().Contains(search)));
         }
 
         // Search by owner
         if (filter.OwnerId != null)
             query = query.Where(i => i.OwnerId == filter.OwnerId);
+
+        // Sort by distance from current location
+        if (filter.Latitude != null && filter.Longitude != null)
+        {
+            // https://learn.microsoft.com/en-us/ef/core/modeling/spatial#longitude-and-latitude
+            var currentLocation = new Point((float)filter.Longitude, (float)filter.Latitude) { SRID = 4326 };
+
+            query = query.OrderBy(i => i.Location.Distance(currentLocation));
+            //query = query.OrderBy(i => GetDistance(i.Location, currentLocation));
+        }
 
         switch (filter.Sortby)
         {
@@ -65,13 +70,32 @@ public class ItemRepository : ACrudRepository<Item, ItemFilter>, IItemRepository
                 break;
         }
 
+
         // Return paginated result
-        return await base.GetAll(query, filter);
+        var items = await base.GetAll(query, filter);
+
+        // Attach distance to items
+        if (filter.Latitude != null && filter.Longitude != null)
+        {
+            var currentLocation = new Point((float)filter.Longitude, (float)filter.Latitude) { SRID = 4326 };
+            foreach (var item in items)
+            {
+                item.Distance = GetDistance(item.Location, currentLocation);
+            }
+        }
+
+        return items;
+    }
+
+    private double GetDistance(Point location1, Point location2)
+    {
+        return location1.ProjectTo(2855).Distance(location2.ProjectTo(2855));
     }
 
     public override async Task<Item?> Get(int id)
     {
         // Todo: dont show deleted items
+        // TODO: distance?
         return await _dbSet.
             // Include(i => i.ItemCategories).
             FirstOrDefaultAsync(m => m.Id == id);

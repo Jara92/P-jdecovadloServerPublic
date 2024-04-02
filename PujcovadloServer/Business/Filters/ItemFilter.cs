@@ -14,6 +14,8 @@ public class ItemFilter : BaseFilter
         Status = filter.Status;
         CategoryId = filter.CategoryId;
         OwnerId = filter.OwnerId;
+        Latitude = filter.Latitude;
+        Longitude = filter.Longitude;
     }
 
 
@@ -41,4 +43,8 @@ public class ItemFilter : BaseFilter
     /// Owner (user) id.
     /// </summary>
     public string? OwnerId { get; set; }
+
+    public float? Latitude { get; set; }
+
+    public float? Longitude { get; set; }
 }

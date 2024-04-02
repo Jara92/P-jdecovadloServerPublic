@@ -32,8 +32,7 @@ namespace PujcovadloServer.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Item>().Property(i => i.Latitude).HasPrecision(18, 15);
-            modelBuilder.Entity<Item>().Property(i => i.Longitude).HasPrecision(18, 15);
+            modelBuilder.HasPostgresExtension("postgis");
 
             // https://learn.microsoft.com/en-us/ef/core/modeling/relationships/many-to-many
             /*modelBuilder.Entity<Item>()

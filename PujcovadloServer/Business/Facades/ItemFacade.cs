@@ -1,5 +1,6 @@
 using AutoMapper;
 using Microsoft.IdentityModel.Tokens;
+using NetTopologySuite.Geometries;
 using NuGet.Packaging;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Enums;
@@ -76,8 +77,8 @@ public class ItemFacade
         item.SellingPrice = request.SellingPrice;
 
         // Update location
-        item.Latitude = request.Latitude;
-        item.Longitude = request.Longitude;
+        // https://learn.microsoft.com/en-us/ef/core/modeling/spatial#longitude-and-latitude
+        item.Location = new Point((float)request.Longitude, (float)request.Latitude) { SRID = 4326 };
 
         // New categories
         var categories = await _itemCategoryService.GetByIds(request.Categories);

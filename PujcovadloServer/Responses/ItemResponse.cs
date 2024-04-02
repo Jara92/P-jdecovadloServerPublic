@@ -22,6 +22,8 @@ public class ItemResponse
 
     public decimal? Longitude { get; set; }
 
+    public double? Distance { get; set; }
+
     public UserResponse Owner { get; set; } = default!;
 
     public ImageResponse? MainImage { get; set; }

@@ -83,7 +83,9 @@ builder.Services.AddRazorPages();
 if (builder.Environment.IsDevelopment())
 {
     builder.Services.AddDbContext<PujcovadloServerContext>(options =>
-        options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+        options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"),
+            // Use NetTopologySuite for spatial data types
+            x => x.UseNetTopologySuite()));
     AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 }
 // Production environment
