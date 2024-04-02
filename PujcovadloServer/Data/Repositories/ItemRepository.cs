@@ -39,8 +39,18 @@ public class ItemRepository : ACrudRepository<Item, ItemFilter>, IItemRepository
 
             query = query.Where(i =>
                 i.Name.ToLower().Contains(search) ||
-                i.Description.ToLower().Contains(search)
+                i.Description.ToLower().Contains(search) ||
+                // Search in categories using text
+                i.Categories.Any(c => c.Name.ToLower().Contains(search)) ||
+                // Search in tags using text
+                i.Tags.Any(t => t.Name.ToLower().Contains(search))
             );
+
+            // Search in categories using text
+            query = query.Where(i => i.Categories.Any(c => c.Name.ToLower().Contains(search)));
+
+            // Search in tags using text
+            query = query.Where(i => i.Tags.Any(t => t.Name.ToLower().Contains(search)));
         }
 
         // Search by owner
