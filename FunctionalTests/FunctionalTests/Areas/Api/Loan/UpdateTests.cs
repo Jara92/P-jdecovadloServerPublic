@@ -14,6 +14,7 @@ using Assert = NUnit.Framework.Assert;
 
 namespace FunctionalTests.FunctionalTests.Areas.Api.Loan;
 
+[Collection("Sequential")]
 public class UpdateTests : IClassFixture<CustomWebApplicationFactory<Program>>
 {
     private readonly WebApplicationFactory<Program> _application;

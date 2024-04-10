@@ -14,6 +14,7 @@ using Assert = NUnit.Framework.Assert;
 
 namespace FunctionalTests.FunctionalTests.Areas.Api.Loan;
 
+[Collection("Sequential")]
 public class LoanLifeCycleScenarioTests : IClassFixture<CustomWebApplicationFactory<Program>>
 {
     private readonly WebApplicationFactory<Program> _application;
@@ -88,7 +89,7 @@ public class LoanLifeCycleScenarioTests : IClassFixture<CustomWebApplicationFact
         Assert.That(reviews, Has.Count.EqualTo(1));
         Assert.That(reviews[0].Comment, Is.EqualTo(ownerReview.Comment));
         Assert.That(reviews[0].Rating, Is.EqualTo(ownerReview.Rating));
-        Assert.That(reviews[0].Author.Id, Is.EqualTo(tenantsLoan.Owner.Id));
+        Assert.That(reviews[0].AuthorId, Is.EqualTo(tenantsLoan.Owner.Id));
 
         // tenant adds a review
         UserHelper.SetAuthorizationHeader(_client, UserHelper.TenantToken);
@@ -100,7 +101,7 @@ public class LoanLifeCycleScenarioTests : IClassFixture<CustomWebApplicationFact
         Assert.That(reviews, Has.Count.EqualTo(2));
         Assert.That(reviews[1].Comment, Is.EqualTo(tenantReview.Comment));
         Assert.That(reviews[1].Rating, Is.EqualTo(tenantReview.Rating));
-        Assert.That(reviews[1].Author.Id, Is.EqualTo(tenantsLoan.Tenant.Id));
+        Assert.That(reviews[1].AuthorId, Is.EqualTo(tenantsLoan.Tenant.Id));
     }
 
     [Fact]

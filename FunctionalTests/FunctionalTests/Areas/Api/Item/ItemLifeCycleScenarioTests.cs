@@ -14,6 +14,7 @@ using Assert = NUnit.Framework.Assert;
 
 namespace FunctionalTests.FunctionalTests.Areas.Api.Item;
 
+[Collection("Sequential")]
 public class ItemLifeCycleScenarioTests : IClassFixture<CustomWebApplicationFactory<Program>>
 {
     private readonly WebApplicationFactory<Program> _application;

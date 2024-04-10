@@ -4,8 +4,8 @@ using FunctionalTests.Mocks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
@@ -16,10 +16,14 @@ namespace FunctionalTests;
 
 public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProgram> where TProgram : class
 {
+    private IConfiguration? _config;
+
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.ConfigureServices(services =>
         {
+            services.AddSingleton<IConfiguration>(Configuration);
+
             // Remove the app's ApplicationDbContext registration.
             var dbContextDescriptor = services.SingleOrDefault(
                 d => d.ServiceType ==
@@ -34,18 +38,35 @@ public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProg
             services.Remove(dbConnectionDescriptor);
 
             // Create open SqliteConnection so EF won't automatically close it.
-            services.AddSingleton<DbConnection>(container =>
+            /*services.AddSingleton<DbConnection>(container =>
             {
-                var connection = new SqliteConnection("DataSource=:memory:");
+                //var connection = new SqliteConnection("DataSource=:memory:");
+                var connectionString = Configuration.GetConnectionString("DefaultConnection");
+
+                var connection = new NpgsqlConnection(Configuration.GetConnectionString("DefaultConnection"));
                 connection.Open();
 
+                /*var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
+                dataSourceBuilder.UseNetTopologySuite();
+                var connection = dataSourceBuilder.Build();
+                connection.OpenConnection();#1#
+
                 return connection;
-            });
+            });*/
 
             services.AddDbContext<PujcovadloServerContext>((container, options) =>
             {
-                var connection = container.GetRequiredService<DbConnection>();
-                options.UseSqlite(connection);
+                //var connection = container.GetRequiredService<DbConnection>();
+                var connectionString = Configuration.GetConnectionString("DefaultConnection");
+                //var connection = new NpgsqlConnection(Configuration.GetConnectionString("DefaultConnection"));
+
+                options.UseNpgsql(connectionString, x =>
+                {
+                    //x.MigrationsAssembly(typeof(PujcovadloServerContext).Assembly.FullName);
+                    //x.MigrationsHistoryTable(schemaService.MigrationsTableName, schemaService.Name);
+                    x.UseNetTopologySuite();
+                });
+                AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
                 options.UseLazyLoadingProxies();
                 options.EnableSensitiveDataLogging();
             });
@@ -83,5 +104,19 @@ public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProg
         });
 
         builder.UseEnvironment("Development");
+    }
+
+    public IConfiguration Configuration
+    {
+        get
+        {
+            if (_config == null)
+            {
+                var builder = new ConfigurationBuilder().AddJsonFile($"testappsettings.json", optional: false);
+                _config = builder.Build();
+            }
+
+            return _config;
+        }
     }
 }

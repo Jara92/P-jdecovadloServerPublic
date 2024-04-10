@@ -1,3 +1,4 @@
+using NetTopologySuite.Geometries;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Enums;
 
@@ -40,87 +41,94 @@ public class TestData
     public TestData()
     {
         ItemCategoryVrtacky =
-            new() { Id = 1, Name = "Vrtacky", Description = "Vrtacky description" };
+            new() { Name = "Vrtacky", Description = "Vrtacky description" };
 
         ItemCategoryPneumatickeVrtacky = new()
-            { Id = 2, Name = "Vrtacky", Parent = ItemCategoryVrtacky, Description = "Pneumaticke vrtacky description" };
+            { Name = "Vrtacky", Parent = ItemCategoryVrtacky, Description = "Pneumaticke vrtacky description" };
 
         ItemCategoryKladiva =
-            new() { Id = 3, Name = "Kladiva", Description = "Kladiva description" };
+            new() { Name = "Kladiva", Description = "Kladiva description" };
 
-        ItemTagVrtackaNarex = new() { Id = 1, Name = "Vrtačka Narex" };
-        ItemTagVrtackaBosch = new() { Id = 2, Name = "Vrtačka Bosh" };
+        ItemTagVrtackaNarex = new() { Name = "Vrtačka Narex" };
+        ItemTagVrtackaBosch = new() { Name = "Vrtačka Bosh" };
 
         Item1 = new()
         {
-            Id = 1, Name = "Item1", Description = "Description1", Status = ItemStatus.Public,
+            Name = "Item1", Description = "Description1", Status = ItemStatus.Public,
             Parameters = "Parameters1", Owner = UserHelper.Owner, OwnerId = UserHelper.OwnerId, PricePerDay = 100,
-            MainImage = null, MainImageId = null
+            MainImage = null, MainImageId = null,
+            Location = new Point(50.0, 14.0) { SRID = 4326 }
         };
 
         Item2 = new()
         {
-            Id = 2, Name = "Item2", Description = "Description1", Status = ItemStatus.Approving,
+            Name = "Item2", Description = "Description1", Status = ItemStatus.Approving,
             Parameters = "Parameters2", Owner = UserHelper.Owner, OwnerId = UserHelper.OwnerId, PricePerDay = 100,
-            MainImage = null, MainImageId = null
+            MainImage = null, MainImageId = null,
+            Location = new Point(50.0, 14.0) { SRID = 4326 }
         };
 
         ItemDeleted = new()
         {
-            Id = 3, Name = "Item deleted", Description = "Description1", Status = ItemStatus.Deleted,
+            Name = "Item deleted", Description = "Description1", Status = ItemStatus.Deleted,
             Parameters = "Parameters2", Owner = UserHelper.Owner, OwnerId = UserHelper.OwnerId, PricePerDay = 100,
-            MainImage = null, MainImageId = null, DeletedAt = DateTime.Today.AddDays(-2)
+            MainImage = null, MainImageId = null, DeletedAt = DateTime.Today.AddDays(-2),
+            Location = new Point(50.0, 14.0) { SRID = 4326 }
         };
 
         ItemWithRunningLoans = new()
         {
-            Id = 4, Name = "Item with running loans", Description = "Description1", Status = ItemStatus.Public,
+            Name = "Item with running loans", Description = "Description1", Status = ItemStatus.Public,
             Parameters = "Parameters2", Owner = UserHelper.Owner, OwnerId = UserHelper.OwnerId, PricePerDay = 100,
-            MainImage = null, MainImageId = null
+            MainImage = null, MainImageId = null,
+            Location = new Point(50.0, 14.0) { SRID = 4326 }
         };
 
         ItemApproving = new()
         {
-            Id = 5, Name = "Item approving", Description = "Description1", Status = ItemStatus.Approving,
+            Name = "Item approving", Description = "Description1", Status = ItemStatus.Approving,
             Parameters = "Parameters2", Owner = UserHelper.Owner, OwnerId = UserHelper.OwnerId, PricePerDay = 100,
-            MainImage = null, MainImageId = null
+            MainImage = null, MainImageId = null,
+            Location = new Point(50.0, 14.0) { SRID = 4326 }
         };
 
         ItemDenied = new()
         {
-            Id = 6, Name = "Item denied", Description = "Description1", Status = ItemStatus.Denied,
+            Name = "Item denied", Description = "Description1", Status = ItemStatus.Denied,
             Parameters = "Parameters2", Owner = UserHelper.Owner, OwnerId = UserHelper.OwnerId, PricePerDay = 100,
-            MainImage = null, MainImageId = null
+            MainImage = null, MainImageId = null,
+            Location = new Point(50.0, 14.0) { SRID = 4326 }
         };
 
         ItemWithoutRunningLoans = new()
         {
-            Id = 7, Name = "Item without running loans", Description = "Description1", Status = ItemStatus.Public,
+            Name = "Item without running loans", Description = "Description1", Status = ItemStatus.Public,
             Parameters = "Parameters2", Owner = UserHelper.Owner, OwnerId = UserHelper.OwnerId, PricePerDay = 100,
-            MainImage = null, MainImageId = null
+            MainImage = null, MainImageId = null,
+            Location = new Point(50.0, 14.0) { SRID = 4326 }
         };
 
         Item1Image1 = new()
         {
-            Id = 10, Item = Item1, Owner = Item1.Owner, Name = "Nazev image 1", Extension = ".png",
-            MimeType = "image/png", Path = "random.png", OwnerId = Item1.OwnerId
+            Item = Item1, Owner = Item1.Owner, Name = "Nazev image 1", Extension = ".png",
+            MimeType = "image/png", Path = "random.png", OwnerId = Item1.OwnerId,
         };
 
         Item1Image2 = new()
         {
-            Id = 2, Item = Item1, Owner = Item1.Owner, Name = "Nazev image 2", Extension = ".png",
+            Item = Item1, Owner = Item1.Owner, Name = "Nazev image 2", Extension = ".png",
             MimeType = "image/png", Path = "random.png", OwnerId = Item1.OwnerId
         };
 
         Item2Image1 = new()
         {
-            Id = 3, Item = Item2, Owner = Item2.Owner, Name = "Nazev image 1", Extension = ".png",
+            Item = Item2, Owner = Item2.Owner, Name = "Nazev image 1", Extension = ".png",
             MimeType = "image/png", Path = "random.png", OwnerId = Item1.OwnerId
         };
 
         Item2Image2 = new()
         {
-            Id = 4, Item = Item2, Owner = Item2.Owner, Name = "Nazev image 2", Extension = ".png",
+            Item = Item2, Owner = Item2.Owner, Name = "Nazev image 2", Extension = ".png",
             MimeType = "image/png", Path = "random.png", OwnerId = Item1.OwnerId
         };
 

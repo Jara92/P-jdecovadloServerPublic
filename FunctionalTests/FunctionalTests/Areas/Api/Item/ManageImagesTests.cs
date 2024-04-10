@@ -2,6 +2,7 @@ using System.Net;
 using FunctionalTests.Helpers;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
+using NetTopologySuite.Geometries;
 using NUnit.Framework;
 using PujcovadloServer;
 using PujcovadloServer.Business.Entities;
@@ -14,6 +15,7 @@ using Assert = NUnit.Framework.Assert;
 
 namespace FunctionalTests.FunctionalTests.Areas.Api.Item;
 
+[Collection("Sequential")]
 public class ManageImagesTests : IClassFixture<CustomWebApplicationFactory<Program>>
 {
     private readonly WebApplicationFactory<Program> _application;
@@ -47,6 +49,7 @@ public class ManageImagesTests : IClassFixture<CustomWebApplicationFactory<Progr
         {
             Name = "Item1", Description = "Description1", Status = ItemStatus.Public,
             Parameters = "Parameters1", Owner = UserHelper.Owner, OwnerId = UserHelper.OwnerId, PricePerDay = 100,
+            Location = new Point(50.0, 14.0) { SRID = 4326 },
             MainImage = null, MainImageId = null,
             Images = new List<Image>()
             {

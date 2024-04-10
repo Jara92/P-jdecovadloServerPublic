@@ -7,8 +7,8 @@ public static class Utilities
 {
     public static void InitializeDbForTests(PujcovadloServerContext db, TestData data)
     {
+        //bool created = db.Database.EnsureCreated();
         db.Database.Migrate();
-        db.Database.EnsureCreated();
 
         // Add users
         db.Users.Add(UserHelper.User);
@@ -56,7 +56,6 @@ public static class Utilities
     {
         // Remove all data from the database
         db.Database.EnsureDeleted();
-
 
         InitializeDbForTests(db, data);
     }

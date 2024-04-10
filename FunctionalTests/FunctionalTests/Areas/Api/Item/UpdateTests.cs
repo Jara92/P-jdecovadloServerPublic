@@ -14,6 +14,7 @@ using Assert = NUnit.Framework.Assert;
 
 namespace FunctionalTests.FunctionalTests.Areas.Api.Item;
 
+[Collection("Sequential")]
 public class UpdateTests : IClassFixture<CustomWebApplicationFactory<Program>>
 {
     private readonly WebApplicationFactory<Program> _application;
@@ -47,7 +48,8 @@ public class UpdateTests : IClassFixture<CustomWebApplicationFactory<Program>>
             Parameters = "Velikost 5 zmena", PricePerDay = 200,
             RefundableDeposit = 4000, SellingPrice = 10000, PurchasePrice = 15000,
             Categories = new List<int> { 1, 2, 3 }, Tags = { "Vrtacky", "NotNarex" },
-            MainImageId = _data.Item1Image1.Id
+            MainImageId = _data.Item1Image1.Id,
+            Longitude = 14.42076m, Latitude = 50.08804m
         };
     }
 

@@ -144,6 +144,10 @@
         </Compile>
     </ItemGroup>
 
+    <ItemGroup>
+        <None Include="testappsettings.json"/>
+    </ItemGroup>
+
     <!-- Turn of Invariant mode -->
     <PropertyGroup>
         <InvariantGlobalization>false</InvariantGlobalization>
