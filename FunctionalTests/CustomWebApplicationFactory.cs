@@ -37,35 +37,11 @@ public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProg
 
             services.Remove(dbConnectionDescriptor);
 
-            // Create open SqliteConnection so EF won't automatically close it.
-            /*services.AddSingleton<DbConnection>(container =>
+            services.AddDbContext<PujcovadloServerContext>((options) =>
             {
-                //var connection = new SqliteConnection("DataSource=:memory:");
-                var connectionString = Configuration.GetConnectionString("DefaultConnection");
+                options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection"),
+                    x => { x.UseNetTopologySuite(); });
 
-                var connection = new NpgsqlConnection(Configuration.GetConnectionString("DefaultConnection"));
-                connection.Open();
-
-                /*var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
-                dataSourceBuilder.UseNetTopologySuite();
-                var connection = dataSourceBuilder.Build();
-                connection.OpenConnection();#1#
-
-                return connection;
-            });*/
-
-            services.AddDbContext<PujcovadloServerContext>((container, options) =>
-            {
-                //var connection = container.GetRequiredService<DbConnection>();
-                var connectionString = Configuration.GetConnectionString("DefaultConnection");
-                //var connection = new NpgsqlConnection(Configuration.GetConnectionString("DefaultConnection"));
-
-                options.UseNpgsql(connectionString, x =>
-                {
-                    //x.MigrationsAssembly(typeof(PujcovadloServerContext).Assembly.FullName);
-                    //x.MigrationsHistoryTable(schemaService.MigrationsTableName, schemaService.Name);
-                    x.UseNetTopologySuite();
-                });
                 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
                 options.UseLazyLoadingProxies();
                 options.EnableSensitiveDataLogging();
