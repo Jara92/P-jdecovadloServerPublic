@@ -214,10 +214,10 @@ builder.Services.AddMvc()
     .AddDataAnnotationsLocalization();
 
 // FileStorage
-builder.Services.AddScoped<IFileStorage, MinioFileStorage>();
+builder.Services.AddSingleton<IFileStorage, MinioFileStorage>();
 
 // Configuration
-builder.Services.AddScoped<PujcovadloServerConfiguration>();
+builder.Services.AddSingleton<PujcovadloServerConfiguration>();
 
 // Authentication service
 builder.Services.AddScoped<IAuthenticateService, AuthenticateService>();
@@ -252,7 +252,7 @@ builder.Services.AddScoped<IAuthorizationHandler, ProfileOwnerAuthorizationHandl
 builder.Services.AddScoped<IAuthorizationHandler, ProfileGuestAuthorizationHandler>();
 
 //Factories
-builder.Services.AddScoped<LoanStateFactory>();
+builder.Services.AddSingleton<LoanStateFactory>();
 
 // Repositories
 builder.Services.AddScoped<IItemRepository, ItemRepository>();
