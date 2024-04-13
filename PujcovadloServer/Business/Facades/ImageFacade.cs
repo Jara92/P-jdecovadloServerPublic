@@ -1,4 +1,3 @@
-using AutoMapper;
 using PujcovadloServer.Business.Entities;
 using PujcovadloServer.Business.Exceptions;
 using PujcovadloServer.Business.Interfaces;
@@ -11,18 +10,16 @@ public class ImageFacade
 {
     private readonly ImageService _imageService;
     private readonly IAuthenticateService _authenticateService;
-    private readonly IMapper _mapper;
     private readonly PujcovadloServerConfiguration _configuration;
     private readonly IFileStorage _fileStorage;
 
-    public ImageFacade(ImageService imageService, IAuthenticateService authenticateService, IMapper mapper,
-        PujcovadloServerConfiguration configuration, IFileStorage fileStorage)
+    public ImageFacade(ImageService imageService, IAuthenticateService authenticateService, IFileStorage fileStorage,
+        PujcovadloServerConfiguration configuration)
     {
         _imageService = imageService;
         _authenticateService = authenticateService;
-        _mapper = mapper;
-        _configuration = configuration;
         _fileStorage = fileStorage;
+        _configuration = configuration;
     }
 
     public virtual async Task<Image> CreateImage(Image image, string filePath)

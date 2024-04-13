@@ -9,7 +9,6 @@ public abstract class ALoanState : ILoanState
     {
         // Nothing to be done here
         if (loan.Status == newStatus) return;
-
         HandleTenantImplementation(loan, newStatus);
     }
 
