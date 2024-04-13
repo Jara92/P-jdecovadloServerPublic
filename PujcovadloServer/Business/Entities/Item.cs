@@ -14,31 +14,25 @@ public class Item : BaseEntity
     [StringLength(64, MinimumLength = 6)]
     // TODO: Add RegularExpression
     /*[RegularExpression(@"^[A-Z]+[a-zA-Z]+[0-9]*$")]*/
-    [DisplayName("Name")]
     public string Name { get; set; } = default!;
 
     [Column(TypeName = "VARCHAR")]
     [StringLength(64, MinimumLength = 1)]
-    [DisplayName("Alias")]
     public string? Alias { get; set; }
 
-    [DisplayName("Description")] public string Description { get; set; } = default!;
+    public string Description { get; set; } = default!;
 
-    [ReadOnly(true)]
-    [DisplayName("Status")]
-    public ItemStatus Status { get; set; } = ItemStatus.Public;
+    [ReadOnly(true)] public ItemStatus Status { get; set; } = ItemStatus.Public;
 
-    [DisplayName("Parameters")] public string? Parameters { get; set; } = "";
+    public string? Parameters { get; set; } = "";
 
-    [Required]
-    [DisplayName("Price per day")]
-    public float PricePerDay { get; set; }
+    [Required] public float PricePerDay { get; set; }
 
-    [DisplayName("Refundable deposit")] public float? RefundableDeposit { get; set; }
+    public float? RefundableDeposit { get; set; }
 
-    [DisplayName("Purchase price")] public float? PurchasePrice { get; set; }
+    public float? PurchasePrice { get; set; }
 
-    [DisplayName("Selling price")] public float? SellingPrice { get; set; }
+    public float? SellingPrice { get; set; }
 
 
     public virtual ICollection<ItemCategory> Categories { get; } = new List<ItemCategory>();
@@ -53,25 +47,17 @@ public class Item : BaseEntity
 
     public string OwnerId { get; set; } = default!;
 
-    [DisplayName("Owner")] public virtual ApplicationUser Owner { get; set; } = default!;
+    public virtual ApplicationUser Owner { get; set; } = default!;
 
     [Column(TypeName = "geography")] public Point Location { get; set; }
 
-    [DisplayName("Created at")]
-    [ReadOnly(true)]
-    public DateTime CreatedAt { get; set; } = DateTime.Now;
+    [ReadOnly(true)] public DateTime CreatedAt { get; set; } = DateTime.Now;
 
-    [DisplayName("Updated at")]
-    [ReadOnly(true)]
-    public DateTime? UpdatedAt { get; set; }
+    [ReadOnly(true)] public DateTime? UpdatedAt { get; set; }
 
-    [DisplayName("Approved at")]
-    [ReadOnly(true)]
-    public DateTime? ApprovedAt { get; set; }
+    [ReadOnly(true)] public DateTime? ApprovedAt { get; set; }
 
-    [DisplayName("Deleted at")]
-    [ReadOnly(true)]
-    public DateTime? DeletedAt { get; set; }
+    [ReadOnly(true)] public DateTime? DeletedAt { get; set; }
 
     [NotMapped] public double? Distance { get; set; }
 }

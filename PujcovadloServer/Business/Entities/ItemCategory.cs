@@ -15,7 +15,7 @@ public class ItemCategory : BaseEntity
     [StringLength(32, MinimumLength = 1)]
     public string? Alias { get; set; }
 
-    public string Description { get; set; } = default!;
+    [Required] public string Description { get; set; } = default!;
 
     public int? ParentId { get; set; }
 
