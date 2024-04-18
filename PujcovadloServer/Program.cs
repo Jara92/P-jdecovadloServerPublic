@@ -199,7 +199,7 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
 // Support for flash messages
 builder.Services.AddFlashes();
 
-builder.Services.AddMvc()
+builder.Services.AddMvc(c => c.Conventions.Add(new ApiExplorerGetsOnlyConvention()))
     // Add support for finding localized views, based on file name suffix, e.g. Index.fr.cshtml
     .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
     // Add support for localizing strings in data annotations (e.g. validation messages) via the
