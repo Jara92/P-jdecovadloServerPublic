@@ -37,7 +37,7 @@ public class ItemFacadeTest
     [SetUp]
     public void Setup()
     {
-        _imageFacade = new Mock<ImageFacade>(null, null, null, null, null);
+        _imageFacade = new Mock<ImageFacade>(null, null, null, null);
         _itemService = new Mock<ItemService>(null);
         _loanService = new Mock<LoanService>(null, null);
         _itemCategoryService = new Mock<ItemCategoryService>(null);

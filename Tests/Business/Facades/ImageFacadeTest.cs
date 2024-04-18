@@ -37,8 +37,8 @@ public class ImageFacadeTest
         _mapper = new Mock<IMapper>();
         _configuration = new Mock<PujcovadloServerConfiguration>(null);
 
-        _itemFacade = new ImageFacade(_imageService.Object, _authenticateService.Object, _mapper.Object,
-            _configuration.Object, _fileStorage.Object);
+        _itemFacade = new ImageFacade(_imageService.Object, _authenticateService.Object, _fileStorage.Object,
+            _configuration.Object);
 
         _user = new ApplicationUser { Id = "1" };
         _owner = new ApplicationUser { Id = "2" };

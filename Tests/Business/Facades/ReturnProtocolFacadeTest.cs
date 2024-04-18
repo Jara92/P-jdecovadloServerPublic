@@ -29,7 +29,7 @@ public class ReturnProtocolFacadeTest
     [SetUp]
     public void Setup()
     {
-        _imageFacade = new Mock<ImageFacade>(null, null, null, null, null);
+        _imageFacade = new Mock<ImageFacade>(null, null, null, null);
         _loanService = new Mock<LoanService>(null, null);
         _returnProtocolService = new Mock<ReturnProtocolService>(null);
         _authenticateService = new Mock<IAuthenticateService>();
