@@ -1,0 +1,17 @@
+# https://ngrok.com/docs/agent/config/
+
+authtoken: AUTH_TOKEN
+
+version: 2
+console_ui_color: transparent
+tunnels:
+  app:
+    proto: http
+    schemes:
+      - https
+    addr: https://localhost:5046
+    #domain: DOMAIN OR LEAVE COMMENTED OUT FOR RANDOM
+  minio:
+    proto: http
+    addr: 9000
+    #domain: DOMAIN OR LEAVE COMMENTED OUT FOR RANDOM
