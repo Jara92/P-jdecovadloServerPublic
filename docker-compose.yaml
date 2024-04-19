@@ -18,7 +18,7 @@ services:
     
   db:
     #image: postgres
-    image: pujcovadlo/postgres # Custom Postgres image with encoding set to UTF-8
+    image: pujcovadlo/postgres # Custom Postgres image with encoding set to UTF-8 and postgis extension
     build:
         context: .
         dockerfile: postgres.Dockerfile
@@ -45,7 +45,7 @@ services:
 
   test_db:
     #image: postgres
-    image: pujcovadlo/postgres # Custom Postgres image with encoding set to UTF-8
+    image: pujcovadlo/postgres # Custom Postgres image with encoding set to UTF-8 and postgis extension
     build:
       context: .
       dockerfile: postgres.Dockerfile
