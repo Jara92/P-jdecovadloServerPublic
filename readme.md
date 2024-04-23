@@ -50,6 +50,11 @@ To může usnadnit testování klientských aplikací na skutečných i simulova
 K dispozici je konfigurační soubor `ngrok.example.yml`. Použití služby vyžaduje registraci na stránkách [Ngrok](https://ngrok.com/).
 Pro správnou funkčnost klientských aplikací je třeba, aby byla veřejně dostupná i služba MinIO, protože ji využívají pro získávání souborů.
 
+Spuštění služby NGrok s konfiguračním souborem:
+```bash
+ngrok start --config ngrok.example.yaml --all
+```
+
 ## Spuštění testů
 Spuštění testů je možné jednotlivě v rámci jednotlivých testových projektů.
 
