@@ -19,28 +19,21 @@ Aplikace se zamýšlena pro nasazení na VPS, ale návrh aplikace umožňuje i n
 ## Spuštění a instalace
 1. Stažení zdrojových kódů aplikace z tohoto repozitáře.
 1. Instalace databáze a objektového úložiště. Tyto služby lze snadno připravit např. pomocí nástroje docker-compose. 
-Poskytnutý docker-compose není zamýšlen k použití na produkčním prostředí a jeho hlavním účelem je usnadnit příppravu vývojářského prostředí.
-   1. Spuštění docker-compose: `docker-compose up`.
-   1. Službu MinIO je nutné dodatečně nastavit prostřednictvím administračního rozhraní dostupného na adrese `http://localhost:9001`. Přístupové údaje jsou uvedeny v souboru `docker-compose.yaml`.
-   1. Nejdříve je třeba vytvořit přístupové klíče, které budou použity v konfiguračním souboru.
-   1. Následně musíme vytvořit nový bucket s libovolným názvem.
-   1. Vytvořený bucket je třeba dodatečně nastavit tak, aby byl veřejně dostupný. Tohoto lze docílit pomocí následujíchc příkazů v terminálu MinIO:
-         
-      ```bash
-         # nastavení přístupu: mc policy set {policy} {host}/{bucket}
-         mc policy set public local/mybucket
-      ```
-   1. Databáze PostgreSQL by neměla vyžadovat žádnou dodatečnou konfiguraci.
+Připravený docker-compose.yaml není zamýšlen k použití na produkčním prostředí a jeho hlavním účelem je usnadnit přípravu vývojářského prostředí.
+
+   Spuštění docker-compose: 
+    ```bash
+    docker-compose up
+    ```
       
 1. Vytvoření a nastavení konfiguračního souboru `PujcovadloServer/appsettings.json`.
    1. Lze využít ukázkový konfigurační soubor `PujcovadloServer/appsettings.example.json`.
    1. Konfigurace databáze pomocí `ConnectionStrings:DefaultConnection`. Ukázková konfigurační soubor obsahuje požadovaný formát.
    Více k pravidlům pro konfiguraci databáze viz [dokumentace](https://learn.microsoft.com/en-us/ef/core/miscellaneous/connection-strings).
    1. Konfigurace `JWT.Secret` pro vydávání JWT tokenů.
-   1. Konfigurace `MinIO` pro připojení k MinIO serveru.
+   1. Konfigurace `MinIO` pro připojení k MinIO instanci.
    1. Konfigurace `Syncfusion` a zadání licenčního klíče. 
-   
-1. Vytvoření databáze a její konfigurace v souboru `PujcovadloServer/appsettings.json`
+
 1. Instalace databáze `dotnet ef database update`
 1. Spuštění aplikace `dotnet run`
 
@@ -66,11 +59,11 @@ dotnet test Tests
 
 ### Funkční testy
 Spuštění funkčních testů vyžaduje spuštěnou instanci databáze. 
-Úložiště MinIO není vyžadováno, protože funkční testy obsahují simulové úložiště.
-Testovací databáze je definována v rámci `docker-compose.yaml` nebo ji lze vytvořit příkazem `create_test_db.sh`.
+Úložiště MinIO není vyžadováno, protože funkční testy využívají simulové úložiště.
+Testovací databáze je připravena v `docker-compose.yaml` jako služba `db_test` nebo ji lze vytvořit příkazem v souboru `create_test_db.sh`.
 
 Konfigurace testovacího prostředí je možná v souboru `PujcovadloServer/testappsettings.json`. 
-Nejsnadnější možností vytvoření testovací konfigurace je zkopírovat `PujcovadloServer/appsettings.json`, kde stačí změnit připojení k databázi tak, aby byla použita testovací databáze.
+Testovací konfigurace je možné vytvořit zkopírováním `PujcovadloServer/appsettings.json`, kde stačí změnit připojení k databázi tak, aby byla použita testovací databáze.
 
 Spuštění funkčních testů:
 ```bash

@@ -1,7 +1,6 @@
 version: '3'
 services:
-
-  pujcovadlo_minio:
+  minio:
     image: quay.io/minio/minio
     command: server /data --console-address ":9001"
     ports:
@@ -11,11 +10,23 @@ services:
     #volumes:
       #- /mypath/miniodata:/data
     environment:
-      MINIO_ROOT_USER: root
-      MINIO_ROOT_PASSWORD: password
+      - "MINIO_ROOT_USER=minio_root"
+      - "MINIO_ROOT_PASSWORD=MinioPassword"
 
     # Important: Minio has to be public accessible
-    
+  createbuckets:
+    image: minio/mc
+    depends_on:
+      - minio
+    # Try to add the host until it is available
+    # Create a bucket for images
+    # Set the bucket to public
+    entrypoint: >
+      /bin/sh -c "
+      until (/usr/bin/mc config host add myminio http://minio:9000 minio_root MinioPassword) do echo '...waiting...' && sleep 1; done; 
+      /usr/bin/mc mb myminio/images;
+      /usr/bin/mc anonymous set public myminio/images;
+      "
   db:
     #image: postgres
     image: pujcovadlo/postgres # Custom Postgres image with encoding set to UTF-8 and postgis extension
@@ -35,15 +46,9 @@ services:
       
       PGDATA: /var/lib/postgresql/data/pgdata
     ports: 
-      - 5432:5432
-
-  adminer:
-    image: adminer
-    restart: always
-    ports:
-      - 8080:8080
-
-  test_db:
+      - "5432:5432"
+  
+  db_test:
     #image: postgres
     image: pujcovadlo/postgres # Custom Postgres image with encoding set to UTF-8 and postgis extension
     build:
@@ -52,7 +57,7 @@ services:
     restart: always
     # set shared memory limit when using docker-compose
     shm_size: 128mb  # or set shared memory limit when deploy via swarm stack
-      # Save data on local volume
+    # Save data on local volume
     #volumes:
     #- /mypath/postgresdata:/var/lib/postgresql/data
     environment:
@@ -62,4 +67,11 @@ services:
 
       PGDATA: /var/lib/postgresql/data/pgdata
     ports:
-      - 8032:5432
+      - "8032:5432"
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "8080:8080"
+        
