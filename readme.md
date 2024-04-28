@@ -34,8 +34,8 @@ Připravený docker-compose.yaml není zamýšlen k použití na produkčním pr
    1. Konfigurace `MinIO` pro připojení k MinIO instanci.
    1. Konfigurace `Syncfusion` a zadání licenčního klíče. 
 
-1. Instalace databáze `dotnet ef database update`
-1. Spuštění aplikace `dotnet run`
+1. Instalace databáze: `dotnet ef database update`
+1. Spuštění aplikace: `dotnet run`
 
 ## Ngrok
 Pro vzdálený přístup k aplikaci lze využít nástroj Ngrok, který umožňuje vytvořit veřejnou URL adresu pro přístup k aplikaci. 
